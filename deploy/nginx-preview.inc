@@ -1,0 +1,48 @@
+location = /qrveo {
+    absolute_redirect off;
+    return 302 /qrveo/;
+}
+
+location = /qrveo-live {
+    absolute_redirect off;
+    return 302 /qrveo-live/__qrveo/console/;
+}
+
+location ^~ /qrveo-live/ {
+    proxy_pass http://127.0.0.1:32984;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Connection "";
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_connect_timeout 5s;
+    proxy_read_timeout 60s;
+    proxy_buffering off;
+    proxy_cache off;
+    add_header Cache-Control "no-store" always;
+    add_header X-Robots-Tag "noindex, nofollow" always;
+}
+
+location ^~ /qrveo/ {
+    root /var/www/qrveo-preview/current;
+    index index.html;
+    absolute_redirect off;
+    charset utf-8;
+    types {
+        text/html html;
+        text/css css;
+        application/javascript js mjs;
+        application/json json;
+        application/xml xml;
+        image/svg+xml svg;
+        image/webp webp;
+        image/jpeg jpg jpeg;
+        image/png png;
+        video/mp4 mp4;
+        font/woff2 woff2;
+    }
+    add_header Cache-Control "no-cache" always;
+    add_header X-Robots-Tag "noindex, nofollow" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    try_files $uri $uri/ =404;
+}

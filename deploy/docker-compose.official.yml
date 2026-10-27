@@ -1,0 +1,36 @@
+# 把下面两段合并进后台安装包的 private-deploy/docker-compose/docker-compose.yml：
+# 1）official 换成新官网镜像，并挂上共享目录；2）（可选）加上编辑入口。
+# 其余服务（api、admin、front……）不用动。
+
+services:
+  official:
+    image: vod-private/mexico-official:qrveo-2
+    restart: unless-stopped
+    environment:
+      DEPLOY_MODE: private
+      VOD_API_HOST: ${API_HOST:-http://127.0.0.1:30015}
+      VOD_ADMIN_DOMAIN: ${ADMIN_URL:-http://127.0.0.1:30081}
+      VOD_WATCH_DOMAIN: ${FRONT_END_URL:-http://127.0.0.1:30112}
+    ports:
+      - "30082:80"
+    volumes:
+      - official-site:/usr/share/nginx/html
+
+  # 可选：网站编辑入口。只在内网或需要时开放端口，并务必设置密码。
+  official-editor:
+    image: vod-private/qrveo-site-editor:qrveo-2
+    restart: unless-stopped
+    environment:
+      EDITOR_PASSWORD: ${OFFICIAL_EDITOR_PASSWORD:?请在 .env 里设置 OFFICIAL_EDITOR_PASSWORD}
+      SITE_ORIGIN: ${OFFICIAL_SITE_ORIGIN:-https://www.qrveo.com}
+      SITE_WATCH: ${FRONT_END_URL:-https://v.qrveo.com}
+      SITE_PREVIEW_URL: ${OFFICIAL_SITE_ORIGIN:-https://www.qrveo.com}/mexico/
+    ports:
+      - "127.0.0.1:30083:4322"
+    volumes:
+      - official-site:/site-dist
+      - official-content:/app/content
+
+volumes:
+  official-site:
+  official-content:

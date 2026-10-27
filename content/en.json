@@ -1,0 +1,1060 @@
+{
+  "meta": {
+    "title": "QRveo · QR codes that open your video instantly",
+    "description": "Upload a video, download its QR code and put it on your product, book, machine or packaging. It plays on any phone, no app needed. Change the video anytime: the QR stays the same. 7 days free.",
+    "ogTitle": "Print the QR once. Change the video anytime.",
+    "ogDescription": "QR codes that open your video on any phone, with no app and no ads. Try it free for 7 days."
+  },
+  "brand": {
+    "poweredBy": "Powered by POLYV video technology"
+  },
+  "contact": {
+    "whatsappText": "Hi, I'd like to learn more about QRveo.",
+    "hours": "Monday to Friday, 9:00 a.m. to 6:00 p.m. (Central Mexico time)"
+  },
+  "header": {
+    "nav": [
+      {
+        "label": "Features"
+      },
+      {
+        "label": "Solutions"
+      },
+      {
+        "label": "Examples"
+      },
+      {
+        "label": "Pricing"
+      },
+      {
+        "label": "Help"
+      }
+    ],
+    "menuAll": "See all solutions",
+    "login": "Log in",
+    "cta": "Try it free",
+    "menuOpen": "Menu"
+  },
+  "home": {
+    "hero": {
+      "kicker": "QR code video for businesses",
+      "title": "Print the QR once. *Change the video* anytime.",
+      "lead": "Upload a video, download its QR code and put it on your product, book, machine or packaging. Anyone who scans it watches it instantly on their phone, no app needed.",
+      "ctaPrimary": "Try it free for 7 days",
+      "ctaSecondary": "See examples",
+      "note": "No card required. Your account is ready in 2 minutes.",
+      "waLink": "Questions? Message us on WhatsApp",
+      "playFilm": "Watch the video",
+      "filmLength": "21 s",
+      "replay": "Watch again",
+      "skip": "Skip",
+      "scanHint": "Scan it with your phone",
+      "tapHint": "Tap the label",
+      "filmCaption": "Example: a store that sells exercise bikes put the QR on the box.",
+      "endCard": {
+        "line1": "Answer once.",
+        "line2": "The video does it every day.",
+        "cta1": "Try it",
+        "cta2": "7 days free",
+        "note1": "No card needed.",
+        "note2": "We help you on WhatsApp.",
+        "sticker1": "SCAN TO SEE",
+        "sticker2": "HOW IT WORKS"
+      }
+    },
+    "proof": [
+      {
+        "k": "No app",
+        "v": "Opens in the phone's browser"
+      },
+      {
+        "k": "No ads",
+        "v": "Only your video plays"
+      },
+      {
+        "k": "Unlimited QRs",
+        "v": "One per video, at no extra cost"
+      },
+      {
+        "k": "CFDI invoice",
+        "v": "Prices in pesos, VAT (IVA) included"
+      }
+    ],
+    "uses": {
+      "label": "Solutions",
+      "title": "One QR, many uses.",
+      "intro": "Anything that's easier to understand on video than on paper.",
+      "more": "See how it works"
+    },
+    "how": {
+      "label": "How it works",
+      "title": "Three steps and you're done.",
+      "intro": "No designer, no developer, and no asking anyone to install anything.",
+      "items": [
+        {
+          "title": "Upload your video",
+          "text": "Drag it from your computer (up to 2 GB per file). In a few minutes it's ready to play on any phone.",
+          "alt": "Video list in the QRveo dashboard"
+        },
+        {
+          "title": "Download your QR",
+          "text": "Every video gets its own code. Pick the style and colors, and put your logo in the center.",
+          "alt": "QR code generator with styles, colors and logo"
+        },
+        {
+          "title": "Put it where people will see it",
+          "text": "On the box, the label, the book, the machine or a poster. You can also send the link on WhatsApp.",
+          "alt": "QR code label stuck on a box"
+        }
+      ],
+      "more": "See all features"
+    },
+    "replace": {
+      "label": "The key part",
+      "title": "Changed the video? *The QR stays the same.*",
+      "text": "Replace the video from your dashboard and the same code shows the new version. Everything you already printed keeps working: no reprinting boxes, books or labels. Your stats keep adding up.",
+      "points": [
+        "Fix a mistake without throwing out packaging",
+        "Change the promotion every season",
+        "Update training whenever the process changes"
+      ],
+      "alt": "QRveo video replacement window: the QR, link and embed code don't change"
+    },
+    "example": {
+      "label": "Examples",
+      "title": "Scan it the way your customer would.",
+      "intro": "Demo videos published on QRveo. Point your phone's camera at the code.",
+      "more": "See all examples"
+    },
+    "panel": {
+      "label": "Your dashboard",
+      "title": "Everything in one place.",
+      "intro": "Organize your videos in folders, search them by name and change whatever you need, right from your computer.",
+      "alt": "QRveo dashboard video list, organized in folders",
+      "points": [
+        {
+          "k": "Folders",
+          "v": "A place for each product, subject, plant or campaign."
+        },
+        {
+          "k": "Stats",
+          "v": "Views and most-watched videos."
+        },
+        {
+          "k": "Team",
+          "v": "Accounts for your team members."
+        }
+      ]
+    },
+    "pricing": {
+      "label": "Pricing",
+      "title": "Start free. Pay only if it works for you.",
+      "text": "7 days free, no card required. After that, annual plans in pesos with VAT (IVA) included. We issue invoices (CFDI).",
+      "from": "Plans from",
+      "fromPrice": "$1,399 MXN a year",
+      "cta": "See plans and pricing"
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "What people ask us most.",
+      "pick": [
+        "clientes-app",
+        "cambiar-video",
+        "no-renuevo",
+        "celulares"
+      ],
+      "more": "See all questions"
+    }
+  },
+  "final": {
+    "title": "Make your first QR today.",
+    "text": "Create your account, upload a video and scan it yourself. If you get stuck, we'll help you on WhatsApp.",
+    "cta": "Try it free for 7 days",
+    "whatsapp": "Message us on WhatsApp"
+  },
+  "solutionsPage": {
+    "title": "Solutions",
+    "lead": "The same QR can explain a product, a lesson, a process or a recipe. Pick yours.",
+    "seoTitle": "Solutions · Video QR codes for products, schools, training and marketing",
+    "other": "Have a different use case? If it's easier to explain on video, it works. Message us and we'll tell you how others do it.",
+    "chatTitle": "Sound familiar?"
+  },
+  "solutions": [
+    {
+      "name": "Products and after-sales",
+      "short": "Assembly, installation and first use, right on the box.",
+      "who": "For importers, brands and online stores",
+      "alt": "A person opens a freshly delivered cardboard box",
+      "title": "Your customer sees *how to assemble it* before messaging you.",
+      "lead": "Put a QR on the box or in the manual. Your customer scans it and watches the assembly, installation or first-use video on their phone.",
+      "pains": [
+        {
+          "k": "The same questions on WhatsApp",
+          "v": "“How do I put it together?” “Where does this screw go?” You answer the same thing every day."
+        },
+        {
+          "k": "Returns that weren't defects",
+          "v": "The product worked; the customer couldn't figure out how to install it and sent it back."
+        },
+        {
+          "k": "Manuals nobody reads",
+          "v": "Tiny drawings, the supplier's translation and zero patience from the customer."
+        }
+      ],
+      "usesTitle": "Where it's used",
+      "uses": [
+        "Furniture, bikes and gym equipment assembled at home",
+        "Appliances and tools: installation and first use",
+        "Beauty and personal care: how to apply it",
+        "Mercado Libre, Amazon or your own store: send the link in the delivery message"
+      ],
+      "featuresTitle": "What helps",
+      "features": [
+        {
+          "k": "One QR per model",
+          "v": "Create as many as you need, at no extra cost."
+        },
+        {
+          "k": "Fix it without reprinting",
+          "v": "If the supplier changes a part, you change the video. Boxes already printed keep working."
+        },
+        {
+          "k": "Your logo on the QR",
+          "v": "Pick colors and put your logo in the center of the code."
+        }
+      ],
+      "note": "The QR complements your printed manual and warranty; it doesn't replace them.",
+      "chatName": "Customers",
+      "chat": [
+        "How do I put the bike together?",
+        "Where does this screw go? 😩",
+        "It's not working, I want to return it"
+      ]
+    },
+    {
+      "name": "Education",
+      "short": "The video explanation, right next to the exercise.",
+      "who": "For schools, teachers, publishers and academies",
+      "alt": "A mom helps her daughter with homework at home",
+      "title": "The book explains. *The QR shows* how it's done.",
+      "lead": "Put a QR next to each topic, exercise or lab. The student, or their mom or dad, scans it and watches the explanation on the family phone.",
+      "pains": [
+        {
+          "k": "Homework gets stuck at home",
+          "v": "It was clear in class; at home nobody remembers how to do it."
+        },
+        {
+          "k": "Too many platforms",
+          "v": "Every app asks for an account and password. Many families get left out."
+        },
+        {
+          "k": "Reprinting is expensive",
+          "v": "If one explanation changes, you don't want to redo the whole book."
+        }
+      ],
+      "usesTitle": "Where it's used",
+      "uses": [
+        "Textbooks, workbooks and study guides",
+        "Homework sheets and notes for parents",
+        "Lab and workshop activities",
+        "Courses and academies: one QR per lesson"
+      ],
+      "featuresTitle": "What helps",
+      "features": [
+        {
+          "k": "No accounts, no app",
+          "v": "Opens in any phone's browser, including budget phones."
+        },
+        {
+          "k": "One playlist per unit",
+          "v": "Group several videos into a series and share a single QR."
+        },
+        {
+          "k": "Optional password",
+          "v": "Protect a video so only your students can watch it."
+        }
+      ],
+      "chatName": "Parents' group chat",
+      "chat": [
+        "Teacher, how do you do exercise 3?",
+        "My son didn't get fractions 😕",
+        "Do we have to download another app?"
+      ]
+    },
+    {
+      "name": "Training and operations",
+      "short": "The procedure on video, right next to the machine.",
+      "who": "For factories, restaurants, stores and franchises",
+      "alt": "A worker's hands assembling a circuit board",
+      "title": "The procedure, *right where it's needed.*",
+      "lead": "Stick a QR on the machine, the workstation or in the kitchen. Everyone sees how it's done on their phone, right when they need it.",
+      "pains": [
+        {
+          "k": "You repeat the same training",
+          "v": "Every new hire needs someone to stop what they're doing to teach them."
+        },
+        {
+          "k": "The manual is in the office",
+          "v": "Questions come up on the line, on the night shift, far from the supervisor."
+        },
+        {
+          "k": "Every shift does it differently",
+          "v": "Without a reference at hand, the process changes from person to person."
+        }
+      ],
+      "usesTitle": "Where it's used",
+      "uses": [
+        "Machine startup, cleaning and part changes",
+        "Recipes and plating in kitchens and franchises",
+        "Health and safety: protective equipment and protocols",
+        "Store opening and closing"
+      ],
+      "featuresTitle": "What helps",
+      "features": [
+        {
+          "k": "Private videos",
+          "v": "Add a password so only your staff can watch them."
+        },
+        {
+          "k": "Always the current version",
+          "v": "The process changes, you change the video. The QR on the machine stays the same."
+        },
+        {
+          "k": "Folders by area",
+          "v": "Organize by plant, line or location."
+        }
+      ],
+      "chatName": "Night shift",
+      "chat": [
+        "Anyone know how to calibrate station 3?",
+        "Supervisor's not here 😬",
+        "Should I just do it like the morning shift?"
+      ]
+    },
+    {
+      "name": "Packaging and marketing",
+      "short": "Recipes, demos and promotions on the packaging.",
+      "who": "For consumer brands, agencies and retail",
+      "alt": "Two shoppers look at a product in a supermarket aisle",
+      "title": "Packaging is printed once. *The campaign changes* whenever you want.",
+      "lead": "Put a QR on the packaging, display or poster. Show a recipe, a demo or this month's promotion, and change it without reprinting.",
+      "pains": [
+        {
+          "k": "Packaging outlasts the campaign",
+          "v": "You print thousands of units and the promotion ends in a month."
+        },
+        {
+          "k": "No room to explain",
+          "v": "A label can't fit how to prepare it or why your product is different."
+        },
+        {
+          "k": "YouTube is a distraction",
+          "v": "When your video ends, your competitors' videos show up."
+        }
+      ],
+      "usesTitle": "Where it's used",
+      "uses": [
+        "Recipes on food packaging",
+        "Demos on in-store displays",
+        "Flyers, posters and event booths",
+        "Wine, coffee or artisanal product labels: the story behind the product"
+      ],
+      "featuresTitle": "What helps",
+      "features": [
+        {
+          "k": "Change the campaign without reprinting",
+          "v": "The same QR shows the new recipe or promotion."
+        },
+        {
+          "k": "No ads or other brands' videos",
+          "v": "Only your content plays."
+        },
+        {
+          "k": "Measure what happens",
+          "v": "See how many times each video was watched."
+        }
+      ],
+      "chatName": "Brand team",
+      "chat": [
+        "The promo's over and the packaging still says the same thing",
+        "Are we reprinting 100,000 boxes? 😳",
+        "The YouTube video ends with our competitors' ads"
+      ]
+    }
+  ],
+  "examplesPage": {
+    "title": "Examples",
+    "lead": "Demo videos published on QRveo. Scan the code with your phone and you'll see exactly what anyone who scans it sees.",
+    "seoTitle": "Video QR code examples",
+    "scan": "Scan it with your phone",
+    "open": "Open on this screen"
+  },
+  "examples": [
+    {
+      "title": "Exercise bike assembly",
+      "place": "QR on the box",
+      "text": "A gym equipment store stuck the QR on the box. The customer watches the assembly in 3 steps."
+    },
+    {
+      "title": "Lesson: equivalent fractions",
+      "place": "QR in the book, next to the lesson",
+      "text": "A school put a QR next to each lesson in the workbook."
+    },
+    {
+      "title": "Station 3: board inspection",
+      "place": "QR at the workstation",
+      "text": "An assembly plant stuck a QR on each station with the current procedure."
+    },
+    {
+      "title": "Recipe: homemade bread",
+      "place": "QR on the flour bag",
+      "text": "A flour brand changes the QR's recipe every season, with the same packaging."
+    }
+  ],
+  "features": {
+    "title": "Features",
+    "lead": "Everything you need for a QR code to open your video.",
+    "seoTitle": "Features · Upload videos, create QR codes and track views",
+    "blocks": [
+      {
+        "label": "Upload",
+        "title": "Upload the video you already have.",
+        "text": "Drag in the video you already have, up to 2 GB per file. QRveo converts it to look great on any phone, in several quality levels, and creates a thumbnail.",
+        "points": [
+          "Upload several videos at once",
+          "Quality from 360p to 1080p",
+          "Automatic thumbnail"
+        ],
+        "alt": "List of uploaded videos in the dashboard",
+        "cursor": {
+          "tip": "Upload video"
+        }
+      },
+      {
+        "label": "QR code",
+        "title": "A QR with your style.",
+        "text": "Every video has its own code. Choose from several styles, change the colors, put your logo in the center and add text. Download it ready to print.",
+        "points": [
+          "5 code styles",
+          "Your colors and logo",
+          "PNG download, regular or large size"
+        ],
+        "alt": "QR code generator with styles and colors",
+        "cursor": {
+          "tip": "Save QR code"
+        }
+      },
+      {
+        "label": "Replace",
+        "title": "Change the video. The QR doesn't change.",
+        "text": "Upload a new version over the same video. The code, the link and the embed code stay the same, and your stats keep adding up.",
+        "points": [
+          "No reprinting",
+          "Same link on WhatsApp and social media",
+          "Views don't reset"
+        ],
+        "alt": "Video replacement window",
+        "cursor": {
+          "tip": "Upload replacement video"
+        }
+      },
+      {
+        "label": "Video page",
+        "title": "Plays on any phone. No app.",
+        "text": "When scanned, a lightweight page opens in the browser with your video and its title. No sign-up, no ads and no other brands' videos at the end.",
+        "points": [
+          "Any phone, Android or iPhone",
+          "Full screen",
+          "No ads or suggested videos"
+        ],
+        "alt": "Video page open on a phone"
+      },
+      {
+        "label": "Privacy",
+        "title": "You decide who watches.",
+        "text": "Add a password to a video so only your staff or students can watch it. If you embed it on your site, choose which domains it can play on.",
+        "points": [
+          "Password per video",
+          "Allowed domains list"
+        ],
+        "alt": "Video password settings",
+        "cursor": {
+          "tip": "Password required"
+        }
+      }
+    ],
+    "more": {
+      "title": "And more",
+      "items": [
+        {
+          "k": "Several videos, one QR",
+          "v": "Group a unit's lessons or a product line's models into a series."
+        },
+        {
+          "k": "Stats",
+          "v": "Daily views and your most-watched videos."
+        },
+        {
+          "k": "Embed it on your site",
+          "v": "Code to add the player to your store or website."
+        },
+        {
+          "k": "Folders",
+          "v": "Organize by product, subject, plant or location."
+        },
+        {
+          "k": "Team accounts",
+          "v": "Give your team members access."
+        },
+        {
+          "k": "Usage alerts",
+          "v": "We email you at 80% and 95% of your plan."
+        }
+      ]
+    },
+    "swap": {
+      "qrCaption": "The same QR",
+      "items": [
+        {
+          "label": "Product",
+          "title": "BF-20 exercise bike · Assembly"
+        },
+        {
+          "label": "School",
+          "title": "Equivalent fractions · Lesson 4"
+        },
+        {
+          "label": "Plant",
+          "title": "Station 3 · Board inspection"
+        },
+        {
+          "label": "Packaging",
+          "title": "Homemade bread in 4 steps"
+        }
+      ],
+      "note": "You change the video; the printed code doesn't change."
+    }
+  },
+  "pricing": {
+    "title": "Clear pricing, in pesos.",
+    "lead": "Start free for 7 days, no card required. If it works for you, choose an annual plan. All prices include VAT (IVA).",
+    "seoTitle": "Pricing · QRveo plans in Mexican pesos, VAT included",
+    "plans": [
+      {
+        "name": "Free trial",
+        "for": "To try it with your first videos",
+        "price": "$0",
+        "unit": "7 days",
+        "monthly": "No card required",
+        "cta": "Create free account"
+      },
+      {
+        "name": "Standard",
+        "for": "For a business with several products, courses or departments",
+        "price": "$1,399",
+        "unit": "MXN a year",
+        "monthly": "VAT included · About $117 a month",
+        "cta": "Start with Standard",
+        "badge": "Most popular"
+      },
+      {
+        "name": "Premium",
+        "for": "For brands and schools with large audiences",
+        "price": "$3,999",
+        "unit": "MXN a year",
+        "monthly": "VAT included · About $333 a month",
+        "cta": "Start with Premium"
+      }
+    ],
+    "compareTitle": "Compare plans",
+    "rows": [
+      {
+        "k": "Video storage",
+        "v": [
+          "5 GB",
+          "60 GB",
+          "500 GB"
+        ]
+      },
+      {
+        "k": "Views per month (approx.)",
+        "v": [
+          "370 to 660",
+          "4,500 to 8,000",
+          "31,000 to 56,000"
+        ]
+      },
+      {
+        "k": "QR codes",
+        "v": [
+          "Unlimited",
+          "Unlimited",
+          "Unlimited"
+        ]
+      },
+      {
+        "k": "Replace video without changing the QR",
+        "v": [
+          "Yes",
+          "Yes",
+          "Yes"
+        ]
+      },
+      {
+        "k": "QR with your logo and colors",
+        "v": [
+          "Yes",
+          "Yes",
+          "Yes"
+        ]
+      },
+      {
+        "k": "Password per video",
+        "v": [
+          "Yes",
+          "Yes",
+          "Yes"
+        ]
+      },
+      {
+        "k": "Stats",
+        "v": [
+          "Yes",
+          "Yes",
+          "Yes"
+        ]
+      },
+      {
+        "k": "Ads",
+        "v": [
+          "None",
+          "None",
+          "None"
+        ]
+      },
+      {
+        "k": "Your brand on the video page",
+        "v": [
+          "—",
+          "Yes",
+          "Yes"
+        ]
+      },
+      {
+        "k": "Quality",
+        "v": [
+          "HD",
+          "HD and UHD",
+          "HD and UHD"
+        ]
+      },
+      {
+        "k": "WhatsApp support",
+        "v": [
+          "Yes",
+          "Yes",
+          "Yes"
+        ]
+      }
+    ],
+    "estimate": "Estimated views based on short HD videos. “Your brand on the page”: hide or change the footer branding.",
+    "terms": [
+      {
+        "k": "What if I don't renew?",
+        "v": "You won't be able to upload or edit videos, but the QRs you already printed keep working."
+      },
+      {
+        "k": "How do I pay?",
+        "v": "By credit or debit card. If you need to pay by bank transfer, message us."
+      },
+      {
+        "k": "Do you issue invoices?",
+        "v": "Yes, we issue invoices (CFDI). Request one with your tax details after paying."
+      },
+      {
+        "k": "What if I run short?",
+        "v": "We email you at 80% and 95% of your plan so you can upgrade in time."
+      }
+    ],
+    "enterprise": {
+      "title": "Does your company need more?",
+      "text": "High volumes, multiple brands or installation on your own servers. Tell us about your case and we'll send you a proposal.",
+      "cta": "Talk to sales"
+    },
+    "estimator": {
+      "title": "Which plan is right for you?",
+      "q": "How many times a month do you think your videos will be watched?",
+      "unit": "views per month",
+      "results": [
+        {
+          "text": "Standard is enough for you."
+        },
+        {
+          "text": "Premium is your best fit."
+        },
+        {
+          "text": "For that volume, let's talk about a custom plan."
+        }
+      ],
+      "note": "Estimate based on short HD videos. You can switch plans whenever you need."
+    }
+  },
+  "help": {
+    "title": "Help",
+    "lead": "Short answers to what people ask us most. Don't see your question? Message us on WhatsApp.",
+    "seoTitle": "Help · QRveo FAQ",
+    "groups": [
+      {
+        "title": "Getting started",
+        "items": [
+          {
+            "q": "What is QRveo?",
+            "a": "A service that makes a QR code open your video instantly. You upload the video, download its QR and put it wherever you want. Anyone who scans it watches it on their phone."
+          },
+          {
+            "q": "Who makes the videos?",
+            "a": "You do. It can be the video your supplier gave you, one you shot on your phone or one you already have on social media. If you get stuck, message us."
+          },
+          {
+            "q": "How long until I have my first QR?",
+            "a": "A few minutes: you create your account, upload the video and download the code once it finishes processing."
+          }
+        ]
+      },
+      {
+        "title": "For people scanning",
+        "items": [
+          {
+            "q": "Do people scanning need to download an app or sign up?",
+            "a": "No. They open the phone's camera, scan the code and the video plays in the browser. No app, no sign-up and no password (unless you add one)."
+          },
+          {
+            "q": "Does it work on any phone?",
+            "a": "Yes, on almost any phone with a camera and a browser, Android or iPhone, including budget phones."
+          },
+          {
+            "q": "Are there ads in the videos?",
+            "a": "No. Only your video plays, and no other brands' videos appear at the end."
+          }
+        ]
+      },
+      {
+        "title": "Videos and QR codes",
+        "items": [
+          {
+            "q": "Can I change the video without reprinting the QR?",
+            "a": "Yes. Replace the video in your dashboard and the same code shows the new version. Everything you already printed keeps working."
+          },
+          {
+            "q": "Do you charge per QR?",
+            "a": "No. You can create as many QRs as you need. Plans are based on storage and views per month."
+          },
+          {
+            "q": "How many videos fit in my plan?",
+            "a": "It depends on length. As a reference, a 3-minute HD video takes up about 100 MB: Standard (60 GB) fits hundreds."
+          },
+          {
+            "q": "My video is in another language. Will it work?",
+            "a": "Yes, you can upload it as is. If you want Spanish subtitles, it's best to add them to the video before uploading."
+          },
+          {
+            "q": "Does the QR replace my printed manual?",
+            "a": "No, it complements it. Keep your printed manual and warranty, and add the QR to show how it's done."
+          }
+        ]
+      },
+      {
+        "title": "Plans and payments",
+        "items": [
+          {
+            "q": "What happens to my QRs if I don't renew?",
+            "a": "You won't be able to upload or edit videos, but the QRs you already printed keep working."
+          },
+          {
+            "q": "What happens if I run out of views for the month?",
+            "a": "We email you when you've used 80% and 95% of your plan, so you can upgrade in time."
+          },
+          {
+            "q": "How do I pay?",
+            "a": "By credit or debit card. If you need to pay by bank transfer, message us."
+          },
+          {
+            "q": "Do you issue invoices?",
+            "a": "Yes, we issue invoices (CFDI)."
+          }
+        ]
+      },
+      {
+        "title": "Privacy and branding",
+        "items": [
+          {
+            "q": "Can I make a video viewable only by my team?",
+            "a": "Yes. Add a password to the video and share it only with the people who should see it."
+          },
+          {
+            "q": "Can I put my brand on the video page?",
+            "a": "On the Standard and Premium plans you can hide or change the footer branding. On every plan you can put your logo on the QR code."
+          }
+        ]
+      }
+    ],
+    "searchLabel": "Search your question",
+    "searchPlaceholder": "E.g. invoice, password, reprint…",
+    "empty": "We couldn't find that question. Message us on WhatsApp and we'll answer."
+  },
+  "contactPage": {
+    "title": "Let's talk.",
+    "lead": "Tell us what you want to explain on video and we'll tell you how to do it. We reply on WhatsApp during business hours.",
+    "seoTitle": "Contact · QRveo",
+    "formTitle": "Message us on WhatsApp",
+    "formNote": "When you send, WhatsApp opens with your message ready. We don't store this data on the site.",
+    "fields": {
+      "name": "Your name",
+      "company": "Company or school",
+      "use": "What do you want to use it for?",
+      "message": "Message (optional)"
+    },
+    "useOptions": [
+      "Products and after-sales",
+      "Education",
+      "Training and operations",
+      "Packaging and marketing",
+      "Other"
+    ],
+    "send": "Open WhatsApp",
+    "channels": "Other ways to reach us",
+    "company": "Company details",
+    "previewTitle": "Here's how your message will look",
+    "previewName": "QRveo"
+  },
+  "about": {
+    "title": "Video that explains, for businesses with no time to explain the same thing twice.",
+    "seoTitle": "About us · QRveo",
+    "lead": "Lots of questions can be answered with a one-minute video. The hard part is getting it to the right person, at the right moment, without asking them to install anything. That's why QRveo exists.",
+    "blocks": [
+      {
+        "k": "What we do",
+        "v": "A simple service that lets any business in Mexico put up a QR code that opens its video, with no coding and no one having to install anything."
+      },
+      {
+        "k": "The technology",
+        "v": "QRveo runs on the POLYV video platform, which processes and streams video for companies and schools. We make it easy to use for businesses in Mexico, with prices in pesos."
+      },
+      {
+        "k": "How we work",
+        "v": "Clear prices with VAT (IVA) included, CFDI invoices, no ads on your videos and WhatsApp support during your business hours."
+      }
+    ],
+    "flowTitle": "How it works, start to finish",
+    "flow": [
+      {
+        "k": "You upload the video",
+        "v": "The one you already have."
+      },
+      {
+        "k": "You download the QR",
+        "v": "With your logo and colors."
+      },
+      {
+        "k": "You put it where it's needed",
+        "v": "Box, book, machine or packaging."
+      },
+      {
+        "k": "People scan it",
+        "v": "It plays instantly, no app."
+      },
+      {
+        "k": "You change the video",
+        "v": "The printed QR stays the same."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "QR codes that open your video instantly, on any phone.",
+    "groups": [
+      {
+        "title": "Product",
+        "links": [
+          {
+            "label": "Features"
+          },
+          {
+            "label": "Pricing"
+          },
+          {
+            "label": "Examples"
+          }
+        ]
+      },
+      {
+        "title": "Solutions",
+        "links": [
+          {
+            "label": "Products and after-sales"
+          },
+          {
+            "label": "Education"
+          },
+          {
+            "label": "Training"
+          },
+          {
+            "label": "Packaging and marketing"
+          }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          {
+            "label": "About us"
+          },
+          {
+            "label": "Contact"
+          },
+          {
+            "label": "Help"
+          }
+        ]
+      },
+      {
+        "title": "Account",
+        "links": [
+          {
+            "label": "Create account"
+          },
+          {
+            "label": "Log in"
+          }
+        ]
+      }
+    ],
+    "legal": [
+      {
+        "label": "Privacy notice"
+      },
+      {
+        "label": "Terms and conditions"
+      }
+    ],
+    "rights": "© 2026 QRveo. All rights reserved."
+  },
+  "ui": {
+    "skip": "Skip to content",
+    "home": "home",
+    "navMain": "Main",
+    "proof": "The basics",
+    "filmAria": "21-second video",
+    "openDemo": "Open the sample video",
+    "phoneAlt": "Video page “{title}” on a phone",
+    "contact": "Contact",
+    "about": "About us",
+    "others": "Other solutions",
+    "online": "online",
+    "onPage": "On this page",
+    "plans": "Plans",
+    "feature": "Feature",
+    "yes": "Yes",
+    "termsTitle": "Good to know",
+    "enterpriseWa": "Hi, I'd like a QRveo proposal for my company.",
+    "topics": "Topics",
+    "notFound": "Didn't find your answer?",
+    "nameRequired": "Enter your name.",
+    "hours": "Hours",
+    "company": "Company",
+    "address": "Address",
+    "city": "City",
+    "waHello": "Hi, I'm {name}.",
+    "waHelloCo": "Hi, I'm {name} from {company}.",
+    "waUse": "I'm interested in QRveo for: {use}.",
+    "waNamePh": "(your name)",
+    "panel": "My dashboard",
+    "langMenu": "Choose your language",
+    "legalNote": "This document is only available in Spanish. The Spanish version is the legally binding one.",
+    "email": "Email",
+    "whatsapp": "WhatsApp"
+  },
+  "auth": {
+    "seoRegister": "Create account",
+    "seoLogin": "Log in",
+    "seoRecover": "Reset password",
+    "sideTitle": "Print the QR once. *Change the video* anytime.",
+    "sidePoints": [
+      "7 days free, no card required.",
+      "Opens on any phone, no app needed.",
+      "We help you in Spanish on WhatsApp."
+    ],
+    "register": {
+      "title": "Create your account",
+      "lead": "In two minutes you'll upload your first video and download its QR code.",
+      "name": "Name or company",
+      "namePh": "E.g. Lopez Hardware",
+      "emailPh": "you@company.com",
+      "code": "Verification code",
+      "codeSend": "Send code",
+      "codeWait": "Resend in {s} s",
+      "codeSent": "We sent a code to your email.",
+      "password": "Password",
+      "passwordHint": "8 to 16 characters, with letters and numbers.",
+      "show": "Show",
+      "hide": "Hide",
+      "consent": "I accept the {terms} and the {privacy}.",
+      "terms": "Terms and conditions",
+      "privacy": "Privacy notice",
+      "submit": "Create account",
+      "busy": "Creating your account…",
+      "done": "Done. Opening your dashboard…",
+      "have": "Already have an account?",
+      "loginLink": "Log in",
+      "planQ": "Not sure which plan is right for you?",
+      "planLink": "See pricing",
+      "email": "Email"
+    },
+    "login": {
+      "title": "Log in",
+      "lead": "Go to your dashboard to upload videos, download QR codes and see stats.",
+      "captcha": "Characters in the image",
+      "captchaNew": "New image",
+      "forgot": "Forgot your password?",
+      "submit": "Log in",
+      "busy": "Logging in…",
+      "done": "Done. Opening your dashboard…",
+      "no": "Don't have an account?",
+      "registerLink": "Create one free",
+      "already": "You're already logged in on this browser.",
+      "goPanel": "Go to my dashboard",
+      "logout": "Log out",
+      "loggedOut": "You've logged out."
+    },
+    "recover": {
+      "title": "Reset your password",
+      "lead": "Enter your account email and we'll send you a link to get back in.",
+      "submit": "Send link",
+      "busy": "Sending…",
+      "sent": "If that email has an account, you'll get the link in a few minutes. Check your spam folder too.",
+      "back": "Back to log in",
+      "resetTitle": "Your new password",
+      "resetBusy": "Generating your new password…",
+      "resetDone": "Here's your new password. Copy it, log in and change it from your dashboard.",
+      "resetFail": "The link is invalid or has expired. Request a new one.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "again": "Request another link"
+    },
+    "errors": {
+      "required": "Fill in this field.",
+      "password": "Password must be 8 to 16 characters, with letters and numbers.",
+      "consent": "To continue, accept the terms and privacy notice.",
+      "code": "Enter the code we sent you.",
+      "captcha": "Enter the characters in the image.",
+      "network": "We couldn't connect to the server. Check your internet connection and try again.",
+      "generic": "Something went wrong. Try again or message us on WhatsApp.",
+      "exists": "That email already has an account. Log in or reset your password.",
+      "credentials": "The email or password doesn't match.",
+      "captchaBad": "The characters don't match. Try a new image.",
+      "codeBad": "The code is incorrect or has expired.",
+      "tooMany": "Too many attempts. Wait a few minutes and try again.",
+      "email": "Enter a valid email."
+    }
+  }
+}

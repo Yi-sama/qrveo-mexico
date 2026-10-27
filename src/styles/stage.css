@@ -1,0 +1,324 @@
+/* 首页短片舞台 + 网页版落版 + 橙色二维码贴纸（沿用 v1，与短片最后一帧逐像素对齐） */
+.hero-film {
+  margin: 0;
+  display: grid;
+}
+.stage,
+.stage-controls {
+  grid-area: 1 / 1;
+}
+.film-cap {
+  grid-area: 2 / 1;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.film-cap span {
+  font: 600 12px var(--f-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-right: 6px;
+}
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: clamp(10px, 1.1vw, 18px);
+  background: #e9e3da;
+  isolation: isolate;
+  box-shadow: 0 30px 60px -40px rgba(20, 18, 16, 0.55);
+}
+/* 落版按 1920×1080 设计稿用 cqw 定位；手机上把这一层放大、裁成竖版海报 */
+.stage-inner {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+}
+.stage-film,
+.endcard {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.stage-film {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.endcard {
+  transition: opacity 0.35s;
+}
+/* 自动播放：脚本接手前先显示第一帧，避免落版闪一下 */
+.autoplay .stage:not([data-started]) .stage-film,
+.stage[data-state="playing"] .stage-film {
+  opacity: 1;
+}
+.autoplay .stage:not([data-started]) .endcard,
+.stage[data-state="playing"] .endcard {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 网页版落版：按 1920×1080 设计稿换算成容器宽度单位（cqw），与短片最后一帧逐像素对齐 */
+.ec-photo {
+  position: absolute;
+  left: 0;
+  top: -7.2917cqw;
+  width: 100cqw;
+  height: 66.6667cqw;
+  max-width: none;
+}
+.ec-boxlabel {
+  position: absolute;
+  left: 9.8958cqw;
+  top: 2.0313cqw;
+  font: 800 1.5625cqw / normal var(--f-display);
+  font-stretch: 115%;
+  letter-spacing: 0.05em;
+  color: rgba(20, 18, 16, 0.6);
+  white-space: nowrap;
+}
+.endcard .ec-sticker {
+  position: absolute;
+  left: 36.4583cqw;
+  top: 13.5417cqw;
+  --w: 13.0208cqw;
+  rotate: -4deg;
+  box-shadow: 0 0.1563cqw 0 rgba(0, 0, 0, 0.12), 0 0.625cqw 1.0417cqw -0.3125cqw rgba(20, 18, 16, 0.38);
+}
+.ec-title {
+  position: absolute;
+  left: 6.25cqw;
+  top: 39.1667cqw;
+  margin: 0;
+  font: 800 5.2083cqw / 0.98 var(--f-display);
+  font-stretch: 105%;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+.ec-side {
+  position: absolute;
+  left: 69.2708cqw;
+  top: 7.2917cqw;
+  width: 28.125cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2.2917cqw;
+}
+.ec-logo {
+  display: flex;
+  align-items: center;
+  gap: 1.0208cqw;
+  font: 800 3.3542cqw / 1 var(--f-display);
+  font-stretch: 112%;
+  letter-spacing: -0.02em;
+}
+.ec-mark {
+  width: 3.6458cqw;
+  height: 3.6458cqw;
+}
+.ec-cta {
+  font: 800 3.0208cqw / 1.04 var(--f-display);
+  color: #fff;
+  background: var(--orange);
+  padding: 1.5625cqw 2.2917cqw;
+  border-radius: 1.25cqw;
+  rotate: -3deg;
+  text-decoration: none;
+  box-shadow: 0 0 0 0.5208cqw rgba(255, 255, 255, 0.95), 0 1.3542cqw 2.3958cqw -0.8333cqw rgba(20, 18, 16, 0.5);
+  transition: background-color 0.15s;
+}
+.ec-cta:hover {
+  background: #ff6a33;
+}
+.ec-site {
+  font: 800 2.3958cqw / normal var(--f-display);
+  letter-spacing: -0.01em;
+}
+.ec-notes {
+  margin-top: 0.5208cqw;
+  font: 600 1.5625cqw / 1.35 var(--f-text);
+  color: var(--ink-2);
+}
+/* 落版出现后才补上的提示（短片里没有） */
+.ec-hint {
+  position: absolute;
+  right: 65.4cqw;
+  top: 21.2cqw;
+  margin: 0;
+  padding: 0.6cqw 1cqw;
+  background: #fff;
+  border-radius: 0.5cqw;
+  font: 700 1.35cqw / 1.2 var(--f-text);
+  rotate: -2deg;
+  box-shadow: 0 0.3cqw 0.8cqw -0.3cqw rgba(20, 18, 16, 0.45);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.4s 0.6s, translate 0.4s 0.6s;
+  translate: -0.8cqw 0;
+}
+.stage[data-state="end"] .ec-hint {
+  opacity: 1;
+  translate: 0 0;
+}
+.ec-arrow {
+  color: var(--orange-ink);
+}
+.hint-tap {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .hint-scan {
+    display: none;
+  }
+  .hint-tap {
+    display: inline;
+  }
+}
+@container (max-width: 640px) {
+  .ec-hint {
+    display: none;
+  }
+}
+
+/* 贴纸（短片里同一张）：--w 为贴纸宽度 */
+.sticker {
+  --w: 220px;
+  width: var(--w);
+  height: calc(var(--w) * 1.25);
+  padding: calc(var(--w) * 0.07);
+  background: var(--orange);
+  border-radius: calc(var(--w) * 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  flex: none;
+}
+.sticker-qr {
+  display: block;
+  background: #fff;
+  border-radius: calc(var(--w) * 0.035);
+  padding: calc(var(--w) * 0.0258);
+}
+.sticker-qr svg {
+  display: block;
+  width: calc(var(--w) * 0.8084);
+  height: calc(var(--w) * 0.8084);
+}
+.sticker-txt {
+  margin-top: calc(var(--w) * 0.045);
+  font: 800 calc(var(--w) * 0.083) / 1.05 var(--f-display);
+  letter-spacing: 0.03em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.stage-controls {
+  z-index: 2;
+  align-self: end;
+  justify-self: end;
+  margin: 0 18px 18px 0;
+  display: flex;
+  gap: 8px;
+}
+.stage-btn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: rgba(20, 18, 16, 0.82);
+  color: #fff;
+  font: 600 14px/1 var(--f-text);
+  cursor: pointer;
+}
+.stage-btn:hover {
+  background: var(--ink);
+}
+.stage-len {
+  opacity: 0.7;
+  font-weight: 500;
+}
+.tri {
+  width: 0;
+  height: 0;
+  border-left: 10px solid currentColor;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+.stage[data-state="end"]:not([data-played]) ~ .stage-controls .stage-play,
+.stage[data-state="end"][data-played] ~ .stage-controls .stage-replay,
+.stage[data-state="playing"] ~ .stage-controls .stage-skip {
+  display: inline-flex;
+}
+
+@media (max-width: 700px) {
+  /* 手机海报：只露出纸箱和贴纸（1920×1080 设计稿里 x 110–1010、y 0–900 这一块），标题上面已经有了 */
+  .stage {
+    aspect-ratio: 1 / 1;
+  }
+  .stage:not([data-state="playing"]) .ec-title {
+    display: none;
+  }
+  .stage-inner {
+    inset: 0 auto auto -12.22%;
+    width: 213.33%;
+    aspect-ratio: 16 / 9;
+  }
+  .stage[data-state="playing"] {
+    aspect-ratio: 16 / 9;
+  }
+  .stage[data-state="playing"] .stage-inner {
+    left: 0;
+    width: 100%;
+  }
+  .ec-hint {
+    font-size: 2.6cqw;
+    padding: 1cqw 1.6cqw;
+    right: 64cqw;
+  }
+  .stage-controls {
+    grid-area: 2 / 1;
+    justify-self: start;
+    margin: 12px 0 0;
+  }
+  .film-cap {
+    grid-area: 3 / 1;
+  }
+  .hint-scan {
+    display: none;
+  }
+  .hint-tap {
+    display: inline;
+  }
+}
+
+/* —— 贴纸“拍”上来 —— */
+/* 只有加载时在视口下方的贴纸才会先藏起来（由 site.js 加 .slap-wait），看得见的永远不藏 */
+.slap-wait {
+  opacity: 0;
+}
+[data-slap].is-in {
+  animation: slap 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes slap {
+  0% {
+    opacity: 0;
+    transform: scale(1.45) rotate(-7deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.95) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
