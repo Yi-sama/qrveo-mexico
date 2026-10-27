@@ -47,8 +47,12 @@ if ($Action -eq 'RunTunnel') {
         if (-not (Test-Path -LiteralPath $connect)) { throw 'Git connect.exe is missing.' }
         $sshArguments += @('-o', "ProxyCommand=`"$connect`" -S $ProxyAddress %h %p")
     }
-    & ssh.exe @sshArguments $Server
-    exit $LASTEXITCODE
+    # The proxy can close an established connection; recreate the same tunnel.
+    while ($true) {
+        & ssh.exe @sshArguments $Server
+        Write-Output ("SSH disconnected ({0}); reconnecting in 3 seconds." -f $LASTEXITCODE)
+        Start-Sleep -Seconds 3
+    }
 }
 
 if ($Action -eq 'Status') {

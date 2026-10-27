@@ -1,6 +1,7 @@
 "use strict";
 
 const http = require("node:http");
+const zlib = require("node:zlib");
 
 const PREFIX = "/qrveo-live";
 const DEFAULT_PUBLIC_ORIGIN = "https://api.yisama.asia";
@@ -98,13 +99,12 @@ function replaceNuxtConfig(text, key, value) {
   return text.replace(pattern, `$1${value}$2`);
 }
 
-function rewriteNuxt(text, config) {
+function rewriteNuxt(text, config, target) {
+  if (!/^\/videos\/[^/]+_h\/?$/.test(target.path)) return text;
   const prefix = config.prefix;
   let result = text
-    .replace(/(["'])\/_nuxt\//g, `$1${prefix}/_nuxt/`)
-    .replace(/(["'])\/videos\//g, `$1${prefix}/videos/`)
-    .replace(/(["'])\/favicon\.ico\b/g, `$1${prefix}/favicon.ico`)
-    .replace(/url\((['"]?)\/_nuxt\//g, `url($1${prefix}/_nuxt/`);
+    .replace(/((?:src|href)=["'])\/_nuxt\//gi, `$1${prefix}/_nuxt/`)
+    .replace(/((?:src|href)=["'])\/favicon\.ico\b/gi, `$1${prefix}/favicon.ico`);
   result = replaceNuxtConfig(result, "baseURL", `${prefix}/`);
   result = replaceNuxtConfig(result, "cdnURL", `${prefix}/`);
   return result;
@@ -118,13 +118,19 @@ function rewriteAdmin(text, config, bootstrap) {
     .replace(/url\((['"]?)\/assets\//g, `url($1${paths.admin}/assets/`)
     .replace(/(["'])\/favicon\.ico\b/g, `$1${paths.admin}/favicon.ico`)
     .replace(/\bf\.p="\/"/g, `f.p="${paths.admin}/"`);
-  if (bootstrap) result = result.replace(/\/mexico\//g, "/qrveo/");
+  if (bootstrap) {
+    const fallback = 'return url.hostname === location.hostname && (url.port === "4321" || url.port === "30082");';
+    if (!result.includes(fallback)) throw new Error("Admin bootstrap allowedOfficial shape mismatch");
+    result = result
+      .replace(fallback, `if (url.origin === ${JSON.stringify(config.publicOrigin)}) return true;\n    ${fallback}`)
+      .replace(/\/mexico\//g, "/qrveo/");
+  }
   return result;
 }
 
 function rewriteText(text, config, target) {
   let result = rewriteLocalUrls(text, config);
-  if (target.service === "front") result = rewriteNuxt(result, config);
+  if (target.service === "front") result = rewriteNuxt(result, config, target);
   if (target.service === "admin") result = rewriteAdmin(result, config, target.bootstrap);
   if (target.service === "admin" && target.path === "/") {
     const injection = `<script>window.__VOD_PRIVATE__=Object.assign(window.__VOD_PRIVATE__||{},{officialOrigin:${JSON.stringify(config.publicOrigin)}});</script>`;
@@ -264,6 +270,19 @@ function copyHeaders(res, headers, transform, config, target) {
   }
 }
 
+function acceptsGzip(value) {
+  return String(value || "").split(",").some((entry) => {
+    const [coding, ...parameters] = entry.trim().split(";");
+    return coding.toLowerCase() === "gzip" && !parameters.some((parameter) => /^q=0(?:\.0*)?$/i.test(parameter.trim()));
+  });
+}
+
+function addVary(res, value) {
+  const current = String(res.getHeader("Vary") || "").split(",").map((item) => item.trim()).filter(Boolean);
+  if (!current.some((item) => item.toLowerCase() === value.toLowerCase())) current.push(value);
+  res.setHeader("Vary", current.join(", "));
+}
+
 async function loadBootstrap(req, config) {
   const headers = requestHeaders(req);
   const index = await requestUpstream(config.upstreams.admin, "/", "GET", headers);
@@ -329,14 +348,24 @@ function createGateway(options = {}) {
       }
       const upstream = target.bootstrap
         ? await loadBootstrap(req, config)
-        : await requestUpstream(config.upstreams[target.service], target.path + url.search, req.method || "GET", requestHeaders(req, body), body);
+        : await requestUpstream(config.upstreams[target.service], target.path + url.search, req.method === "HEAD" ? "GET" : (req.method || "GET"), requestHeaders(req, body), body);
       const contentType = String(upstream.headers["content-type"] || "");
-      const transform = req.method !== "HEAD" && (target.bootstrap || /text\/|javascript|json|mpegurl|xml/.test(contentType));
+      const transform = target.bootstrap || /text\/|javascript|json|mpegurl|xml/.test(contentType);
       if (target.bootstrap && !contentType) res.setHeader("Content-Type", "application/javascript; charset=utf-8");
       copyHeaders(res, upstream.headers, transform, config, target);
       res.statusCode = upstream.status;
-      if (transform) res.end(rewriteText(upstream.body.toString("utf8"), config, target));
-      else res.end(upstream.body);
+      if (transform) {
+        let output = Buffer.from(rewriteText(upstream.body.toString("utf8"), config, target));
+        if (acceptsGzip(req.headers["accept-encoding"])) {
+          output = zlib.gzipSync(output);
+          res.setHeader("Content-Encoding", "gzip");
+        }
+        addVary(res, "Accept-Encoding");
+        res.setHeader("Content-Length", String(output.length));
+        res.end(req.method === "HEAD" ? undefined : output);
+      } else {
+        res.end(req.method === "HEAD" ? undefined : upstream.body);
+      }
     } catch (error) {
       if (!res.headersSent) res.writeHead(502).end("Preview upstream unavailable");
       else res.destroy(error);

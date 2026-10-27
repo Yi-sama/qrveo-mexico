@@ -124,6 +124,24 @@ EDITOR_PASSWORD=设一个密码 node editor.mjs
 
 - **场景短片和卡片图**（`public/video/sol-*.mp4`、`public/img/sol-*.webp`）：来自 Mixkit 的免费视频，授权说明见 [LICENSES.md](LICENSES.md)。
 
+## 临时公网演示
+
+这个仓库保存官网源码、网页素材和演示网关。私有后端安装包、数据库、密钥、运行状态和短片工程不在仓库内。
+
+现有演示入口是 `https://api.yisama.asia/qrveo/`。美国服务器提供静态官网和 HTTPS，`/qrveo-live/` 经 SSH 反向隧道连接本机后台；电脑、WSL 后端和隧道需要保持运行。网关只开放登录、控制台必要的只读接口和四条示例视频，不包含上传、删除、付款和完整管理操作。
+
+在本机后台已启动、代理已连通且服务器已配置 `deploy/nginx-preview.inc` 后，从仓库根目录使用 PowerShell 7：
+
+```powershell
+pwsh -File deploy/us-tunnel.ps1 -Action Start
+pwsh -File deploy/us-tunnel.ps1 -Action Status
+pwsh -File deploy/us-tunnel.ps1 -Action Stop
+```
+
+`Stop` 只关闭网关和隧道，本地后端继续运行。脚本默认使用本机 `.ssh/us-server-ed25519` 和代理 `127.0.0.1:30000`，运行记录保存在 Git 忽略的 `.runtime/`。隧道断线后每 3 秒重连；重连期间可能短暂返回 502。`Status` 检查本地进程；公网连通性还应检查 `/qrveo-live/healthz`。访问速度取决于本机上行和代理链路，适合临时演示。
+
+连接真实后台的官网版本使用 `deploy/build-live.mjs` 构建，需要设置独立的 `SITE_DIST` 输出目录；纯静态演示仍使用 `deploy/build-preview.mjs`。网关的路径与鉴权检查可运行 `node deploy/demo-gateway.test.cjs`。
+
 ## 上线：替换后台里的官网服务
 新官网和旧官网（`vod-private/mexico-official`）用的是同一个约定：
 - 容器里的 nginx 监听 80 端口；
