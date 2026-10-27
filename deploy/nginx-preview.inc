@@ -8,6 +8,22 @@ location = /qrveo-live {
     return 302 /qrveo-live/__qrveo/console/;
 }
 
+# Watch SSR depends on the device and query, even when an old snapshot has HTML.
+location ^~ /qrveo-live/videos/ {
+    proxy_pass http://127.0.0.1:32984;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Connection "";
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_connect_timeout 5s;
+    proxy_read_timeout 60s;
+    proxy_buffering off;
+    proxy_cache off;
+    add_header Cache-Control "no-store" always;
+    add_header X-Robots-Tag "noindex, nofollow" always;
+}
+
 location ^~ /qrveo-live/ {
     root /var/www/qrveo-preview/demo-static/current;
     index index.html;

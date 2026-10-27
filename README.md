@@ -144,7 +144,7 @@ pwsh -File deploy/us-tunnel.ps1 -Action Stop
 
 ### 演示静态资源加速
 
-`deploy/nginx-preview.inc` 支持从美国服务器直接提供后台页面、观看页、播放器和四条公开示例视频的 HLS 分段。未导出的请求仍走本机隧道；登录、验证码、账号数据、播放统计接口和私有视频不会写入快照或进入公共缓存。
+`deploy/nginx-preview.inc` 支持从美国服务器直接提供后台页面、观看页脚本、播放器和四条公开示例视频的 HLS 分段。观看页 HTML 根据设备和查询参数动态渲染，不能作为通用快照；`/qrveo-live/videos/` 始终走本机隧道，即使旧快照还留有 HTML。登录、验证码、账号数据、播放统计接口和私有视频不会写入快照或进入公共缓存。
 
 本机 WSL 后端和演示网关运行时，使用一个尚不存在的输出目录：
 
@@ -157,7 +157,7 @@ tar.exe -czf .runtime/demo-static-NEW_RELEASE.tar.gz -C .runtime/demo-static-NEW
 
 将压缩包上传并解包到美国服务器的 `/var/www/qrveo-preview/demo-static/releases/NEW_RELEASE/`，在该目录执行 `find qrveo-live -type f -name '*.gz' -exec gzip -dk {} +`，保留压缩文件并恢复普通文件；然后让 `/var/www/qrveo-preview/demo-static/current` 指向该目录。首次启用时，备份并更新 `/etc/nginx/snippets/qrveo-preview.inc`，通过 `nginx -t` 后再重载 Nginx。后续更新只需发布新目录并切换链接；回退时切回旧目录即可。
 
-快照源站设置 5 分钟公共缓存，响应带有 `X-QRveo-Source: us-static`；现有 Cloudflare 策略会延长部分脚本的浏览器缓存，2026-10-27 实测为 4 小时，以公网响应头为准。接口继续使用 `Cache-Control: no-store`。后台页面、播放器、示例视频或视频标题等展示内容更新后，需要重新导出发布；未带版本号的脚本更新后还应刷新对应 CDN 缓存。登录和数据请求仍依赖本机后台与隧道。
+快照源站设置 5 分钟公共缓存，响应带有 `X-QRveo-Source: us-static`；现有 Cloudflare 策略会延长部分脚本的浏览器缓存，2026-10-27 实测为 4 小时，以公网响应头为准。观看页 HTML 和接口使用 `Cache-Control: no-store`。后台页面、观看页脚本、播放器或示例视频更新后，需要重新导出发布；未带版本号的脚本更新后还应刷新对应 CDN 缓存。观看页 HTML、登录和数据请求仍依赖本机后台与隧道。
 
 ## 上线：替换后台里的官网服务
 新官网和旧官网（`vod-private/mexico-official`）用的是同一个约定：

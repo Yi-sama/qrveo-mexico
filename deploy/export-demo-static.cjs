@@ -12,6 +12,8 @@ const PUBLIC_ORIGIN = process.env.QRVEO_PUBLIC_ORIGIN || "https://api.yisama.asi
 function canExport(pathname) {
   const target = resolveTarget("GET", pathname);
   // Session/API responses stay live, including public video metadata and counters.
+  // Watch HTML and payloads vary by device and query; they cannot share a snapshot.
+  if (target?.service === "front") return target.path.startsWith("/_nuxt/") || target.path === "/favicon.ico";
   return !!target && !target.requiresAuth && !["api", "health"].includes(target.service);
 }
 
@@ -69,7 +71,6 @@ async function main() {
     `${PREFIX}/__qrveo/player/vod-player-hls.min.js`,
     ...adminFiles,
     ...frontFiles,
-    ...VIDEO_IDS.map((id) => `${PREFIX}/videos/${id}_h`),
   ]);
   function addMedia(value, base = PUBLIC_ORIGIN) {
     const url = new URL(value, base);

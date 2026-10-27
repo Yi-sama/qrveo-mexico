@@ -14,6 +14,9 @@ for (const pathname of [
   `/__qrveo/api/vod/video/${VIDEO_IDS[0]}_h.json`,
   "/__qrveo/hls/vod-mp4/other/private/stream.m3u8",
   "/__qrveo/media/vod-mp4/other/private/source.mp4",
+  `/videos/${VIDEO_IDS[0]}_h`,
+  `/videos/${VIDEO_IDS[0]}_h/_payload.json`,
+  "/_payload.json",
   "/healthz", "/../private",
 ]) assert.equal(canExport(PREFIX + pathname), false, pathname);
 
