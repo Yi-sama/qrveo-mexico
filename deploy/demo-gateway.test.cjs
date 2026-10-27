@@ -5,6 +5,17 @@ const http = require("node:http");
 const vm = require("node:vm");
 const zlib = require("node:zlib");
 const { PREFIX, VIDEO_IDS, createGateway } = require("./demo-gateway.cjs");
+const { canExport } = require("./export-demo-static.cjs");
+
+assert.equal(canExport(`${PREFIX}/__qrveo/console/`), true);
+assert.equal(canExport(`${PREFIX}/__qrveo/hls/vod-mp4/hceea401fc/${VIDEO_IDS[0]}/stream.m3u8`), true);
+for (const pathname of [
+  "/__qrveo/api/user/get-user", "/__qrveo/api/auth/kaptcha",
+  `/__qrveo/api/vod/video/${VIDEO_IDS[0]}_h.json`,
+  "/__qrveo/hls/vod-mp4/other/private/stream.m3u8",
+  "/__qrveo/media/vod-mp4/other/private/source.mp4",
+  "/healthz", "/../private",
+]) assert.equal(canExport(PREFIX + pathname), false, pathname);
 
 const OLD_BOOTSTRAP = `
 function allowedOfficial(url) {

@@ -128,7 +128,7 @@ EDITOR_PASSWORD=设一个密码 node editor.mjs
 
 这个仓库保存官网源码、网页素材和演示网关。私有后端安装包、数据库、密钥、运行状态和短片工程不在仓库内。
 
-现有演示入口是 `https://api.yisama.asia/qrveo/`。美国服务器提供静态官网和 HTTPS，`/qrveo-live/` 经 SSH 反向隧道连接本机后台；电脑、WSL 后端和隧道需要保持运行。网关只开放登录、控制台必要的只读接口和四条示例视频，不包含上传、删除、付款和完整管理操作。
+现有演示入口是 `https://api.yisama.asia/qrveo/`。美国服务器提供静态官网和 HTTPS，`/qrveo-live/` 下的动态请求经 SSH 反向隧道连接本机后台，静态资源可按下节发布加速快照；电脑、WSL 后端和隧道需要保持运行。网关只开放登录、控制台必要的只读接口和四条示例视频，不包含上传、删除、付款和完整管理操作。
 
 在本机后台已启动、代理已连通且服务器已配置 `deploy/nginx-preview.inc` 后，从仓库根目录使用 PowerShell 7：
 
@@ -141,6 +141,23 @@ pwsh -File deploy/us-tunnel.ps1 -Action Stop
 `Stop` 只关闭网关和隧道，本地后端继续运行。脚本默认使用本机 `.ssh/us-server-ed25519` 和代理 `127.0.0.1:30000`，运行记录保存在 Git 忽略的 `.runtime/`。隧道断线后每 3 秒重连；重连期间可能短暂返回 502。`Status` 检查本地进程；公网连通性还应检查 `/qrveo-live/healthz`。访问速度取决于本机上行和代理链路，适合临时演示。
 
 连接真实后台的官网版本使用 `deploy/build-live.mjs` 构建，需要设置独立的 `SITE_DIST` 输出目录；纯静态演示仍使用 `deploy/build-preview.mjs`。网关的路径与鉴权检查可运行 `node deploy/demo-gateway.test.cjs`。
+
+### 演示静态资源加速
+
+`deploy/nginx-preview.inc` 支持从美国服务器直接提供后台页面、观看页、播放器和四条公开示例视频的 HLS 分段。未导出的请求仍走本机隧道；登录、验证码、账号数据、播放统计接口和私有视频不会写入快照或进入公共缓存。
+
+本机 WSL 后端和演示网关运行时，使用一个尚不存在的输出目录：
+
+```powershell
+node deploy/export-demo-static.cjs .runtime/demo-static-NEW_RELEASE
+tar.exe -czf .runtime/demo-static-NEW_RELEASE.tar.gz -C .runtime/demo-static-NEW_RELEASE -T .runtime/demo-static-NEW_RELEASE/archive-files.txt
+```
+
+导出脚本只读取当前可访问的公开资源，按正在运行的 Nuxt 资源清单和 Webpack 引用排除旧构建文件，预先生成 gzip 文件，并在输出目录写入校验用的 `manifest.json`。传输清单 `archive-files.txt` 优先选用压缩文件，避免重复上传。原始 MP4 下载不在快照内。不要把快照或私有后端构建产物提交到 Git。
+
+将压缩包上传并解包到美国服务器的 `/var/www/qrveo-preview/demo-static/releases/NEW_RELEASE/`，在该目录执行 `find qrveo-live -type f -name '*.gz' -exec gzip -dk {} +`，保留压缩文件并恢复普通文件；然后让 `/var/www/qrveo-preview/demo-static/current` 指向该目录。首次启用时，备份并更新 `/etc/nginx/snippets/qrveo-preview.inc`，通过 `nginx -t` 后再重载 Nginx。后续更新只需发布新目录并切换链接；回退时切回旧目录即可。
+
+快照源站设置 5 分钟公共缓存，响应带有 `X-QRveo-Source: us-static`；现有 Cloudflare 策略会延长部分脚本的浏览器缓存，2026-10-27 实测为 4 小时，以公网响应头为准。接口继续使用 `Cache-Control: no-store`。后台页面、播放器、示例视频或视频标题等展示内容更新后，需要重新导出发布；未带版本号的脚本更新后还应刷新对应 CDN 缓存。登录和数据请求仍依赖本机后台与隧道。
 
 ## 上线：替换后台里的官网服务
 新官网和旧官网（`vod-private/mexico-official`）用的是同一个约定：
