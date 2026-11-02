@@ -10,12 +10,7 @@
   opacity: 1;
   translate: 0 0;
 }
-.topbar-in {
-  transition: height 0.25s;
-}
-.topbar.is-scrolled .topbar-in {
-  height: 60px;
-}
+/* 顶栏滚动后不再变矮：变矮会让整页上移，浏览器回调滚动位置后又变高，来回抖动 */
 
 /* 截图上的光标：移到按钮处点一下 */
 .screen-body {
@@ -408,10 +403,10 @@
   font-size: 19px;
 }
 .plan {
-  transition: box-shadow 0.3s, translate 0.3s;
+  transition: box-shadow 0.3s;
 }
+/* 估算器推荐的套餐：只加橙色外框，不移动位置（移动会让两张卡对不齐） */
 .plan.is-rec {
-  translate: 0 -6px;
   box-shadow: 0 0 0 3px var(--orange), var(--shadow);
 }
 .compare tbody tr {

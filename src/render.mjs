@@ -12,6 +12,9 @@ export const CONSOLE = "https://console.qrveo.com";
 export const ROUTES = { register: "/#/register", login: "/#/login", upgrade: "/#/secure/upgrade", panel: "/#/secure/overview" };
 // 注册、登录、找回密码是官网自己的页面（调用后台接口，成功后带着登录状态进入控制台）；升级付款仍在控制台里
 export const AUTH = { register: "registro/", login: "iniciar-sesion/", recover: "recuperar/" };
+// 官网结账页：付费套餐的按钮都指向这里（?plan=estandar|premium）
+export const PAY = "pago/";
+const planLink = (o, pl) => (pl.action === "checkout" ? `href="${o.L}${PAY}?plan=${encodeURIComponent(pl.id)}" data-pay-plan="${esc(pl.id)}"` : acct(o, pl.action || "register"));
 export const acct = (o, action) =>
   AUTH[action] ? `href="${o.L}${AUTH[action]}" data-auth="${action}"` : `href="${CONSOLE}${ROUTES[action]}" data-console="${action}"`;
 
@@ -577,6 +580,11 @@ ${finalCta(c, o)}`,
 // —— 价格 ——
 export const pagePricing = (c, o) => {
   const P = c.pricing;
+  // 第一个套餐是免费试用：做成上方的横条；下面两张卡只放付费套餐，写清比上一档多了什么
+  const [trial, ...paid] = P.plans;
+  // 折扣百分比由原价和现价算出，改价格时不会对不上
+  const num = (x) => Number(String(x).replace(/[^\d.]/g, ""));
+  const off = (pl) => Math.round((1 - num(pl.price) / num(pl.listPrice)) * 100);
   return page(
     c,
     o,
@@ -584,19 +592,34 @@ export const pagePricing = (c, o) => {
     `${pageHero("", P.title, P.lead)}
 <section class="sec sec-tight" aria-label="${esc(c.ui.plans)}">
   <div class="wrap">
-    <div class="plans">${P.plans
+    <aside class="trial" aria-labelledby="plan-${esc(trial.id)}">
+      <div class="trial-txt">
+        <h2 class="trial-t" id="plan-${esc(trial.id)}">${esc(P.trial.title)}</h2>
+        <p>${esc(P.trial.text)}</p>
+      </div>
+      <dl class="trial-keys">${P.rows
+        .slice(0, 2)
+        .filter((r) => r.v[0])
+        .map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v[0])}</dd></div>`)
+        .join("")}</dl>
+      <a class="btn btn-ghost" ${acct(o, trial.action || "register")}>${esc(trial.cta)}</a>
+    </aside>
+    <div class="plans">${paid
       .map(
         (pl) => `<article class="plan${pl.badge ? " plan-featured" : ""}" data-plan-id="${esc(pl.id)}" aria-labelledby="plan-${esc(pl.id)}">
         ${pl.badge ? `<p class="plan-badge">${esc(pl.badge)}</p>` : ""}
         <h2 class="plan-name" id="plan-${esc(pl.id)}">${esc(pl.name)}</h2>
         <p class="plan-for">${esc(pl.for)}</p>
-        <p class="plan-price"><b>${esc(pl.price)}</b> <span>${esc(pl.unit)}</span></p>
-        <p class="plan-monthly">${esc(pl.monthly)}</p>
-        <a class="btn ${pl.badge ? "btn-primary" : "btn-ghost"} btn-block" ${acct(o, pl.action || "register")}>${esc(pl.cta)}</a>
-        <ul class="plan-keys">${P.rows
-          .slice(0, 3)
-          .map((r) => `<li><span>${esc(r.k)}</span><b>${esc(r.v[P.plans.indexOf(pl)])}</b></li>`)
-          .join("")}</ul>
+        ${pl.listPrice ? `<p class="plan-promo"><span class="plan-off">−${off(pl)}%</span> ${esc(P.promo.label)}</p>` : ""}
+        <p class="plan-price">${pl.listPrice ? `<s><span class="sr">${esc(P.promo.was)} </span>${esc(pl.listPrice)}</s> ` : ""}<b>${esc(pl.price)}</b> <span>${esc(pl.unit)}</span></p>
+        <p class="plan-monthly">${esc(pl.monthly)}<br>${esc(P.invoice)}</p>
+        <a class="btn ${pl.badge ? "btn-primary" : "btn-ink"} btn-block" ${planLink(o, pl)}>${esc(pl.cta)}</a>
+        <dl class="plan-stats">${P.rows
+          .slice(0, 2)
+          .map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v[P.plans.indexOf(pl)])}</dd></div>`)
+          .join("")}</dl>
+        <p class="plan-more">${esc(pl.extrasTitle)}</p>
+        <ul class="plan-extras">${pl.extras.map((x) => `<li>${check}${esc(x)}</li>`).join("")}</ul>
       </article>`,
       )
       .join("")}</div>
@@ -628,9 +651,9 @@ export const pagePricing = (c, o) => {
       <table class="compare">
         <thead><tr><th scope="col"><span class="sr">${esc(c.ui.feature)}</span></th>${P.plans.map((pl) => `<th scope="col">${esc(pl.name)}</th>`).join("")}</tr></thead>
         <tbody>${P.rows
-          .map((r) => `<tr><th scope="row">${esc(r.k)}</th>${r.v.map((v) => `<td>${v === "Sí" || v === c.ui.yes ? `${check}<span class="sr">${esc(c.ui.yes)}</span>` : esc(v)}</td>`).join("")}</tr>`)
+          .map((r) => `<tr><th scope="row">${esc(r.k)}</th>${r.v.map((v) => `<td>${v === "Sí" || v === c.ui.yes ? `${check}<span class="sr">${esc(c.ui.yes)}</span>` : esc(v).replace(/([~〜–])/g, "$1<wbr>")}</td>`).join("")}</tr>`)
           .join("")}</tbody>
-        <tfoot><tr><td></td>${P.plans.map((pl) => `<td><a class="more" ${acct(o, pl.action || "register")}>${esc(pl.cta)} ${arrow}</a></td>`).join("")}</tr></tfoot>
+        <tfoot><tr><td></td>${P.plans.map((pl) => `<td><a class="more" ${planLink(o, pl)}>${esc(pl.cta)} ${arrow}</a></td>`).join("")}</tr></tfoot>
       </table>
     </div>
     <p class="fine">${esc(P.estimate)}</p>
@@ -849,6 +872,138 @@ export const pageAuth = (c, o, kind) => {
 </section>
 ${authText(c)}`,
     `page-auth page-${kind}`,
+  );
+};
+
+// —— 结账页（第一阶段是模拟支付：后台 /billing/demo-checkout 收到资料就开通套餐，不扣款）——
+// 价格以后台为准；这里显示的金额来自 content 的套餐价格（含 IVA），只做展示
+// 银行卡：第一阶段在浏览器里校验格式（Luhn、有效期、安全码），卡号和安全码不发给后台，只发卡组织和后四位
+const CARD_LOGOS = ["VISA", "MC", "AMEX"].map((b) => `<i class="card-logo card-logo-${b.toLowerCase()}">${b}</i>`).join("");
+export const pageCheckout = (c, o) => {
+  const K = c.checkout;
+  const P = c.pricing;
+  const num = (x) => Number(String(x).replace(/[^\d.]/g, ""));
+  const money = (n) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const paid = P.plans.filter((pl) => pl.action === "checkout");
+  const col = (pl) => P.plans.indexOf(pl);
+  const priceLabel = (pl) => `${pl.price} MXN`;
+  const radio = (name, value, checked, body) =>
+    `<label class="pick"><input type="radio" name="${name}" value="${esc(value)}"${checked ? " checked" : ""}><span class="pick-box">${body}</span></label>`;
+  const summary = (pl, i) => {
+    const total = num(pl.price);
+    const sub = Math.round((total / 1.16) * 100) / 100;
+    return `<div class="pay-sum-plan" data-sum="${esc(pl.id)}"${i ? " hidden" : ""}>
+        <p class="pay-sum-name"><b>${esc(pl.name)}</b><span>${esc(K.period)}</span></p>
+        <dl class="pay-sum-keys">${P.rows
+          .slice(0, 2)
+          .map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v[col(pl)])}</dd></div>`)
+          .join("")}</dl>
+        <dl class="pay-sum-money">
+          ${pl.listPrice ? `<div class="pay-sum-promo"><dt>${esc(P.promo.label)}</dt><dd><s><span class="sr">${esc(P.promo.was)} </span>${esc(pl.listPrice)}</s></dd></div>` : ""}
+          <div><dt>${esc(K.subtotal)}</dt><dd>${money(sub)}</dd></div>
+          <div><dt>${esc(K.iva)}</dt><dd>${money(Math.round((total - sub) * 100) / 100)}</dd></div>
+          <div class="pay-sum-total"><dt>${esc(K.total)}</dt><dd>${esc(pl.price)} <small>MXN</small></dd></div>
+        </dl>
+      </div>`;
+  };
+  const text = { ...c.auth.errors, ...K, plans: Object.fromEntries(paid.map((pl) => [pl.id, { name: pl.name, price: priceLabel(pl) }])) };
+  return page(
+    c,
+    o,
+    { title: `${K.seo} · ${c.brand.name}`, description: K.lead, noindex: true },
+    `<section class="pay" data-pay-page>
+  <div class="wrap pay-grid">
+    <div class="pay-main">
+      <div data-pay-head>
+        ${label(K.eyebrow)}
+        <h1>${esc(K.title)}</h1>
+        <p class="lead">${esc(K.lead)}</p>
+      </div>
+
+      <div class="pay-login" data-pay-login hidden>
+        <h2>${esc(K.loginTitle)}</h2>
+        <p>${esc(K.loginText)}</p>
+        <div class="cta-row"><a class="btn btn-primary btn-lg" href="${o.L}${AUTH.login}" data-pay-return>${esc(K.loginBtn)}</a><a class="btn btn-ghost btn-lg" href="${o.L}${AUTH.register}" data-pay-return>${esc(K.registerBtn)}</a></div>
+      </div>
+
+      <form class="auth-form pay-form" data-pay-form novalidate hidden>
+        <p class="pay-account"><span>${esc(K.account)}</span> <b data-pay-account></b> <span class="pay-notyou">${esc(K.notYou)} <button type="button" class="link-btn" data-pay-logout>${esc(K.logout)}</button></span></p>
+
+        <fieldset class="pay-set">
+          <legend>${esc(K.planTitle)}</legend>
+          <div class="picks picks-2">${paid
+            .map((pl, i) =>
+              radio("plan", pl.id, i === 0, `<b>${esc(pl.name)}</b><span class="pick-price">${esc(pl.price)} <small>${esc(pl.unit)}</small></span><span class="pick-note">${esc(P.rows[0].v[col(pl)])} · ${esc(pl.for)}</span>`),
+            )
+            .join("")}</div>
+        </fieldset>
+
+        <fieldset class="pay-set">
+          <legend>${esc(K.billingTitle)}</legend>
+          ${fld("name", K.name, inp("name", "text", `autocomplete="organization" required maxlength="120" placeholder="${esc(K.namePh)}"`))}
+          ${fld("email", K.email, inp("email", "email", `autocomplete="email" required maxlength="120" inputmode="email" placeholder="${esc(c.auth.register.emailPh)}"`))}
+          <div class="pay-2">
+            ${fld("rfc", K.rfc, inp("rfc", "text", 'autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16" placeholder="XAXX010101000"'), `<p class="fld-hint">${esc(K.rfcHint)}</p>`)}
+            ${fld("phone", K.phone, inp("phone", "tel", 'autocomplete="tel" maxlength="20" inputmode="tel" placeholder="+52"'))}
+          </div>
+        </fieldset>
+
+        <fieldset class="pay-set">
+          <legend>${esc(K.methodTitle)}</legend>
+          <div class="picks">
+            ${radio("method", "card", true, `<b>${esc(K.card)}</b><span class="pick-note">${esc(K.cardNote)}</span><span class="card-logos" aria-hidden="true">${CARD_LOGOS}</span>`)}
+            <div class="pay-panel" data-method-panel="card">
+              ${fld("cardnum", K.cardNumber, `<div class="fld-card">${inp("cardnum", "text", 'autocomplete="cc-number" inputmode="numeric" maxlength="23" placeholder="1234 1234 1234 1234" spellcheck="false"')}<span class="card-brand" data-card-brand aria-live="polite"></span></div>`)}
+              ${fld("cardname", K.cardName, inp("cardname", "text", `autocomplete="cc-name" maxlength="60" autocapitalize="characters" spellcheck="false" placeholder="${esc(K.cardNamePh)}"`))}
+              <div class="pay-2">
+                ${fld("cardexp", K.cardExp, inp("cardexp", "text", 'autocomplete="cc-exp" inputmode="numeric" maxlength="7" placeholder="MM / AA"'))}
+                ${fld("cardcvc", K.cardCvc, inp("cardcvc", "password", 'autocomplete="cc-csc" inputmode="numeric" maxlength="4" placeholder="•••"'), `<p class="fld-hint">${esc(K.cardCvcHint)}</p>`)}
+              </div>
+            </div>
+            ${radio("method", "spei", false, `<b>${esc(K.spei)}</b><span class="pick-note">${esc(K.speiNote)}</span>`)}
+            <div class="pay-panel" data-method-panel="spei" hidden>
+              <p>${esc(K.speiIntro)}</p>
+              <dl class="spei">
+                <div><dt>${esc(K.speiBank)}</dt><dd>${esc(c.contact.bank)}</dd></div>
+                <div><dt>${esc(K.speiClabe)}</dt><dd><code>${esc(c.contact.clabe.replace(/^(\d{3})(\d{3})(\d{11})(\d)$/, "$1 $2 $3 $4"))}</code><button type="button" class="copy-btn" data-copy-text="${esc(c.contact.clabe)}">${esc(K.copy)}</button></dd></div>
+                <div><dt>${esc(K.speiHolder)}</dt><dd>${esc(c.contact.company)}</dd></div>
+                <div><dt>${esc(K.speiAmount)}</dt><dd><code data-spei-amount></code><button type="button" class="copy-btn" data-copy-from="[data-spei-amount]">${esc(K.copy)}</button></dd></div>
+                <div><dt>${esc(K.speiRef)}</dt><dd><code data-spei-ref></code><button type="button" class="copy-btn" data-copy-from="[data-spei-ref]">${esc(K.copy)}</button></dd></div>
+              </dl>
+              <p class="fine">${esc(K.speiWhen)}</p>
+            </div>
+          </div>
+        </fieldset>
+
+        <p class="pay-demo">${esc(K.demo)}</p>
+        <p class="auth-msg" role="alert" data-auth-msg hidden></p>
+        <button class="btn btn-primary btn-lg btn-block auth-submit" type="submit" data-busy="${esc(K.busy)}"><span data-pay-btn>${esc(K.pay.replace("{price}", priceLabel(paid[0])))}</span></button>
+      </form>
+
+      <div class="pay-done" data-pay-done hidden tabindex="-1">
+        <span class="pay-done-mark" aria-hidden="true">${check}</span>
+        <h1 data-done-title></h1>
+        <p class="lead" data-done-text></p>
+        <p class="pay-done-paid" data-done-paid></p>
+        <dl class="pay-done-order"><div><dt>${esc(K.order)}</dt><dd data-done-order></dd></div></dl>
+        <div class="cta-row"><a class="btn btn-primary btn-lg" href="${CONSOLE}${ROUTES.panel}" data-console="panel">${esc(K.goPanel)}</a></div>
+        <p class="fine">${esc(K.invoice)} <a href="${waHref(c)}" target="_blank" rel="noopener" data-done-wa>${esc(c.contact.whatsappLabel)}</a></p>
+      </div>
+    </div>
+
+    <aside class="pay-sum" aria-label="${esc(K.summary)}" data-pay-sum>
+      <p class="pay-sum-t">${esc(K.summary)}</p>
+      ${paid.map(summary).join("")}
+      <ul class="ticks pay-sum-notes">
+        <li data-pay-until hidden>${check}<span></span></li>
+        <li>${check}${esc(K.keep)}</li>
+        <li>${check}${esc(P.invoice)}</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+<script type="application/json" id="pay-text">${JSON.stringify(text).replace(/</g, "\u003c")}</script>`,
+    "page-pay",
   );
 };
 

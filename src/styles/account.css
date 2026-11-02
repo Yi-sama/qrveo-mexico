@@ -160,19 +160,26 @@ html:is(:lang(zh-CN), :lang(ja)) :is(h1, h2) .hl {
   color: var(--orange-ink);
 }
 
-/* 浏览器语言和页面不同时的提示条 */
+/* 浏览器语言和页面不同时的提示：浮在左下角（右下角留给 WhatsApp 按钮），出现时不推动页面 */
 .lang-hint {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 45;
+  max-width: min(420px, calc(100% - 112px));
+  border-radius: 14px;
   background: var(--ink);
   color: var(--paper);
   font-size: 14px;
+  box-shadow: 0 18px 40px -16px rgba(20, 18, 16, 0.6);
   animation: lang-menu 0.3s ease-out;
 }
 .lang-hint .wrap {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  min-height: 42px;
+  width: auto;
+  padding: 8px 8px 8px 18px;
 }
 .lang-hint a {
   color: inherit;
@@ -475,5 +482,427 @@ html:is(:lang(zh-CN), :lang(ja)) :is(h1, h2) .hl {
   }
   .lang {
     margin-left: -16px;
+  }
+}
+
+/* —— 结账页 —— */
+.pay {
+  padding: clamp(40px, 6vw, 80px) 0 var(--sec);
+}
+.pay-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 600px) minmax(0, 380px);
+  justify-content: space-between;
+  gap: clamp(40px, 7vw, 104px);
+  align-items: start;
+}
+.pay-main h1 {
+  margin: 0 0 14px;
+  font: 800 clamp(34px, 4.2vw, 50px) / 1.04 var(--f-display);
+  font-stretch: 108%;
+  letter-spacing: -0.025em;
+}
+.pay-main .lead {
+  margin: 0 0 32px;
+  color: var(--ink-2);
+  font-size: 18px;
+}
+.pay [hidden] {
+  display: none !important;
+}
+.pay-login {
+  padding: 28px;
+  border-radius: var(--r);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+.pay-login h2 {
+  margin: 0 0 8px;
+  font: 750 24px/1.2 var(--f-display);
+}
+.pay-login p {
+  margin: 0 0 22px;
+  color: var(--ink-2);
+}
+.pay-login .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.pay-form {
+  gap: 28px;
+}
+.pay-account {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.pay-account b {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.pay-notyou {
+  display: block;
+  margin-top: 2px;
+}
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.pay-set {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.pay-set legend {
+  padding: 0;
+  margin-bottom: 14px;
+  font: 750 13px/1.2 var(--f-text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.pay-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.picks {
+  display: grid;
+  gap: 10px;
+}
+.picks-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.pick {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+.pick input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.pick-box {
+  display: grid;
+  gap: 4px;
+  height: 100%;
+  padding: 16px 18px 16px 50px;
+  border: 1.5px solid rgba(20, 18, 16, 0.18);
+  border-radius: 14px;
+  background: var(--white);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pick-box::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 19px;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(20, 18, 16, 0.3);
+  border-radius: 50%;
+  background: var(--white);
+}
+.pick input:checked + .pick-box {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.pick input:checked + .pick-box::before {
+  border: 6px solid var(--orange);
+}
+.pick input:focus-visible + .pick-box {
+  box-shadow: 0 0 0 4px rgba(255, 90, 31, 0.25);
+}
+.pick:hover .pick-box {
+  border-color: rgba(20, 18, 16, 0.45);
+}
+.pick-box b {
+  font-size: 16px;
+}
+.pick-price {
+  font: 800 22px/1.2 var(--f-display);
+}
+.pick-price small {
+  font: 500 13px var(--f-text);
+  color: var(--ink-3);
+}
+.pick-note {
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.45;
+}
+/* 选中的付款方式下面展开：卡号表单或转账信息 */
+.pay-panel {
+  display: grid;
+  gap: 18px;
+  margin: -10px 0 0;
+  padding: 20px 18px 18px;
+  border: 1.5px solid var(--ink);
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+  background: var(--white);
+}
+.pick:has(input:checked):has(+ .pay-panel:not([hidden])) .pick-box {
+  border-radius: 14px 14px 0 0;
+  border-bottom-color: var(--line);
+  box-shadow: none;
+}
+.pay-panel > p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.pay-panel .fine {
+  margin: 0;
+}
+.card-logos {
+  position: absolute;
+  right: 16px;
+  top: 17px;
+  display: flex;
+  gap: 4px;
+}
+.card-logo {
+  padding: 2px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: 800 10px/1.3 var(--f-text);
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+.card-logo-visa { color: #1a1f71; }
+.card-logo-mc { color: #eb001b; }
+.card-logo-amex { color: #006fcf; }
+.fld-card {
+  position: relative;
+}
+.fld-card input:not([type="checkbox"]) {
+  padding-right: 150px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.card-brand {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-3);
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+}
+.card-brand[data-brand="visa"] { color: #1a1f71; }
+.card-brand[data-brand="mastercard"] { color: #eb001b; }
+.card-brand[data-brand="amex"] { color: #006fcf; }
+.spei {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.spei > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.spei > div + div {
+  border-top: 1px solid var(--line);
+}
+.spei dt {
+  color: var(--ink-3);
+  font-size: 14px;
+}
+.spei dd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+.spei code {
+  font: 600 16px/1.3 ui-monospace, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+.copy-btn {
+  padding: 4px 10px;
+  border: 1px solid rgba(20, 18, 16, 0.2);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 600 13px/1.4 var(--f-text);
+  cursor: pointer;
+}
+.copy-btn:hover {
+  background: var(--paper-2);
+}
+.pay-done-paid {
+  margin: -20px 0 24px;
+  color: var(--ink-3);
+  font-size: 15px;
+}
+.pay-demo {
+  margin: 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--orange);
+  border-radius: 0 10px 10px 0;
+  background: #fff4ee;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.pay-sum {
+  position: sticky;
+  top: calc(var(--topbar) + 32px);
+  padding: 28px;
+  border-radius: 24px;
+  background: var(--paper-2);
+}
+.pay-sum-t {
+  margin: 0 0 18px;
+  font: 750 13px/1.2 var(--f-text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.pay-sum-name {
+  display: grid;
+  margin: 0 0 18px;
+}
+.pay-sum-name b {
+  font: 800 30px/1.1 var(--f-display);
+  letter-spacing: -0.015em;
+}
+.pay-sum-name span {
+  color: var(--ink-3);
+  font-size: 15px;
+}
+.pay-sum dl {
+  margin: 0;
+}
+.pay-sum dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 15px;
+}
+.pay-sum dt {
+  color: var(--ink-2);
+}
+.pay-sum dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.pay-sum-keys {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.pay-sum-money {
+  padding-top: 10px;
+}
+.pay-sum-promo dd s {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.pay-sum .pay-sum-total {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  align-items: baseline;
+}
+.pay-sum-total dt {
+  color: var(--ink);
+  font-weight: 700;
+}
+.pay-sum-total dd {
+  font: 800 28px/1 var(--f-display);
+}
+.pay-sum-total small {
+  font: 500 13px var(--f-text);
+  color: var(--ink-3);
+}
+.pay-sum-notes {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+.pay-done {
+  outline: none;
+}
+.pay-done-mark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 22px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: var(--white);
+}
+.pay-done-mark .ck {
+  width: 28px;
+  height: 28px;
+}
+.pay-done-order {
+  display: inline-block;
+  margin: 0 0 28px;
+  padding: 12px 18px;
+  border: 1.5px dashed rgba(20, 18, 16, 0.25);
+  border-radius: 12px;
+  background: var(--white);
+}
+.pay-done-order dt {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.pay-done-order dd {
+  margin: 0;
+  font: 600 18px/1.3 ui-monospace, Consolas, monospace;
+}
+.pay-done .fine a {
+  white-space: nowrap;
+}
+.pay-done .cta-row {
+  margin-bottom: 24px;
+}
+@media (max-width: 960px) {
+  .pay-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pay-sum {
+    position: static;
+    max-width: 600px;
+  }
+}
+@media (max-width: 560px) {
+  .picks-2 {
+    grid-template-columns: 1fr;
+  }
+  .pay > .wrap .pay-set > .pay-2 {
+    grid-template-columns: 1fr;
+  }
+  .card-logos {
+    display: none;
+  }
+  .spei > div {
+    flex-wrap: wrap;
   }
 }

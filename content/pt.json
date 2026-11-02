@@ -77,7 +77,7 @@
       },
       {
         "k": "Nota fiscal CFDI",
-        "v": "Preços em pesos, IVA incluso"
+        "v": "Preços em pesos, IVA (16%) incluso"
       }
     ],
     "uses": {
@@ -149,7 +149,7 @@
     "pricing": {
       "label": "Preços",
       "title": "Comece grátis. Pague só se fizer sentido.",
-      "text": "7 dias grátis, sem cartão. Depois, planos anuais em pesos com IVA incluso. Emitimos nota fiscal (CFDI).",
+      "text": "7 dias grátis, sem cartão. Depois, planos anuais em pesos com IVA (16%) incluso. Emitimos nota fiscal (CFDI).",
       "from": "Planos a partir de",
       "fromPrice": "$1,399 MXN por ano",
       "cta": "Ver planos e preços"
@@ -267,7 +267,7 @@
         },
         {
           "k": "Uma lista por unidade",
-          "v": "Agrupe vários vídeos em uma coluna e compartilhe um só QR."
+          "v": "Agrupe vários vídeos em uma lista e compartilhe um só QR."
         },
         {
           "k": "Senha opcional",
@@ -488,7 +488,7 @@
       "items": [
         {
           "k": "Vários vídeos, um QR",
-          "v": "Reúna as aulas de uma unidade ou os modelos de uma linha em uma coluna."
+          "v": "Reúna as aulas de uma unidade ou os modelos de uma linha em uma lista."
         },
         {
           "k": "Estatísticas",
@@ -537,7 +537,7 @@
   },
   "pricing": {
     "title": "Preços claros, em pesos.",
-    "lead": "Comece grátis por 7 dias, sem cartão. Se fizer sentido, escolha um plano anual. Todos os preços incluem IVA.",
+    "lead": "Comece grátis por 7 dias, sem cartão. Se fizer sentido, escolha um plano anual. Todos os preços incluem IVA (16%).",
     "seoTitle": "Preços · Planos do QRveo em pesos mexicanos com IVA incluso",
     "plans": [
       {
@@ -553,17 +553,29 @@
         "for": "Para um negócio com vários produtos, cursos ou áreas",
         "price": "$1,399",
         "unit": "MXN por ano",
-        "monthly": "IVA incluso · Equivale a $117 por mês",
+        "monthly": "IVA (16%) incluso · Equivale a $117 por mês",
         "cta": "Começar com o Padrão",
-        "badge": "O mais escolhido"
+        "badge": "O mais escolhido",
+        "extrasTitle": "Tudo do teste grátis, e mais:",
+        "extras": [
+          "Sua marca na página do vídeo",
+          "Um ano inteiro, não só 7 dias",
+          "12 vezes mais espaço que o teste"
+        ]
       },
       {
         "name": "Premium",
         "for": "Para marcas e escolas com grande público",
         "price": "$3,999",
         "unit": "MXN por ano",
-        "monthly": "IVA incluso · Equivale a $333 por mês",
-        "cta": "Começar com o Premium"
+        "monthly": "IVA (16%) incluso · Equivale a $333 por mês",
+        "cta": "Começar com o Premium",
+        "extrasTitle": "Tudo do Padrão, e mais:",
+        "extras": [
+          "Mais de 8 vezes o espaço do Padrão",
+          "Cerca de 7 vezes mais reproduções por mês",
+          "Feito para milhares de embalagens, livros ou alunos"
+        ]
       }
     ],
     "compareTitle": "Compare os planos",
@@ -579,7 +591,7 @@
       {
         "k": "Visualizações por mês (aprox.)",
         "v": [
-          "370 a 660",
+          "",
           "4,500 a 8,000",
           "31,000 a 56,000"
         ]
@@ -641,14 +653,6 @@
         ]
       },
       {
-        "k": "Qualidade",
-        "v": [
-          "HD",
-          "HD e UHD",
-          "HD e UHD"
-        ]
-      },
-      {
         "k": "Suporte pelo WhatsApp",
         "v": [
           "Sim",
@@ -665,7 +669,7 @@
       },
       {
         "k": "Como pago?",
-        "v": "Com cartão de crédito ou débito. Se precisar pagar por transferência, fale com a gente."
+        "v": "Com cartão de crédito ou débito, ou por transferência SPEI: preencha seus dados e enviamos as informações para transferir."
       },
       {
         "k": "Vocês emitem nota fiscal?",
@@ -673,7 +677,7 @@
       },
       {
         "k": "E se o plano não for suficiente?",
-        "v": "Avisamos por e-mail quando você atingir 80 % e 95 % do plano, para que você mude para um maior a tempo."
+        "v": "Avisamos por e-mail quando você atingir 80 % e 95 % do plano, para que você mude para um maior a tempo. Seus vídeos não param ao chegar a 100%."
       }
     ],
     "enterprise": {
@@ -697,7 +701,16 @@
         }
       ],
       "note": "Estimativa com vídeos curtos em HD. Você pode mudar de plano quando precisar."
-    }
+    },
+    "trial": {
+      "title": "Teste grátis de 7 dias",
+      "text": "Sem cartão. Envie seus primeiros vídeos, imprima um QR e escaneie você mesmo. O que você imprimir continua funcionando quando o teste acabar."
+    },
+    "promo": {
+      "label": "Preço de lançamento",
+      "was": "De"
+    },
+    "invoice": "Emitimos nota fiscal (CFDI)"
   },
   "help": {
     "title": "Ajuda",
@@ -772,11 +785,11 @@
           },
           {
             "q": "E se as visualizações do mês acabarem?",
-            "a": "Avisamos por e-mail quando você usar 80 % e 95 % do plano, para que você mude para um maior a tempo."
+            "a": "Avisamos por e-mail quando você usar 80 % e 95 % do plano, para que você mude para um maior a tempo. Seus vídeos não param ao chegar a 100%."
           },
           {
             "q": "Como pago?",
-            "a": "Com cartão de crédito ou débito. Se precisar pagar por transferência, fale com a gente."
+            "a": "Com cartão de crédito ou débito, ou por transferência SPEI: preencha seus dados e enviamos as informações para transferir."
           },
           {
             "q": "Vocês emitem nota fiscal?",
@@ -842,7 +855,7 @@
       },
       {
         "k": "Como trabalhamos",
-        "v": "Preços claros com IVA incluso, nota fiscal CFDI, sem anúncios nos seus vídeos e suporte pelo WhatsApp no seu horário."
+        "v": "Preços claros com IVA (16%) incluso, nota fiscal CFDI, sem anúncios nos seus vídeos e suporte pelo WhatsApp em horário comercial do México."
       }
     ],
     "flowTitle": "Como funciona, do início ao fim",
@@ -1056,5 +1069,74 @@
       "tooMany": "Tentativas demais. Aguarde alguns minutos e tente de novo.",
       "email": "Digite um e-mail válido."
     }
+  },
+  "checkout": {
+    "seo": "Pagamento",
+    "eyebrow": "Pagamento",
+    "title": "Conclua sua compra",
+    "lead": "Seu plano é ativado na hora. Seus vídeos e códigos QR continuam iguais.",
+    "account": "O plano será ativado na conta",
+    "notYou": "Não é sua conta?",
+    "logout": "Sair",
+    "planTitle": "Plano",
+    "period": "Pagamento anual · 365 dias",
+    "billingTitle": "Dados para o recibo",
+    "name": "Nome ou razão social",
+    "namePh": "Padaria La Espiga",
+    "email": "E-mail para recibos",
+    "rfc": "RFC (opcional)",
+    "rfcHint": "Só se você precisar de nota fiscal (CFDI).",
+    "rfcBad": "O RFC tem 12 ou 13 caracteres, sem espaços.",
+    "phone": "Telefone (opcional)",
+    "methodTitle": "Forma de pagamento",
+    "card": "Cartão de crédito ou débito",
+    "cardNote": "Visa, Mastercard ou American Express",
+    "spei": "Transferência SPEI",
+    "speiNote": "Enviamos a CLABE para pagar pelo seu banco",
+    "demo": "Versão de teste: nada é cobrado. Ao pagar, o plano é ativado na hora.",
+    "pay": "Pagar {price}",
+    "busy": "Processando…",
+    "summary": "Seu pedido",
+    "subtotal": "Subtotal",
+    "iva": "IVA (16%)",
+    "total": "Total",
+    "until": "Válido até {date}",
+    "extend": "Somado ao seu plano atual",
+    "keep": "Seus vídeos e códigos QR não mudam",
+    "loginTitle": "Entre para continuar",
+    "loginText": "O plano é ativado na sua conta QRveo. Se ainda não tem uma, crie grátis: leva um minuto.",
+    "loginBtn": "Entrar",
+    "registerBtn": "Criar conta grátis",
+    "doneTitle": "Pronto! Seu plano {plan} está ativo",
+    "doneText": "Você já pode enviar mais vídeos. Válido até {date}.",
+    "order": "Número do pedido",
+    "invoice": "Precisa de nota fiscal? Escreva no WhatsApp com o número do pedido.",
+    "goPanel": "Ir para o meu painel",
+    "child": "Subcontas não podem comprar planos. Peça ao administrador da conta.",
+    "off": "O pagamento on-line ainda não está disponível. Escreva no WhatsApp e ajudamos você.",
+    "session": "Sua sessão terminou. Entre de novo para continuar.",
+    "cardNumber": "Número do cartão",
+    "cardName": "Nome no cartão",
+    "cardNamePh": "Como aparece no cartão",
+    "cardExp": "Validade",
+    "cardCvc": "Código de segurança",
+    "cardCvcHint": "3 dígitos no verso (4 na frente no American Express)",
+    "cardBad": "Confira o número do cartão.",
+    "cardBrandBad": "Aceitamos Visa, Mastercard e American Express.",
+    "expBad": "Confira a data: mês e ano, por exemplo 08/29.",
+    "expPast": "Este cartão está vencido.",
+    "cvcBad": "Digite o código de segurança completo.",
+    "speiIntro": "Transfira pelo app ou site do seu banco com estes dados. Coloque a referência no campo de descrição para identificarmos seu pagamento.",
+    "speiBank": "Banco",
+    "speiClabe": "CLABE",
+    "speiHolder": "Beneficiário",
+    "speiAmount": "Valor exato",
+    "speiRef": "Descrição / referência",
+    "speiPay": "Já fiz a transferência",
+    "speiWhen": "Ativamos seu plano assim que virmos o depósito: com SPEI costuma chegar em minutos.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "paidWith": "Pago com {brand} final {last4}",
+    "paidSpei": "Pago por transferência SPEI · referência {ref}"
   }
 }

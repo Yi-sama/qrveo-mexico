@@ -180,13 +180,20 @@ if (topbar) {
   onScroll();
 }
 
-// 6 · 离开首屏后才出现 WhatsApp 浮动按钮
+// 6 · WhatsApp 浮动按钮：滚过第一屏才出现；页尾自带 WhatsApp 的区块在视野里时让开；联系页和账号页不显示
 const wa = document.querySelector("[data-wa-float]");
-const hero = document.querySelector(".hero");
-if (wa && hero) {
-  new IntersectionObserver(([e]) => wa.classList.toggle("is-on", !e.isIntersecting), {
-    rootMargin: "0px 0px -35% 0px",
-  }).observe(hero);
+if (wa && document.querySelector(".contact-form, .auth")) wa.remove();
+else if (wa) {
+  const ends = [...document.querySelectorAll(".final, .foot")];
+  const seen = new Set();
+  const update = () => wa.classList.toggle("is-on", scrollY > innerHeight * 0.6 && !seen.size);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => (e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)));
+    update();
+  });
+  ends.forEach((el) => io.observe(el));
+  addEventListener("scroll", update, { passive: true });
+  update();
 }
 
 // 7 · 贴纸进入视野时“拍”上来
@@ -421,7 +428,7 @@ if (langBox) {
     }),
   );
 
-  // 第一次来、浏览器语言和本页不同：顶部轻轻提示一次，可以关掉
+  // 第一次来、浏览器语言和本页不同：轻轻提示一次，可以关掉
   let saved = "";
   try {
     saved = localStorage.getItem("vqr-lang") || "";
@@ -450,7 +457,7 @@ if (langBox) {
         /* 忽略 */
       }
     });
-    document.querySelector("[data-topbar]")?.after(bar);
+    document.body.append(bar); // 浮在左下角，不把页面往下推
   }
 }
 
@@ -493,7 +500,7 @@ async function api(path, { method = "GET", body, token } = {}) {
   }
   const j = await res.json().catch(() => ({}));
   const bad = !res.ok || j.success === false || (typeof j.code === "number" && j.code !== 0 && j.code !== 200);
-  if (bad) throw Object.assign(new Error(j.message || j.msg || ""), { status: res.status, code: j.errorCode || j.code });
+  if (bad) throw Object.assign(new Error(j.message || j.msg || ""), { status: res.status, code: j.errorCode || j.code, num: typeof j.code === "number" ? j.code : j.statusCode, errors: j.errors });
   return j || {};
 }
 const dataOf = (j) => (j && j.data && typeof j.data === "object" ? j.data : j) || {};
@@ -759,4 +766,224 @@ if (authPage) {
         resetBox.querySelector("[data-reset-again]").hidden = false;
       });
   }
+}
+
+// 18 · 结账页（第一阶段是模拟支付：后台 /billing/demo-checkout 收到资料就开通套餐，不扣款）
+// 要先登录：令牌来自官网登录写的 cookie；控制台的“升级”按钮跳过来之前也会写这个 cookie
+const payPage = document.querySelector("[data-pay-page]");
+if (payPage) {
+  const T = JSON.parse(document.getElementById("pay-text").textContent);
+  const form = payPage.querySelector("[data-pay-form]");
+  const login = payPage.querySelector("[data-pay-login]");
+  const msg = form.querySelector("[data-auth-msg]");
+  const btn = form.querySelector(".auth-submit");
+  const btnText = form.querySelector("[data-pay-btn]");
+  const untilRow = payPage.querySelector("[data-pay-until]");
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const RFC = /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/;
+  const DAY = 86400000;
+  const fmt = (d) => d.toLocaleDateString(document.documentElement.lang, { day: "numeric", month: "long", year: "numeric" });
+  // 后台的接口有两种写法：status="success" 或 success=true；都要看
+  const ok = (j) => !(j && j.status && j.status !== "success");
+  const val = (n) => String(form.elements[n]?.value || "").trim();
+  const say = (text) => {
+    msg.hidden = !text;
+    msg.textContent = text || "";
+  };
+  const fieldErr = (name, text) => {
+    const box = form.querySelector(`[data-fld="${name}"]`);
+    const el = box.querySelector("[data-err]");
+    el.hidden = !text;
+    el.textContent = text || "";
+    form.elements[name].setAttribute("aria-invalid", String(!!text));
+  };
+  form.addEventListener("input", (e) => e.target.name && form.querySelector(`[data-fld="${e.target.name}"]`) && fieldErr(e.target.name, ""));
+
+  // 套餐：?plan= 预选；切换时右边的订单摘要和按钮金额跟着换
+  let user = null;
+  const want = new URLSearchParams(location.search).get("plan");
+  const radio = form.querySelector(`input[name="plan"][value="${CSS.escape(want || "")}"]`);
+  if (radio) radio.checked = true;
+  const plan = () => form.elements.plan.value;
+  // 当前套餐还没到期、又买同一个：在原到期日上加一年；否则从今天起一年
+  const sameAs = (id) => user && new RegExp(id === "premium" ? "premium" : "est[aá]ndar|standard", "i").test(String(user.packagetypeName || ""));
+  const showPlan = () => {
+    const id = plan();
+    payPage.querySelectorAll("[data-sum]").forEach((el) => (el.hidden = el.dataset.sum !== id));
+    btnText.textContent = method() === "spei" ? T.speiPay : T.pay.replace("{price}", T.plans[id].price);
+    form.querySelector("[data-spei-amount]").textContent = T.plans[id].price;
+    if (!user) return;
+    const exp = new Date(user.serviceExpiration).getTime();
+    const extend = sameAs(id) && exp > Date.now();
+    untilRow.querySelector("span").textContent = T.until.replace("{date}", fmt(new Date((extend ? exp : Date.now()) + 365 * DAY))) + (extend ? ` · ${T.extend}` : "");
+    untilRow.hidden = false;
+  };
+  // 付款方式：选中的那一种展开它的面板（银行卡填卡，SPEI 显示转账信息）
+  const method = () => form.elements.method.value;
+  const showMethod = () => {
+    form.querySelectorAll("[data-method-panel]").forEach((el) => (el.hidden = el.dataset.methodPanel !== method()));
+    showPlan();
+  };
+  form.addEventListener("change", (e) => (e.target.name === "plan" ? showPlan() : e.target.name === "method" && showMethod()));
+  // SPEI 参考号：7 位数字，同一个浏览器标签里保持不变，转账备注要填
+  let ref = sessionStorage.getItem("qrveo-spei-ref");
+  if (!ref) sessionStorage.setItem("qrveo-spei-ref", (ref = String(1000000 + Math.floor(Math.random() * 9000000))));
+  form.querySelector("[data-spei-ref]").textContent = ref;
+  form.querySelectorAll(".copy-btn").forEach((b) =>
+    b.addEventListener("click", () => {
+      const text = b.dataset.copyText || form.querySelector(b.dataset.copyFrom).textContent;
+      navigator.clipboard?.writeText(b.dataset.copyText ? text : text.replace(/[^\d.]/g, "")).then(() => {
+        b.textContent = T.copied;
+        setTimeout(() => (b.textContent = T.copy), 1600);
+      });
+    }),
+  );
+
+  // 银行卡：边输入边分组、认卡组织；提交时校验
+  const BRANDS = [
+    ["amex", "American Express", /^3[47]/, [15], 4],
+    ["visa", "Visa", /^4/, [13, 16, 19], 3],
+    ["mastercard", "Mastercard", /^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/, [16], 3],
+  ];
+  const digits = (n) => val(n).replace(/\D/g, "");
+  const brandOf = (num) => BRANDS.find((b) => b[2].test(num));
+  const luhn = (num) => {
+    let sum = 0;
+    for (let i = 0; i < num.length; i++) {
+      let d = +num[num.length - 1 - i];
+      if (i % 2) d = d * 2 > 9 ? d * 2 - 9 : d * 2;
+      sum += d;
+    }
+    return sum % 10 === 0;
+  };
+  const cardInput = form.elements.cardnum;
+  const brandTag = form.querySelector("[data-card-brand]");
+  cardInput.addEventListener("input", () => {
+    const num = digits("cardnum").slice(0, 19);
+    const b = brandOf(num);
+    // American Express 按 4-6-5 分组，其他按 4 位一组
+    cardInput.value = b && b[0] === "amex" ? [num.slice(0, 4), num.slice(4, 10), num.slice(10, 15)].filter(Boolean).join(" ") : num.replace(/(\d{4})(?=\d)/g, "$1 ");
+    brandTag.textContent = b ? b[1] : "";
+    brandTag.dataset.brand = b ? b[0] : "";
+    form.elements.cardcvc.maxLength = b ? b[4] : 4;
+  });
+  form.elements.cardexp.addEventListener("input", (e) => {
+    let d = digits("cardexp").slice(0, 4);
+    if (d.length === 1 && d > "1") d = `0${d}`; // 输入 8 → 08
+    e.target.value = d.length > 2 || (d.length === 2 && e.inputType !== "deleteContentBackward") ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
+  });
+  form.elements.cardcvc.addEventListener("input", (e) => (e.target.value = digits("cardcvc")));
+  const cardRules = () => {
+    const num = digits("cardnum");
+    const b = brandOf(num);
+    const [mm, yy] = [digits("cardexp").slice(0, 2), digits("cardexp").slice(2)];
+    const now = new Date();
+    const expOk = /^(0[1-9]|1[0-2])$/.test(mm) && yy.length === 2;
+    const notPast = expOk && new Date(2000 + +yy, +mm, 1) > now;
+    return [
+      ["cardnum", num.length >= 12 && (b ? b[3].includes(num.length) && luhn(num) : false), b || num.length < 12 ? T.cardBad : T.cardBrandBad],
+      ["cardname", !!val("cardname"), T.required],
+      ["cardexp", notPast, expOk ? T.expPast : T.expBad],
+      ["cardcvc", digits("cardcvc").length === (b ? b[4] : 3), T.cvcBad],
+    ];
+  };
+  showMethod();
+
+  // 登录后回到这一页（带着选好的套餐）
+  const back = () => {
+    const u = new URL(location.href);
+    u.searchParams.set("plan", plan());
+    return u.pathname + u.search;
+  };
+  payPage.querySelectorAll("[data-pay-return]").forEach((a) => a.addEventListener("click", () => (a.href = `${a.href.split("?")[0]}?return=${encodeURIComponent(back())}`)));
+  const needLogin = (text) => {
+    clearToken();
+    user = null;
+    form.hidden = true;
+    login.hidden = false;
+    const p = login.querySelector("p");
+    if (text) p.textContent = text;
+  };
+
+  const token = readToken();
+  if (!token) needLogin();
+  else
+    api("/user/get-user", { token })
+      .then((j) => {
+        if (!ok(j)) throw Object.assign(new Error(""), { status: 401 });
+        user = dataOf(j);
+        form.querySelector("[data-pay-account]").textContent = user.email || user.name || "";
+        if (!form.elements.name.value) form.elements.name.value = user.company || user.name || "";
+        if (!form.elements.email.value) form.elements.email.value = user.email || "";
+        if (!form.elements.phone.value) form.elements.phone.value = user.telephone || "";
+        form.hidden = false;
+        showPlan();
+      })
+      .catch((e) => (e.network ? (form.hidden = false, say(T.network)) : needLogin()));
+
+  payPage.querySelector("[data-pay-logout]").addEventListener("click", async () => {
+    await api("/auth/logout", { method: "POST", token: readToken() }).catch(() => {});
+    needLogin();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    say("");
+    form.elements.rfc.value = val("rfc").toUpperCase().replace(/\s+/g, "");
+    const rules = [
+      ["name", !!val("name"), T.required],
+      ["email", EMAIL.test(val("email")), T.email],
+      ["rfc", !val("rfc") || RFC.test(val("rfc")), T.rfcBad],
+      ...(method() === "card" ? cardRules() : []),
+    ];
+    let first = null;
+    for (const [name, good, text] of rules) {
+      fieldErr(name, good ? "" : text);
+      if (!good && !first) first = form.elements[name];
+    }
+    if (first) return first.focus();
+    btn.disabled = true;
+    btnText.textContent = btn.dataset.busy;
+    try {
+      const billing = { name: val("name"), email: val("email") };
+      if (val("rfc")) billing.rfc = val("rfc");
+      if (val("phone")) billing.phone = val("phone");
+      // 卡号和安全码不出浏览器：后台只拿到卡组织和后四位
+      const num = digits("cardnum");
+      const pay = method() === "card" ? { card: { brand: brandOf(num)[0], last4: num.slice(-4), exp: digits("cardexp").replace(/^(\d\d)(\d\d)$/, "$1/$2"), holder: val("cardname") } } : { spei: { reference: ref } };
+      const j = await api("/billing/demo-checkout", { method: "POST", token: readToken(), body: { plan: plan(), method: method(), billing, ...pay } });
+      if (!ok(j)) throw Object.assign(new Error(j.message || ""), { status: j.statusCode });
+      const d = dataOf(j);
+      const done = payPage.querySelector("[data-pay-done]");
+      const exp = d.serviceExpiration ? new Date(d.serviceExpiration) : new Date(Date.now() + 365 * DAY);
+      const order = d.orderNo || d.orderId || d.order_no || (d.order && (d.order.orderNo || d.order.id)) || "";
+      done.querySelector("[data-done-title]").textContent = T.doneTitle.replace("{plan}", T.plans[plan()].name);
+      done.querySelector("[data-done-text]").textContent = T.doneText.replace("{date}", fmt(exp));
+      done.querySelector("[data-done-order]").textContent = order;
+      done.querySelector("[data-done-paid]").textContent = pay.card
+        ? T.paidWith.replace("{brand}", brandOf(num)[1]).replace("{last4}", pay.card.last4)
+        : T.paidSpei.replace("{ref}", ref);
+      ["cardnum", "cardcvc"].forEach((n) => (form.elements[n].value = ""));
+      done.querySelector(".pay-done-order").hidden = !order;
+      done.querySelector('[data-console="panel"]').href = panelUrl();
+      untilRow.querySelector("span").textContent = T.until.replace("{date}", fmt(exp));
+      payPage.querySelector("[data-pay-head]").hidden = true;
+      form.hidden = true;
+      done.hidden = false;
+      done.focus();
+      scrollTo({ top: 0, behavior: "instant" });
+    } catch (err) {
+      // 有的错误是 HTTP 200 + 业务码，所以 HTTP 状态不是错误码时看业务码
+      const s = err.status >= 400 ? err.status : err.num || err.status;
+      // 400 时后台在 errors 里按字段给出原因（例如 email、billing.rfc）；用我们自己的多语言提示标到对应输入框
+      const bad = Object.keys((s === 400 && err.errors) || {}).map((k) => k.replace(/^billing\./, ""));
+      const known = { name: T.required, email: T.email, rfc: T.rfcBad };
+      bad.filter((k) => known[k]).forEach((k) => fieldErr(k, known[k]));
+      if (s === 401) needLogin(T.session);
+      else if (bad.some((k) => known[k])) form.elements[bad.find((k) => known[k])].focus();
+      else say(err.network ? T.network : s === 403 ? T.child : s === 404 || s === 409 ? T.off : T.generic);
+      btn.disabled = false;
+      showPlan();
+    }
+  });
 }

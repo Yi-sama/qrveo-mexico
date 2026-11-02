@@ -14,7 +14,7 @@ function canExport(pathname) {
   // Session/API responses stay live, including public video metadata and counters.
   // Watch HTML and payloads vary by device and query; they cannot share a snapshot.
   if (target?.service === "front") return target.path.startsWith("/_nuxt/") || target.path === "/favicon.ico";
-  return !!target && !target.requiresAuth && !["api", "health"].includes(target.service);
+  return !!target && !target.requiresAuth && !target.dynamic && !["api", "health"].includes(target.service);
 }
 
 function containerFiles(container, directory, publicPrefix) {

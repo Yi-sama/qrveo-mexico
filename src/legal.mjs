@@ -56,23 +56,23 @@ export const legalPages = [
       {
         h: "El servicio",
         p: [
-          "QRveo te permite subir videos de tus productos, generar un código QR para cada uno y que tus clientes los vean en su celular sin instalar una app ni registrarse.",
+          "QRveo te permite subir videos, generar un código QR para cada uno y que cualquier persona los vea en su celular sin instalar una app ni registrarse.",
         ],
       },
       {
         h: "Prueba gratis",
-        p: ["La prueba dura 30 días, no requiere tarjeta e incluye 5 GB de espacio. Al terminar, puedes contratar un plan anual."],
+        p: ["La prueba dura 7 días, no requiere tarjeta e incluye 5 GB de espacio. Los QR que imprimas durante la prueba siguen funcionando al terminar. Al terminar, puedes contratar un plan anual."],
       },
       {
         h: "Planes y pagos",
         p: [
-          "Los precios publicados están en pesos mexicanos e incluyen IVA. Los planes se pagan por año con tarjeta de crédito o débito, o por transferencia SPEI. Emitimos factura (CFDI) a solicitud.",
+          "Los precios publicados están en pesos mexicanos e incluyen IVA (16%). Los planes se pagan por año con tarjeta de crédito o débito, o por transferencia SPEI. Emitimos factura (CFDI) a solicitud.",
         ],
       },
       {
         h: "Si no renuevas",
         p: [
-          "Al vencer tu plan ya no podrás subir ni editar videos, pero los códigos QR que ya imprimiste siguen funcionando para que tus clientes no se queden sin instructivo.",
+          "Al vencer tu plan ya no podrás subir ni editar videos, pero los códigos QR que ya imprimiste siguen funcionando, para que quien los escanee pueda seguir viendo tus videos.",
         ],
       },
       {

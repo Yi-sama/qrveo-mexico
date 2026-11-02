@@ -4,7 +4,7 @@ const assert = require("node:assert/strict");
 const http = require("node:http");
 const vm = require("node:vm");
 const zlib = require("node:zlib");
-const { PREFIX, VIDEO_IDS, createGateway } = require("./demo-gateway.cjs");
+const { PREFIX, VIDEO_IDS, createGateway, resolveTarget } = require("./demo-gateway.cjs");
 const { canExport } = require("./export-demo-static.cjs");
 
 assert.equal(canExport(`${PREFIX}/__qrveo/console/`), true);
@@ -18,7 +18,14 @@ for (const pathname of [
   `/videos/${VIDEO_IDS[0]}_h/_payload.json`,
   "/_payload.json",
   "/healthz", "/../private",
+  "/pages/c5f71b70-9f65-4a97-bf8e-5d327cc3b70a",
+  "/__qrveo/media/vod-material/owner/uploadmaterial/a/file.pdf",
 ]) assert.equal(canExport(PREFIX + pathname), false, pathname);
+assert.equal(resolveTarget("GET", `${PREFIX}/pages/c5f71b70-9f65-4a97-bf8e-5d327cc3b70a`).service, "front");
+assert.equal(resolveTarget("GET", `${PREFIX}/page-assets/pdfjs/pdf.min.mjs`).service, "front");
+assert.equal(resolveTarget("GET", `${PREFIX}/__qrveo/media/vod-material/owner/uploadmaterial/a/draft.html`).requiresAuth, true);
+assert.equal(resolveTarget("PUT", `${PREFIX}/__qrveo/media/vod-material/owner/uploadmaterial/a/index.html`).signedUpload, true);
+assert.equal(resolveTarget("PUT", `${PREFIX}/__qrveo/media/system/private.js`), null);
 
 const OLD_BOOTSTRAP = `
 function allowedOfficial(url) {
@@ -93,18 +100,41 @@ function json(res, value) {
 
 async function main() {
   const calls = [];
+  const publicId = "ownerpublicvideo0123456789";
+  let publicMetadata = { success: true, statusCode: 200, data: { sourceVideoId: publicId, passwordRequired: false } };
   const api = http.createServer((req, res) => {
     const chunks = [];
     req.on("data", (chunk) => chunks.push(chunk));
     req.on("end", () => {
       const body = Buffer.concat(chunks).toString("utf8");
-      calls.push({ path: req.url, token: req.headers["x-auth-token"], body, contentLength: req.headers["content-length"] });
+      calls.push({ path: req.url, token: req.headers["x-auth-token"], body, contentLength: req.headers["content-length"], origin: req.headers.origin });
+      if (req.method === "OPTIONS" && req.url === "/billing/demo-checkout") {
+        if (["http://127.0.0.1:4321", "https://api.yisama.asia"].includes(req.headers.origin)) {
+          res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
+          res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+          res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept-Language, x-auth-token");
+        }
+        res.writeHead(204).end();
+        return;
+      }
       if (req.url === "/user/get-user") return json(res, req.headers["x-auth-token"] === "ok" ? { success: true, data: { userId: "owner" } } : { success: false });
+      if (req.url === `/vod/video/${publicId}_o.json`) return json(res, publicMetadata);
       if (req.url.startsWith("/vod/video/")) return json(res, { success: true, hls: `http://127.0.0.1:${ports.hls}/vod-mp4/hceea401fc/${VIDEO_IDS[1]}/stream.m3u8` });
+      if (req.url === "/custom-page/create") return json(res, { success: true });
+      if (req.url.startsWith("/custom-page/list?")) {
+        return json(res, { success: true, data: { list: [{ id: "owned-page", pageName: "QA page" }], total: 1 } });
+      }
       if (req.url === "/overview/playback/event") return json(res, { success: true });
       if (req.url === "/deploy-info") return json(res, { success: true, data: { emailVerificationRequired: false } });
       if (req.url === "/auth/login") return json(res, { success: true, token: "demo" });
       if (req.url === "/auth/logout") return json(res, { success: true });
+      if (req.url === "/billing/demo-checkout") {
+        if (req.headers["x-auth-token"] !== "ok") {
+          res.statusCode = 401;
+          return json(res, { status: "error", success: false, statusCode: 401 });
+        }
+        return json(res, { status: "success", statusCode: 200, success: true, data: { orderNo: "demo-test", packagetypeId: 124 } });
+      }
       res.statusCode = 404;
       json(res, { success: false });
     });
@@ -115,6 +145,15 @@ async function main() {
     res.end(`#EXTM3U\nhttp://127.0.0.1:${ports.storage}/vod-mp4/hceea401fc/${VIDEO_IDS[1]}/part.ts\n`);
   });
   const storage = http.createServer((req, res) => {
+    if (req.method === "PUT") {
+      const chunks = [];
+      req.on("data", chunk => chunks.push(chunk));
+      req.on("end", () => {
+        calls.push({ path: req.url, headers: req.headers, body: Buffer.concat(chunks).toString("utf8") });
+        res.writeHead(200).end();
+      });
+      return;
+    }
     res.setHeader("content-type", "video/mp4");
     res.end(Buffer.from([0, 1, 2, 3]));
   });
@@ -183,6 +222,7 @@ async function main() {
     assert.match(consolePage.body, new RegExp(`${PREFIX}/__qrveo/console-bootstrap\\.js`));
     assert.match(consolePage.body, new RegExp(`https://api\\.yisama\\.asia${PREFIX}/__qrveo/player/vod-player\\.min\\.js`));
     assert.match(consolePage.body, /officialOrigin:"https:\/\/api\.yisama\.asia"/);
+    assert.match(consolePage.body, /officialBase:"\/qrveo\/"/);
     const bootstrap = await request(gatewayPort, `${PREFIX}/__qrveo/console-bootstrap.js`);
     assert.equal(bootstrapOrigin(OLD_BOOTSTRAP), "https://api.yisama.asia:4321");
     assert.match(OLD_BOOTSTRAP, /return url\.hostname === location\.hostname && \(url\.port === "4321" \|\| url\.port === "30082"\);/);
@@ -196,14 +236,47 @@ async function main() {
     const detail = await request(gatewayPort, `${PREFIX}/__qrveo/api/vod/video/${video}.json`);
     assert.equal(detail.status, 200);
     assert.match(detail.body, new RegExp(`https://api\\.yisama\\.asia${PREFIX}/__qrveo/hls/`));
-    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/cos/get-upload-credential`)).status, 404);
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/cos/get-upload-credential`)).status, 401);
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/custom-page/create`, { method: "POST", body: {} })).status, 401);
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/media/vod-material/owner/uploadmaterial/a/index.html`, { method: "PUT" })).status, 401);
     assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/user/get-user`)).status, 401);
     assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/user/get-user`, { headers: { "x-auth-token": "ok" } })).status, 200);
+    const pageListPath = `${PREFIX}/__qrveo/api/custom-page/list?page=2&pageSize=10&keyword=QA%20page`;
+    for (const headers of [{}, { "x-auth-token": "expired" }]) {
+      const before = calls.filter(call => call.path.startsWith("/custom-page/list?")).length;
+      assert.equal((await request(gatewayPort, pageListPath, { headers })).status, 401);
+      assert.equal(calls.filter(call => call.path.startsWith("/custom-page/list?")).length, before);
+    }
+    const pageList = await request(gatewayPort, pageListPath, { headers: { "x-auth-token": "ok" } });
+    assert.equal(pageList.status, 200);
+    assert.equal(JSON.parse(pageList.body).data.list[0].id, "owned-page");
+    assert.equal(JSON.parse(pageList.body).data.total, 1);
+    assert.equal(calls.findLast(call => call.path.startsWith("/custom-page/list?")).path,
+      "/custom-page/list?page=2&pageSize=10&keyword=QA%20page");
+    assert.equal(calls.findLast(call => call.path.startsWith("/custom-page/list?")).token, "ok");
     const logout = await request(gatewayPort, `${PREFIX}/__qrveo/api/auth/logout`, { method: "POST", body: {}, headers: { "x-auth-token": "ok", "accept-language": "es-MX" } });
     assert.equal(logout.status, 200);
     const logoutCall = calls.findLast((call) => call.path === "/auth/logout");
     assert.equal(logoutCall.token, "ok");
     assert.equal(logoutCall.contentLength, "2");
+    const checkoutPath = `${PREFIX}/__qrveo/api/billing/demo-checkout`;
+    const checkoutBody = { plan: "estandar", method: "spei", billing: { name: "Test", email: "test@example.com" }, spei: { reference: "3162551" } };
+    assert.equal((await request(gatewayPort, checkoutPath, { method: "POST", body: checkoutBody })).status, 401);
+    const checkout = await request(gatewayPort, checkoutPath, { method: "POST", body: checkoutBody, headers: { "x-auth-token": "ok" } });
+    assert.equal(checkout.status, 200);
+    assert.equal(JSON.parse(checkout.body).data.orderNo, "demo-test");
+    assert.deepEqual(JSON.parse(calls.findLast((call) => call.path === "/billing/demo-checkout").body), checkoutBody);
+    assert.equal((await request(gatewayPort, checkoutPath)).status, 404);
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/billing/checkout`, { method: "POST", body: {}, headers: { "x-auth-token": "ok" } })).status, 404);
+    for (const origin of ["http://127.0.0.1:4321", "https://api.yisama.asia", "https://untrusted.example"]) {
+      const preflight = await request(gatewayPort, checkoutPath, {
+        method: "OPTIONS",
+        headers: { origin, "access-control-request-method": "POST", "access-control-request-headers": "content-type,accept-language,x-auth-token" },
+      });
+      assert.equal(preflight.status, 204);
+      assert.equal(preflight.headers["access-control-allow-origin"], origin === "https://untrusted.example" ? undefined : origin);
+    }
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/billing/checkout`, { method: "OPTIONS" })).status, 404);
     assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/overview/playback/event`, { method: "POST", body: { videoId: video, sessionId: "s", event: "play" } })).status, 200);
     assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/overview/playback/event`, { method: "POST", body: { videoId: "other", sessionId: "s", event: "play" } })).status, 404);
     assert.ok(calls.some((call) => call.path === "/overview/playback/event"));
@@ -218,6 +291,34 @@ async function main() {
     assert.equal(media.status, 200);
     assert.equal(media.headers["content-encoding"], undefined);
     assert.deepEqual(media.bodyBuffer, Buffer.from([0, 1, 2, 3]));
+    const publicMedia = `${PREFIX}/__qrveo/media/vod-mp4/owner/${publicId}/source.mp4`;
+    assert.equal((await request(gatewayPort, publicMedia)).status, 200);
+    publicMetadata.data.passwordRequired = true;
+    assert.equal((await request(gatewayPort, publicMedia)).status, 401);
+    publicMetadata.data.passwordRequired = false;
+    publicMetadata.data.sourceVideoId = "other";
+    assert.equal((await request(gatewayPort, publicMedia)).status, 401);
+    publicMetadata.data.sourceVideoId = publicId;
+    assert.equal((await request(gatewayPort, publicMedia.replace("/owner/", "/other/"))).status, 401);
+    publicMetadata.success = false;
+    assert.equal((await request(gatewayPort, publicMedia)).status, 401);
+    const largeDraft = { projectData: "x".repeat(100000) };
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/custom-page/create`, { method: "POST", headers: { "x-auth-token": "ok" }, body: largeDraft })).status, 200);
+    assert.deepEqual(JSON.parse(calls.findLast(call => call.path === "/custom-page/create").body), largeDraft);
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/api/auth/login`, { method: "POST", body: largeDraft })).status, 413);
+    const signedHeaders = {
+      authorization: "AWS4-HMAC-SHA256 Credential=test, SignedHeaders=content-type;host;x-amz-date;x-amz-security-token, Signature=test",
+      "x-amz-date": "20261029T000000Z",
+      "x-amz-content-sha256": "test-payload-hash",
+      "x-amz-security-token": "test-sts-token",
+    };
+    const uploadPath = "/vod-material/owner/uploadmaterial/a/index.html";
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/media${uploadPath}`, { method: "PUT", headers: signedHeaders, body: { html: "test" } })).status, 200);
+    const uploadCall = calls.findLast(call => call.path === uploadPath);
+    assert.equal(uploadCall.headers.host, "api.yisama.asia");
+    for (const [name, value] of Object.entries(signedHeaders)) assert.equal(uploadCall.headers[name], value);
+    assert.equal(uploadCall.body, '{"html":"test"}');
+    assert.equal((await request(gatewayPort, `${PREFIX}/__qrveo/media${uploadPath}`, { method: "PUT", headers: { authorization: signedHeaders.authorization } })).status, 401);
     console.log("demo gateway checks passed");
   } finally {
     await close(gateway);

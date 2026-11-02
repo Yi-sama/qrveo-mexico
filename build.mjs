@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { existsSync } from "node:fs";
-import { AUTH, pageAbout, pageAuth, pageContact, pageExamples, pageFeatures, pageHelp, pageHome, pageLegal, pagePricing, pageSolution, pageSolutions } from "./src/render.mjs";
+import { AUTH, PAY, pageAbout, pageCheckout, pageAuth, pageContact, pageExamples, pageFeatures, pageHelp, pageHome, pageLegal, pagePricing, pageSolution, pageSolutions } from "./src/render.mjs";
 import { DEFAULT_LANG, LANGS, langDir, localize, missing } from "./src/i18n.mjs";
 import { pageExample } from "./src/example.mjs";
 import { legalPages } from "./src/legal.mjs";
@@ -100,6 +100,7 @@ export default qrcode;
     for (const [p, fn] of pages) await put(p, fn(c, opts(p)));
     for (const s of c.solutions) await put(`soluciones/${s.slug}/`, pageSolution(c, opts(`soluciones/${s.slug}/`), s));
     for (const kind of ["register", "login", "recover"]) await put(AUTH[kind], pageAuth(c, opts(AUTH[kind]), kind));
+    await put(PAY, pageCheckout(c, opts(PAY)));
     for (const page of legalPages) await write(`${dir}${page.path}index.html`, pageLegal(c, opts(page.path), page));
   }
   // 备用静态示例页只有西语（模仿后台观看页）
@@ -107,7 +108,7 @@ export default qrcode;
   // 站点地图（给搜索引擎）
   await write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.filter((u) => !u.endsWith(AUTH.recover)).map((u) => `  <url><loc>${ORIGIN}${BASE}${u}</loc></url>`).join("\n")}
+${urls.filter((u) => !u.endsWith(AUTH.recover) && !u.endsWith(PAY)).map((u) => `  <url><loc>${ORIGIN}${BASE}${u}</loc></url>`).join("\n")}
 </urlset>
 `);
 

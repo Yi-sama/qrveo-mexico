@@ -77,7 +77,7 @@
       },
       {
         "k": "Facture CFDI",
-        "v": "Prix en pesos, TVA (IVA) incluse"
+        "v": "Prix en pesos, TVA (IVA) de 16 % incluse"
       }
     ],
     "uses": {
@@ -149,7 +149,7 @@
     "pricing": {
       "label": "Tarifs",
       "title": "Commencez gratuitement. Payez seulement si ça vous sert.",
-      "text": "7 jours gratuits, sans carte bancaire. Ensuite, des forfaits annuels en pesos, TVA (IVA) incluse. Nous émettons une facture (CFDI).",
+      "text": "7 jours gratuits, sans carte bancaire. Ensuite, des forfaits annuels en pesos, TVA (IVA) de 16 % incluse. Nous émettons une facture (CFDI).",
       "from": "Forfaits à partir de",
       "fromPrice": "$1,399 MXN par an",
       "cta": "Voir les forfaits et tarifs"
@@ -537,7 +537,7 @@
   },
   "pricing": {
     "title": "Des tarifs clairs, en pesos.",
-    "lead": "Commencez gratuitement pendant 7 jours, sans carte bancaire. Si ça vous sert, choisissez un forfait annuel. Tous les prix incluent la TVA (IVA).",
+    "lead": "Commencez gratuitement pendant 7 jours, sans carte bancaire. Si ça vous sert, choisissez un forfait annuel. Tous les prix incluent la TVA (IVA) de 16 %.",
     "seoTitle": "Tarifs · Forfaits QRveo en pesos mexicains, TVA (IVA) incluse",
     "plans": [
       {
@@ -553,17 +553,29 @@
         "for": "Pour une entreprise avec plusieurs produits, cours ou services",
         "price": "$1,399",
         "unit": "MXN par an",
-        "monthly": "TVA incluse · Soit $117 par mois",
+        "monthly": "TVA de 16 % incluse · Soit $117 par mois",
         "cta": "Choisir Standard",
-        "badge": "Le plus choisi"
+        "badge": "Le plus choisi",
+        "extrasTitle": "Tout l’essai gratuit, plus :",
+        "extras": [
+          "Votre marque sur la page vidéo",
+          "Une année complète, pas seulement 7 jours",
+          "12 fois plus d’espace que l’essai"
+        ]
       },
       {
         "name": "Premium",
         "for": "Pour les marques et écoles à large audience",
         "price": "$3,999",
         "unit": "MXN par an",
-        "monthly": "TVA incluse · Soit $333 par mois",
-        "cta": "Choisir Premium"
+        "monthly": "TVA de 16 % incluse · Soit $333 par mois",
+        "cta": "Choisir Premium",
+        "extrasTitle": "Tout le forfait Standard, plus :",
+        "extras": [
+          "Plus de 8 fois l’espace de Standard",
+          "Environ 7 fois plus de lectures par mois",
+          "Pensé pour des milliers d’emballages, de livres ou d’élèves"
+        ]
       }
     ],
     "compareTitle": "Comparez les forfaits",
@@ -579,7 +591,7 @@
       {
         "k": "Lectures par mois (env.)",
         "v": [
-          "370 à 660",
+          "",
           "4 500 à 8 000",
           "31 000 à 56 000"
         ]
@@ -641,14 +653,6 @@
         ]
       },
       {
-        "k": "Qualité",
-        "v": [
-          "HD",
-          "HD et UHD",
-          "HD et UHD"
-        ]
-      },
-      {
         "k": "Assistance sur WhatsApp",
         "v": [
           "Oui",
@@ -665,7 +669,7 @@
       },
       {
         "k": "Comment payer ?",
-        "v": "Par carte de crédit ou de débit. Pour payer par virement, écrivez-nous."
+        "v": "Par carte de crédit ou de débit, ou par virement SPEI : remplissez vos coordonnées et nous vous donnons les informations de virement."
       },
       {
         "k": "Émettez-vous des factures ?",
@@ -673,7 +677,7 @@
       },
       {
         "k": "Et si mon forfait ne suffit plus ?",
-        "v": "Nous vous prévenons par e-mail à 80 % et 95 % de votre forfait pour que vous passiez à un forfait supérieur à temps."
+        "v": "Nous vous prévenons par e-mail à 80 % et 95 % de votre forfait pour que vous passiez à un forfait supérieur à temps. Vos vidéos ne s’arrêtent pas à 100 %."
       }
     ],
     "enterprise": {
@@ -697,7 +701,16 @@
         }
       ],
       "note": "Estimation basée sur des vidéos courtes en HD. Vous pouvez changer de forfait quand vous en avez besoin."
-    }
+    },
+    "trial": {
+      "title": "Essai gratuit de 7 jours",
+      "text": "Sans carte. Importez vos premières vidéos, imprimez un QR et scannez-le vous-même. Ce que vous imprimez continue de fonctionner après l’essai."
+    },
+    "promo": {
+      "label": "Prix de lancement",
+      "was": "Avant"
+    },
+    "invoice": "Facture CFDI disponible"
   },
   "help": {
     "title": "Aide",
@@ -772,11 +785,11 @@
           },
           {
             "q": "Que se passe-t-il si j'épuise mes lectures du mois ?",
-            "a": "Nous vous prévenons par e-mail quand vous avez utilisé 80 % puis 95 % de votre forfait, pour que vous passiez à un forfait supérieur à temps."
+            "a": "Nous vous prévenons par e-mail quand vous avez utilisé 80 % puis 95 % de votre forfait, pour que vous passiez à un forfait supérieur à temps. Vos vidéos ne s’arrêtent pas à 100 %."
           },
           {
             "q": "Comment payer ?",
-            "a": "Par carte de crédit ou de débit. Pour payer par virement, écrivez-nous."
+            "a": "Par carte de crédit ou de débit, ou par virement SPEI : remplissez vos coordonnées et nous vous donnons les informations de virement."
           },
           {
             "q": "Émettez-vous des factures ?",
@@ -842,7 +855,7 @@
       },
       {
         "k": "Notre façon de travailler",
-        "v": "Des prix clairs TVA (IVA) incluse, une facture CFDI, aucune publicité sur vos vidéos et une assistance sur WhatsApp à vos horaires."
+        "v": "Des prix clairs TVA (IVA) de 16 % incluse, une facture CFDI, aucune publicité sur vos vidéos et une assistance sur WhatsApp aux heures de bureau du Mexique."
       }
     ],
     "flowTitle": "Comment ça marche, du début à la fin",
@@ -1056,5 +1069,74 @@
       "tooMany": "Trop de tentatives. Patientez quelques minutes et réessayez.",
       "email": "Saisissez une adresse e-mail valide."
     }
+  },
+  "checkout": {
+    "seo": "Paiement",
+    "eyebrow": "Paiement",
+    "title": "Finalisez votre achat",
+    "lead": "Votre forfait est activé immédiatement. Vos vidéos et codes QR restent les mêmes.",
+    "account": "Le forfait sera activé sur le compte",
+    "notYou": "Ce n’est pas votre compte ?",
+    "logout": "Se déconnecter",
+    "planTitle": "Forfait",
+    "period": "Paiement annuel · 365 jours",
+    "billingTitle": "Informations pour le reçu",
+    "name": "Nom ou raison sociale",
+    "namePh": "Boulangerie La Espiga",
+    "email": "E-mail pour les reçus",
+    "rfc": "RFC (facultatif)",
+    "rfcHint": "Seulement si vous avez besoin d’une facture (CFDI).",
+    "rfcBad": "Le RFC compte 12 ou 13 caractères, sans espaces.",
+    "phone": "Téléphone (facultatif)",
+    "methodTitle": "Mode de paiement",
+    "card": "Carte de crédit ou de débit",
+    "cardNote": "Visa, Mastercard ou American Express",
+    "spei": "Virement SPEI",
+    "speiNote": "Nous vous donnons la CLABE pour payer depuis votre banque",
+    "demo": "Version de test : rien n’est débité. Au paiement, le forfait est activé immédiatement.",
+    "pay": "Payer {price}",
+    "busy": "Traitement…",
+    "summary": "Votre commande",
+    "subtotal": "Sous-total",
+    "iva": "TVA (16 %)",
+    "total": "Total",
+    "until": "Valable jusqu’au {date}",
+    "extend": "S’ajoute à votre forfait actuel",
+    "keep": "Vos vidéos et codes QR ne changent pas",
+    "loginTitle": "Connectez-vous pour continuer",
+    "loginText": "Le forfait est activé sur votre compte QRveo. Si vous n’en avez pas encore, créez-le gratuitement : cela prend une minute.",
+    "loginBtn": "Se connecter",
+    "registerBtn": "Créer un compte gratuit",
+    "doneTitle": "C’est fait ! Votre forfait {plan} est actif",
+    "doneText": "Vous pouvez déjà mettre en ligne plus de vidéos. Valable jusqu’au {date}.",
+    "order": "Numéro de commande",
+    "invoice": "Besoin d’une facture ? Écrivez-nous sur WhatsApp avec votre numéro de commande.",
+    "goPanel": "Aller à mon tableau de bord",
+    "child": "Les sous-comptes ne peuvent pas acheter de forfait. Demandez à l’administrateur du compte.",
+    "off": "Le paiement en ligne n’est pas encore disponible. Écrivez-nous sur WhatsApp, nous vous aiderons.",
+    "session": "Votre session a expiré. Reconnectez-vous pour continuer.",
+    "cardNumber": "Numéro de carte",
+    "cardName": "Nom sur la carte",
+    "cardNamePh": "Tel qu’il figure sur la carte",
+    "cardExp": "Date d’expiration",
+    "cardCvc": "Code de sécurité",
+    "cardCvcHint": "3 chiffres au dos (4 au recto pour American Express)",
+    "cardBad": "Vérifiez le numéro de carte.",
+    "cardBrandBad": "Nous acceptons Visa, Mastercard et American Express.",
+    "expBad": "Vérifiez la date : mois et année, par exemple 08/29.",
+    "expPast": "Cette carte a expiré.",
+    "cvcBad": "Saisissez le code de sécurité complet.",
+    "speiIntro": "Faites le virement depuis l’application ou le site de votre banque avec ces informations. Indiquez la référence dans le libellé pour que nous identifiions votre paiement.",
+    "speiBank": "Banque",
+    "speiClabe": "CLABE",
+    "speiHolder": "Bénéficiaire",
+    "speiAmount": "Montant exact",
+    "speiRef": "Libellé / référence",
+    "speiPay": "J’ai fait le virement",
+    "speiWhen": "Nous activons votre forfait dès réception du dépôt : avec SPEI, cela prend généralement quelques minutes.",
+    "copy": "Copier",
+    "copied": "Copié",
+    "paidWith": "Payé avec {brand} se terminant par {last4}",
+    "paidSpei": "Payé par virement SPEI · référence {ref}"
   }
 }

@@ -77,7 +77,7 @@
       },
       {
         "k": "CFDI-Rechnung",
-        "v": "Preise in pesos, inkl. MwSt. (IVA)"
+        "v": "Preise in pesos, inkl. 16 % MwSt. (IVA)"
       }
     ],
     "uses": {
@@ -149,7 +149,7 @@
     "pricing": {
       "label": "Preise",
       "title": "Gratis starten. Nur zahlen, wenn es dir hilft.",
-      "text": "7 Tage gratis, ohne Kreditkarte. Danach Jahrespläne in pesos inkl. MwSt. (IVA). Wir stellen eine Rechnung (CFDI) aus.",
+      "text": "7 Tage gratis, ohne Kreditkarte. Danach Jahrespläne in pesos inkl. 16 % MwSt. (IVA). Wir stellen eine Rechnung (CFDI) aus.",
       "from": "Pläne ab",
       "fromPrice": "$1,399 MXN pro Jahr",
       "cta": "Pläne und Preise ansehen"
@@ -537,7 +537,7 @@
   },
   "pricing": {
     "title": "Klare Preise, in pesos.",
-    "lead": "7 Tage gratis starten, ohne Kreditkarte. Wenn es dir hilft, wählst du einen Jahresplan. Alle Preise inkl. MwSt. (IVA).",
+    "lead": "7 Tage gratis starten, ohne Kreditkarte. Wenn es dir hilft, wählst du einen Jahresplan. Alle Preise inkl. 16 % MwSt. (IVA).",
     "seoTitle": "Preise · QRveo-Pläne in mexikanischen pesos inkl. MwSt. (IVA)",
     "plans": [
       {
@@ -553,17 +553,29 @@
         "for": "Für Unternehmen mit mehreren Produkten, Kursen oder Bereichen",
         "price": "$1,399",
         "unit": "MXN pro Jahr",
-        "monthly": "Inkl. MwSt. · Entspricht $117 pro Monat",
+        "monthly": "Inkl. 16 % MwSt. · Entspricht $117 pro Monat",
         "cta": "Mit Standard starten",
-        "badge": "Am beliebtesten"
+        "badge": "Am beliebtesten",
+        "extrasTitle": "Alles aus dem Test, dazu:",
+        "extras": [
+          "Deine Marke auf der Videoseite",
+          "Ein ganzes Jahr statt 7 Tage",
+          "12-mal so viel Speicher wie im Test"
+        ]
       },
       {
         "name": "Premium",
         "for": "Für Marken und Schulen mit großem Publikum",
         "price": "$3,999",
         "unit": "MXN pro Jahr",
-        "monthly": "Inkl. MwSt. · Entspricht $333 pro Monat",
-        "cta": "Mit Premium starten"
+        "monthly": "Inkl. 16 % MwSt. · Entspricht $333 pro Monat",
+        "cta": "Mit Premium starten",
+        "extrasTitle": "Alles aus Standard, dazu:",
+        "extras": [
+          "Mehr als 8-mal so viel Speicher wie Standard",
+          "Etwa 7-mal mehr Aufrufe pro Monat",
+          "Für Tausende Verpackungen, Bücher oder Lernende"
+        ]
       }
     ],
     "compareTitle": "Pläne vergleichen",
@@ -579,7 +591,7 @@
       {
         "k": "Aufrufe pro Monat (ca.)",
         "v": [
-          "370 bis 660",
+          "",
           "4,500 bis 8,000",
           "31,000 bis 56,000"
         ]
@@ -641,14 +653,6 @@
         ]
       },
       {
-        "k": "Qualität",
-        "v": [
-          "HD",
-          "HD und UHD",
-          "HD und UHD"
-        ]
-      },
-      {
         "k": "Support per WhatsApp",
         "v": [
           "Ja",
@@ -665,7 +669,7 @@
       },
       {
         "k": "Wie bezahle ich?",
-        "v": "Per Kredit- oder Debitkarte. Wenn du per Überweisung zahlen möchtest, schreib uns."
+        "v": "Per Kredit- oder Debitkarte oder per SPEI-Überweisung: Gib deine Daten ein und du erhältst die Überweisungsdaten."
       },
       {
         "k": "Gibt es eine Rechnung?",
@@ -673,7 +677,7 @@
       },
       {
         "k": "Und wenn es nicht reicht?",
-        "v": "Wir benachrichtigen dich per E-Mail bei 80 % und 95 % deines Plans, damit du rechtzeitig upgraden kannst."
+        "v": "Wir benachrichtigen dich per E-Mail bei 80 % und 95 % deines Plans, damit du rechtzeitig upgraden kannst. Deine Videos laufen weiter, auch wenn du 100 % erreichst."
       }
     ],
     "enterprise": {
@@ -697,7 +701,16 @@
         }
       ],
       "note": "Schätzung bei kurzen HD-Videos. Du kannst den Plan jederzeit wechseln."
-    }
+    },
+    "trial": {
+      "title": "7 Tage gratis testen",
+      "text": "Ohne Kreditkarte. Lade deine ersten Videos hoch, drucke einen QR-Code und scanne ihn selbst. Was du druckst, funktioniert auch nach dem Test weiter."
+    },
+    "promo": {
+      "label": "Einführungspreis",
+      "was": "Statt"
+    },
+    "invoice": "Mit CFDI-Rechnung"
   },
   "help": {
     "title": "Hilfe",
@@ -772,11 +785,11 @@
           },
           {
             "q": "Was passiert, wenn meine monatlichen Aufrufe aufgebraucht sind?",
-            "a": "Wir benachrichtigen dich per E-Mail, wenn du 80 % und 95 % deines Plans verbraucht hast, damit du rechtzeitig upgraden kannst."
+            "a": "Wir benachrichtigen dich per E-Mail, wenn du 80 % und 95 % deines Plans verbraucht hast, damit du rechtzeitig upgraden kannst. Deine Videos laufen weiter, auch wenn du 100 % erreichst."
           },
           {
             "q": "Wie bezahle ich?",
-            "a": "Per Kredit- oder Debitkarte. Wenn du per Überweisung zahlen möchtest, schreib uns."
+            "a": "Per Kredit- oder Debitkarte oder per SPEI-Überweisung: Gib deine Daten ein und du erhältst die Überweisungsdaten."
           },
           {
             "q": "Gibt es eine Rechnung?",
@@ -842,7 +855,7 @@
       },
       {
         "k": "Wie wir arbeiten",
-        "v": "Klare Preise inkl. MwSt. (IVA), CFDI-Rechnung, keine Werbung in deinen Videos und Support per WhatsApp zu deinen Geschäftszeiten."
+        "v": "Klare Preise inkl. 16 % MwSt. (IVA), CFDI-Rechnung, keine Werbung in deinen Videos und Support per WhatsApp zu den Geschäftszeiten in Mexiko."
       }
     ],
     "flowTitle": "So funktioniert es, von Anfang bis Ende",
@@ -1056,5 +1069,74 @@
       "tooMany": "Zu viele Versuche. Warte ein paar Minuten und versuch es erneut.",
       "email": "Gib eine gültige E-Mail-Adresse ein."
     }
+  },
+  "checkout": {
+    "seo": "Bezahlen",
+    "eyebrow": "Bezahlen",
+    "title": "Kauf abschließen",
+    "lead": "Ihr Tarif wird sofort aktiviert. Ihre Videos und QR-Codes bleiben gleich.",
+    "account": "Der Tarif wird aktiviert für das Konto",
+    "notYou": "Nicht Ihr Konto?",
+    "logout": "Abmelden",
+    "planTitle": "Tarif",
+    "period": "Jährliche Zahlung · 365 Tage",
+    "billingTitle": "Angaben für die Quittung",
+    "name": "Name oder Firmenname",
+    "namePh": "Bäckerei La Espiga",
+    "email": "E-Mail für Quittungen",
+    "rfc": "RFC (optional)",
+    "rfcHint": "Nur wenn Sie eine Rechnung (CFDI) brauchen.",
+    "rfcBad": "Die RFC hat 12 oder 13 Zeichen, ohne Leerzeichen.",
+    "phone": "Telefon (optional)",
+    "methodTitle": "Zahlungsart",
+    "card": "Kredit- oder Debitkarte",
+    "cardNote": "Visa, Mastercard oder American Express",
+    "spei": "SPEI-Überweisung",
+    "speiNote": "Sie erhalten eine CLABE für die Zahlung über Ihre Bank",
+    "demo": "Testversion: Es wird nichts abgebucht. Beim Bezahlen wird der Tarif sofort aktiviert.",
+    "pay": "{price} bezahlen",
+    "busy": "Wird verarbeitet…",
+    "summary": "Ihre Bestellung",
+    "subtotal": "Zwischensumme",
+    "iva": "MwSt. (16 %)",
+    "total": "Gesamt",
+    "until": "Gültig bis {date}",
+    "extend": "Wird zu Ihrem aktuellen Tarif addiert",
+    "keep": "Ihre Videos und QR-Codes ändern sich nicht",
+    "loginTitle": "Melden Sie sich an, um fortzufahren",
+    "loginText": "Der Tarif wird in Ihrem QRveo-Konto aktiviert. Noch kein Konto? Erstellen Sie es kostenlos – das dauert eine Minute.",
+    "loginBtn": "Anmelden",
+    "registerBtn": "Kostenloses Konto erstellen",
+    "doneTitle": "Fertig! Ihr Tarif {plan} ist aktiv",
+    "doneText": "Sie können jetzt mehr Videos hochladen. Gültig bis {date}.",
+    "order": "Bestellnummer",
+    "invoice": "Brauchen Sie eine Rechnung? Schreiben Sie uns auf WhatsApp mit Ihrer Bestellnummer.",
+    "goPanel": "Zu meinem Dashboard",
+    "child": "Unterkonten können keine Tarife kaufen. Bitten Sie den Kontoadministrator darum.",
+    "off": "Online-Zahlung ist noch nicht verfügbar. Schreiben Sie uns auf WhatsApp, wir helfen Ihnen.",
+    "session": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an, um fortzufahren.",
+    "cardNumber": "Kartennummer",
+    "cardName": "Name auf der Karte",
+    "cardNamePh": "Wie auf der Karte angegeben",
+    "cardExp": "Ablaufdatum",
+    "cardCvc": "Sicherheitscode",
+    "cardCvcHint": "3 Ziffern auf der Rückseite (4 auf der Vorderseite bei American Express)",
+    "cardBad": "Prüfen Sie die Kartennummer.",
+    "cardBrandBad": "Wir akzeptieren Visa, Mastercard und American Express.",
+    "expBad": "Prüfen Sie das Datum: Monat und Jahr, z. B. 08/29.",
+    "expPast": "Diese Karte ist abgelaufen.",
+    "cvcBad": "Geben Sie den vollständigen Sicherheitscode ein.",
+    "speiIntro": "Überweisen Sie mit diesen Daten über die App oder Website Ihrer Bank. Geben Sie die Referenz als Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.",
+    "speiBank": "Bank",
+    "speiClabe": "CLABE",
+    "speiHolder": "Empfänger",
+    "speiAmount": "Genauer Betrag",
+    "speiRef": "Verwendungszweck / Referenz",
+    "speiPay": "Ich habe überwiesen",
+    "speiWhen": "Wir aktivieren Ihren Tarif, sobald die Zahlung eingeht: Mit SPEI dauert das meist nur Minuten.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "paidWith": "Bezahlt mit {brand}, endet auf {last4}",
+    "paidSpei": "Bezahlt per SPEI-Überweisung · Referenz {ref}"
   }
 }
