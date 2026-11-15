@@ -1,10 +1,10 @@
 param(
     [ValidateSet('Start', 'Stop', 'Status', 'RunTunnel')]
     [string]$Action = 'Status',
-    [string]$Server = '156.238.252.115',
+    [ValidateSet('us-server-cf')]
+    [string]$Server = 'us-server-cf',
     [string]$Key = (Join-Path $HOME '.ssh/us-server-ed25519'),
-    [string]$PublicOrigin = 'https://api.yisama.asia',
-    [string]$ProxyAddress = '127.0.0.1:30000'
+    [string]$PublicOrigin = 'https://api.yisama.asia'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -33,26 +33,22 @@ function Get-Identity($process) {
 }
 
 if ($Action -eq 'RunTunnel') {
+    $ssh = Join-Path $env:WINDIR 'System32/OpenSSH/ssh.exe'
+    $identity = @(& $ssh -o BatchMode=yes -o ConnectTimeout=30 $Server 'hostname; whoami')
+    if ($LASTEXITCODE -ne 0 -or ($identity -join "`n").Trim() -cne "ser021360749320`nroot") {
+        throw 'US Cloudflare SSH identity probe failed; stop for diagnosis.'
+    }
     $sshArguments = @(
-        '-n', '-N', '-T', '-p', '22', '-l', 'root', '-i', $Key,
+        '-n', '-N', '-T', '-i', $Key,
         '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes',
         '-o', 'PasswordAuthentication=no', '-o', 'KbdInteractiveAuthentication=no',
         '-o', 'ConnectTimeout=10', '-o', 'ExitOnForwardFailure=yes',
-        '-o', 'ServerAliveInterval=2', '-o', 'ServerAliveCountMax=3',
+        '-o', 'ServerAliveInterval=30', '-o', 'ServerAliveCountMax=3',
         '-E', (Join-Path $runtimeDir 'tunnel.log'),
         '-R', '127.0.0.1:32984:127.0.0.1:32084'
     )
-    if ($ProxyAddress) {
-        $connect = 'C:/Program Files/Git/mingw64/bin/connect.exe'
-        if (-not (Test-Path -LiteralPath $connect)) { throw 'Git connect.exe is missing.' }
-        $sshArguments += @('-o', "ProxyCommand=`"$connect`" -S $ProxyAddress %h %p")
-    }
-    # The proxy can close an established connection; recreate the same tunnel.
-    while ($true) {
-        & ssh.exe @sshArguments $Server
-        Write-Output ("SSH disconnected ({0}); reconnecting in 3 seconds." -f $LASTEXITCODE)
-        Start-Sleep -Seconds 3
-    }
+    & $ssh @sshArguments $Server
+    throw "US Cloudflare SSH tunnel stopped ($LASTEXITCODE); inspect tunnel.log before restarting."
 }
 
 if ($Action -eq 'Status') {
@@ -113,7 +109,7 @@ try {
     $tunnel = Start-Process -FilePath (Get-Command pwsh.exe).Source -WindowStyle Hidden -PassThru `
         -ArgumentList @('-NoProfile', '-File', ('"' + $PSCommandPath + '"'),
             '-Action', 'RunTunnel', '-Server', $Server, '-Key', ('"' + $Key + '"'),
-            '-PublicOrigin', $PublicOrigin, '-ProxyAddress', ('"' + $ProxyAddress + '"')) `
+            '-PublicOrigin', $PublicOrigin) `
         -RedirectStandardOutput (Join-Path $runtimeDir 'tunnel.stdout.log') `
         -RedirectStandardError (Join-Path $runtimeDir 'tunnel.stderr.log')
     Start-Sleep -Seconds 2

@@ -1,9 +1,121 @@
 {
+  "generator": {
+    "nav": "QR gratis erstellen",
+    "title": "QR-Code erstellen",
+    "lead": "Video oder Link auswählen.",
+    "homeNote": "Links ohne Anmeldung. Videos mit 30 Tagen Testzeit.",
+    "free": "Keine Kreditkarte",
+    "videoTab": "Video",
+    "url": "Link",
+    "videoTitle": "Ihr Video in einem QR",
+    "videoText": "Für Ihr Produkt, Ihren Unterricht oder Ihre Verpackung. Der Scan öffnet das Video auf dem Handy, ohne App.",
+    "videoDays": "30 Tage kostenlos",
+    "videoSpace": "5 GB im Test",
+    "videoCard": "Keine Kreditkarte",
+    "videoStart": "Konto erstellen und hochladen",
+    "videoLogin": "Ich habe schon ein Konto",
+    "upload": "Mein Video hochladen",
+    "videoExample": "Beispiel: Produktanleitung",
+    "seeExample": "Beispiel öffnen",
+    "urlLabel": "Ziel-Link",
+    "urlNote": "Das Ziel dieses QR-Codes lässt sich später nicht ändern.",
+    "generate": "QR erstellen",
+    "remaining": "",
+    "loading": "Kontingent wird geprüft…",
+    "unlimited": "",
+    "videoLimit": "Unbegrenzte QR-Codes, auch im kostenlosen Test. Der Kontospeicher und die vor dem Upload angezeigte Dateigröße gelten weiterhin.",
+    "quotaNote": "",
+    "privacy": "Der Server erzeugt den QR-Code, ohne den ursprünglichen Link zu speichern. Ihr Logo bleibt in diesem Browser.",
+    "customize": "Anpassen",
+    "color": "QR-Farbe",
+    "logo": "Logo",
+    "logoAdd": "Logo hinzufügen",
+    "logoHint": "PNG, JPG oder WebP.",
+    "logoRemove": "Logo entfernen",
+    "template": "Etikett",
+    "templates": [
+      "Nur QR",
+      "Produkt",
+      "Bildung",
+      "Aktion"
+    ],
+    "caption": "Etikettentext",
+    "captions": {
+      "product": "Scannen und Anwendung ansehen",
+      "education": "Scannen und lernen",
+      "promotion": "Scannen und entdecken"
+    },
+    "empty": "Ihr QR erscheint hier",
+    "preview": "Vorschau",
+    "download": "Herunterladen",
+    "downloadNote": "PNG mit 1600 px Breite · Vektor-SVG",
+    "open": "Link öffnen",
+    "ready": "Ihr QR ist fertig.",
+    "changed": "Der Link wurde geändert. Erstellen Sie den neuen QR.",
+    "noscript": "Aktivieren Sie JavaScript, um Ihren QR zu erstellen.",
+    "errors": {
+      "url": "Geben Sie einen gültigen https://- oder http://-Link mit maximal 600 Zeichen ein.",
+      "color": "Wählen Sie eine dunklere Farbe, damit der QR lesbar bleibt.",
+      "logo": "Wählen Sie eine gültige PNG-, JPG- oder WebP-Datei.",
+      "limit": "Der QR-Code konnte nicht erstellt werden. Bitte erneut versuchen.",
+      "service": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "session": "Ihre Sitzung ist abgelaufen. Bitte erneut anmelden.",
+      "generic": "Der QR konnte nicht erstellt oder heruntergeladen werden. Prüfen Sie die Angaben und versuchen Sie es erneut.",
+      "tooLarge": "Dein Video ist größer als 50 MB. Kürze oder komprimiere es und versuche es erneut.",
+      "tooLong": "Dein Video ist länger als {seconds} Sekunden. Nimm einen kürzeren Ausschnitt.",
+      "badFormat": "Diese Datei ist kein MP4-, MOV- oder WebM-Video.",
+      "trialLimit": "Der Upload konnte nicht gestartet werden. Bitte erneut versuchen.",
+      "trialExpired": "Dieses Testvideo wurde bereits gelöscht. Lade es erneut hoch.",
+      "captcha": "Der Code stimmt nicht. Gib den aus dem neuen Bild ein.",
+      "trialFailed": "Wir konnten dieses Video nicht verarbeiten. Versuche eine andere Datei.",
+      "trialServer": "Wegen eines Problems bei uns konnte dein Video nicht verarbeitet werden. Versuche es in ein paar Minuten erneut.",
+      "draft": "Dein Video konnte für den Sprachwechsel nicht gespeichert werden. Es ist noch auf dieser Seite. Versuche es erneut.",
+      "accountSize": "Für dieses Video sind höchstens {max} verfügbar.",
+      "accountStorage": "Dein Konto hat nicht genug Speicherplatz. Gib Speicher frei oder erweitere deinen Tarif.",
+      "accountExpired": "Dein Tarif ist abgelaufen. Verlängere ihn, um Videos hochzuladen."
+    },
+    "navTag": "Ohne Anmeldung",
+    "dropTitle": "Video hierher ziehen",
+    "dropOr": "oder tippen, um es auszuwählen",
+    "dropLimits": "MP4, MOV oder WebM. Bis {seconds} Sekunden und {max}.",
+    "keepNote": "Dein Video bleibt nur 24 Stunden auf unserem Server und wird dann automatisch gelöscht. Registriere dich, um es zu behalten.",
+    "trialCaptcha": "Code aus dem Bild eingeben",
+    "trialSubmit": "Hochladen und QR erstellen",
+    "trialUploading": "Video wird hochgeladen: {p} %",
+    "trialProcessing": "Dein Video wird vorbereitet. Das kann ein paar Minuten dauern; du kannst die Seite verlassen und später zurückkehren.",
+    "trialReady": "Dein QR ist fertig. Scanne ihn mit dem Handy.",
+    "trialExpires": "Wird in {h} h {m} min gelöscht, wenn du kein Konto erstellst.",
+    "trialKeep": "Konto erstellen und behalten",
+    "trialRemove": "Video entfernen",
+    "trialFallback": "Erstelle dein kostenloses Konto, um dieses Video hochzuladen und seinen QR zu erhalten.",
+    "trialLocal": "So sehen es deine Kunden auf dem Handy.",
+    "colorCustom": "Andere Farbe",
+    "fineTitle": "Limits und Datenschutz",
+    "emptyCap": "Dein QR erscheint auf dem Etikett.",
+    "yourCap": "Dein QR",
+    "mineTitle": "Das ist dein QR-Code",
+    "mineHint": "Ausdrucken und aufs Produkt kleben. Wer ihn scannt, sieht dein Video.",
+    "copyLink": "Link kopieren",
+    "copied": "Link kopiert",
+    "again": "Weiteren Video-QR erstellen",
+    "againNote": "Ohne Konto wird nur ein Video gleichzeitig gespeichert: Das neue ersetzt dieses, und dieser QR-Code funktioniert dann nicht mehr. Mit Konto kannst du mehrere behalten.",
+    "againCancel": "Zurück zu meinem QR",
+    "scanHere": "Das ist dein QR",
+    "downloadPng": "PNG herunterladen",
+    "styleTitle": "Etikett-Stil",
+    "trialQuota": "",
+    "trialRemaining": "",
+    "phoneMine": "Dein Video",
+    "videoLabel": "Video auswählen",
+    "memberTitle": "In dein Konto hochladen",
+    "memberNote": "Das Video wird in deinem Konto gespeichert. Dort gestaltest und lädst du den QR-Code herunter.",
+    "memberLimits": "MP4, MOV oder WebM. Bis zu {max}."
+  },
   "meta": {
     "title": "QRveo · QR-Codes, die dein Video sofort öffnen",
-    "description": "Lade ein Video hoch, lade den QR-Code herunter und bring ihn auf dein Produkt, Buch, deine Maschine oder Verpackung. Läuft auf jedem Handy, ohne App. Tausch das Video jederzeit aus: Der QR-Code bleibt gleich. 7 Tage kostenlos.",
+    "description": "Lade ein Video hoch, lade den QR-Code herunter und bring ihn auf dein Produkt, Buch, deine Maschine oder Verpackung. Läuft auf jedem Handy, ohne App. Tausch das Video jederzeit aus: Der QR-Code bleibt gleich. 30 Tage kostenlos.",
     "ogTitle": "QR-Code einmal drucken. Video jederzeit ändern.",
-    "ogDescription": "QR-Codes, die dein Video auf jedem Handy öffnen – ohne App und ohne Werbung. 7 Tage kostenlos testen."
+    "ogDescription": "QR-Codes, die dein Video auf jedem Handy öffnen – ohne App und ohne Werbung. 30 Tage kostenlos testen."
   },
   "brand": {
     "poweredBy": "Mit Videotechnologie von POLYV"
@@ -40,7 +152,7 @@
       "kicker": "Video per QR-Code für Unternehmen",
       "title": "QR-Code einmal drucken. *Video jederzeit ändern.*",
       "lead": "Lade ein Video hoch, lade den QR-Code herunter und bring ihn auf dein Produkt, dein Buch, deine Maschine oder deine Verpackung. Wer ihn scannt, sieht das Video sofort auf dem Handy – ohne App.",
-      "ctaPrimary": "7 Tage gratis testen",
+      "ctaPrimary": "30 Tage gratis testen",
       "ctaSecondary": "Beispiele ansehen",
       "note": "Ohne Kreditkarte. Dein Konto ist in 2 Minuten startklar.",
       "waLink": "Fragen? Schreib uns per WhatsApp",
@@ -55,7 +167,7 @@
         "line1": "Du antwortest einmal.",
         "line2": "Das Video jeden Tag.",
         "cta1": "Teste es",
-        "cta2": "7 Tage gratis",
+        "cta2": "30 Tage gratis",
         "note1": "Ohne Kreditkarte.",
         "note2": "Hilfe per WhatsApp.",
         "sticker1": "SCANNEN UND",
@@ -77,7 +189,7 @@
       },
       {
         "k": "CFDI-Rechnung",
-        "v": "Preise in pesos, inkl. MwSt. (IVA)"
+        "v": "Preise in pesos, inkl. 16 % MwSt. (IVA)"
       }
     ],
     "uses": {
@@ -93,7 +205,7 @@
       "items": [
         {
           "title": "Video hochladen",
-          "text": "Zieh es einfach vom Computer herein (bis zu 2 GB pro Datei). Nach wenigen Minuten läuft es auf jedem Handy.",
+          "text": "Zieh es einfach vom Computer herein. Die verfügbare Dateigrenze wird vor dem Upload angezeigt. Nach wenigen Minuten läuft es auf jedem Handy.",
           "alt": "Videoliste im QRveo-Dashboard"
         },
         {
@@ -149,7 +261,7 @@
     "pricing": {
       "label": "Preise",
       "title": "Gratis starten. Nur zahlen, wenn es dir hilft.",
-      "text": "7 Tage gratis, ohne Kreditkarte. Danach Jahrespläne in pesos inkl. MwSt. (IVA). Wir stellen eine Rechnung (CFDI) aus.",
+      "text": "30 Tage gratis, ohne Kreditkarte. Danach Jahrespläne in pesos inkl. 16 % MwSt. (IVA). Wir stellen eine Rechnung (CFDI) aus.",
       "from": "Pläne ab",
       "fromPrice": "$1,399 MXN pro Jahr",
       "cta": "Pläne und Preise ansehen"
@@ -169,7 +281,7 @@
   "final": {
     "title": "Erstell heute deinen ersten QR-Code.",
     "text": "Konto anlegen, Video hochladen und selbst scannen. Wenn du nicht weiterkommst, helfen wir dir per WhatsApp.",
-    "cta": "7 Tage gratis testen",
+    "cta": "30 Tage gratis testen",
     "whatsapp": "Schreib uns per WhatsApp"
   },
   "solutionsPage": {
@@ -419,7 +531,7 @@
       {
         "label": "Hochladen",
         "title": "Lade das Video hoch, das du schon hast.",
-        "text": "Zieh dein vorhandenes Video herein, bis zu 2 GB pro Datei. QRveo wandelt es so um, dass es auf jedem Handy gut aussieht, in mehreren Qualitätsstufen, und erstellt ein Vorschaubild.",
+        "text": "Zieh dein vorhandenes Video herein. Die verfügbare Dateigrenze wird vor dem Upload angezeigt. QRveo wandelt es so um, dass es auf jedem Handy gut aussieht, in mehreren Qualitätsstufen, und erstellt ein Vorschaubild.",
         "points": [
           "Mehrere Videos gleichzeitig hochladen",
           "Qualität von 360p bis 1080p",
@@ -537,14 +649,14 @@
   },
   "pricing": {
     "title": "Klare Preise, in pesos.",
-    "lead": "7 Tage gratis starten, ohne Kreditkarte. Wenn es dir hilft, wählst du einen Jahresplan. Alle Preise inkl. MwSt. (IVA).",
+    "lead": "30 Tage gratis starten, ohne Kreditkarte. Wenn es dir hilft, wählst du einen Jahresplan. Alle Preise inkl. 16 % MwSt. (IVA).",
     "seoTitle": "Preise · QRveo-Pläne in mexikanischen pesos inkl. MwSt. (IVA)",
     "plans": [
       {
         "name": "Gratis-Test",
         "for": "Zum Ausprobieren mit deinen ersten Videos",
         "price": "$0",
-        "unit": "7 Tage",
+        "unit": "30 Tage",
         "monthly": "Ohne Kreditkarte",
         "cta": "Gratis-Konto erstellen"
       },
@@ -553,17 +665,29 @@
         "for": "Für Unternehmen mit mehreren Produkten, Kursen oder Bereichen",
         "price": "$1,399",
         "unit": "MXN pro Jahr",
-        "monthly": "Inkl. MwSt. · Entspricht $117 pro Monat",
+        "monthly": "Inkl. 16 % MwSt. · Entspricht $117 pro Monat",
         "cta": "Mit Standard starten",
-        "badge": "Am beliebtesten"
+        "badge": "Am beliebtesten",
+        "extrasTitle": "Alles aus dem Test, dazu:",
+        "extras": [
+          "Deine Marke auf der Videoseite",
+          "Ein ganzes Jahr statt 30 Tage",
+          "12-mal so viel Speicher wie im Test"
+        ]
       },
       {
         "name": "Premium",
         "for": "Für Marken und Schulen mit großem Publikum",
         "price": "$3,999",
         "unit": "MXN pro Jahr",
-        "monthly": "Inkl. MwSt. · Entspricht $333 pro Monat",
-        "cta": "Mit Premium starten"
+        "monthly": "Inkl. 16 % MwSt. · Entspricht $333 pro Monat",
+        "cta": "Mit Premium starten",
+        "extrasTitle": "Alles aus Standard, dazu:",
+        "extras": [
+          "Mehr als 8-mal so viel Speicher wie Standard",
+          "Etwa 7-mal mehr Aufrufe pro Monat",
+          "Für Tausende Verpackungen, Bücher oder Lernende"
+        ]
       }
     ],
     "compareTitle": "Pläne vergleichen",
@@ -579,7 +703,7 @@
       {
         "k": "Aufrufe pro Monat (ca.)",
         "v": [
-          "370 bis 660",
+          "",
           "4,500 bis 8,000",
           "31,000 bis 56,000"
         ]
@@ -641,14 +765,6 @@
         ]
       },
       {
-        "k": "Qualität",
-        "v": [
-          "HD",
-          "HD und UHD",
-          "HD und UHD"
-        ]
-      },
-      {
         "k": "Support per WhatsApp",
         "v": [
           "Ja",
@@ -665,7 +781,7 @@
       },
       {
         "k": "Wie bezahle ich?",
-        "v": "Per Kredit- oder Debitkarte. Wenn du per Überweisung zahlen möchtest, schreib uns."
+        "v": "Per Kredit- oder Debitkarte oder per SPEI-Überweisung: Gib deine Daten ein und du erhältst die Überweisungsdaten."
       },
       {
         "k": "Gibt es eine Rechnung?",
@@ -673,7 +789,7 @@
       },
       {
         "k": "Und wenn es nicht reicht?",
-        "v": "Wir benachrichtigen dich per E-Mail bei 80 % und 95 % deines Plans, damit du rechtzeitig upgraden kannst."
+        "v": "Wir benachrichtigen dich per E-Mail bei 80 % und 95 % deines Plans, damit du rechtzeitig upgraden kannst. Deine Videos laufen weiter, auch wenn du 100 % erreichst."
       }
     ],
     "enterprise": {
@@ -697,7 +813,16 @@
         }
       ],
       "note": "Schätzung bei kurzen HD-Videos. Du kannst den Plan jederzeit wechseln."
-    }
+    },
+    "trial": {
+      "title": "30 Tage gratis testen",
+      "text": "Ohne Kreditkarte. Lade deine ersten Videos hoch, drucke einen QR-Code und scanne ihn selbst. Was du druckst, funktioniert auch nach dem Test weiter."
+    },
+    "promo": {
+      "label": "Einführungspreis",
+      "was": "Statt"
+    },
+    "invoice": "Mit CFDI-Rechnung"
   },
   "help": {
     "title": "Hilfe",
@@ -772,11 +897,11 @@
           },
           {
             "q": "Was passiert, wenn meine monatlichen Aufrufe aufgebraucht sind?",
-            "a": "Wir benachrichtigen dich per E-Mail, wenn du 80 % und 95 % deines Plans verbraucht hast, damit du rechtzeitig upgraden kannst."
+            "a": "Wir benachrichtigen dich per E-Mail, wenn du 80 % und 95 % deines Plans verbraucht hast, damit du rechtzeitig upgraden kannst. Deine Videos laufen weiter, auch wenn du 100 % erreichst."
           },
           {
             "q": "Wie bezahle ich?",
-            "a": "Per Kredit- oder Debitkarte. Wenn du per Überweisung zahlen möchtest, schreib uns."
+            "a": "Per Kredit- oder Debitkarte oder per SPEI-Überweisung: Gib deine Daten ein und du erhältst die Überweisungsdaten."
           },
           {
             "q": "Gibt es eine Rechnung?",
@@ -842,7 +967,7 @@
       },
       {
         "k": "Wie wir arbeiten",
-        "v": "Klare Preise inkl. MwSt. (IVA), CFDI-Rechnung, keine Werbung in deinen Videos und Support per WhatsApp zu deinen Geschäftszeiten."
+        "v": "Klare Preise inkl. 16 % MwSt. (IVA), CFDI-Rechnung, keine Werbung in deinen Videos und Support per WhatsApp zu den Geschäftszeiten in Mexiko."
       }
     ],
     "flowTitle": "So funktioniert es, von Anfang bis Ende",
@@ -975,12 +1100,22 @@
     "whatsapp": "WhatsApp"
   },
   "auth": {
+    "google": {
+      "separator": "oder mit E-Mail",
+      "loading": "Verbindung wird hergestellt…",
+      "button": "Mit Google fortfahren",
+      "unavailable": "Google ist derzeit nicht verfügbar. Nutzen Sie Ihre E-Mail-Adresse.",
+      "failed": "Die Anmeldung mit Google ist fehlgeschlagen. Versuchen Sie es erneut oder nutzen Sie Ihre E-Mail.",
+      "link": "Verknüpfen und anmelden",
+      "linkRequired": "Geben Sie Ihr bisheriges Passwort ein, um Google mit Ihrem Konto zu verknüpfen.",
+      "consentRequired": "Akzeptieren Sie die Bedingungen und den Datenschutzhinweis, um Ihr Konto zu erstellen."
+    },
     "seoRegister": "Konto erstellen",
     "seoLogin": "Anmelden",
     "seoRecover": "Passwort zurücksetzen",
     "sideTitle": "QR-Code einmal drucken. *Video jederzeit ändern.*",
     "sidePoints": [
-      "7 Tage gratis, ohne Kreditkarte.",
+      "30 Tage gratis, ohne Kreditkarte.",
       "Öffnet sich auf jedem Handy, ohne App.",
       "Wir helfen dir auf Spanisch per WhatsApp."
     ],
@@ -1055,6 +1190,78 @@
       "codeBad": "Der Code ist falsch oder abgelaufen.",
       "tooMany": "Zu viele Versuche. Warte ein paar Minuten und versuch es erneut.",
       "email": "Gib eine gültige E-Mail-Adresse ein."
-    }
+    },
+    "sideMineVideo": "Dein Video steckt schon in einem QR. *Erstelle dein Konto*, dann wird es nicht gelöscht.",
+    "sideMineUrl": "Dein QR ist fertig. *Mit einem Konto* kann er auch ein Video öffnen.",
+    "claimDone": "Dein Testvideo ist jetzt in deinem Konto."
+  },
+  "checkout": {
+    "seo": "Bezahlen",
+    "eyebrow": "Bezahlen",
+    "title": "Kauf abschließen",
+    "lead": "Ihr Tarif wird sofort aktiviert. Ihre Videos und QR-Codes bleiben gleich.",
+    "account": "Der Tarif wird aktiviert für das Konto",
+    "notYou": "Nicht Ihr Konto?",
+    "logout": "Abmelden",
+    "planTitle": "Tarif",
+    "period": "Jährliche Zahlung · 365 Tage",
+    "billingTitle": "Angaben für die Quittung",
+    "name": "Name oder Firmenname",
+    "namePh": "Bäckerei La Espiga",
+    "email": "E-Mail für Quittungen",
+    "rfc": "RFC (optional)",
+    "rfcHint": "Nur wenn Sie eine Rechnung (CFDI) brauchen.",
+    "rfcBad": "Die RFC hat 12 oder 13 Zeichen, ohne Leerzeichen.",
+    "phone": "Telefon (optional)",
+    "methodTitle": "Zahlungsart",
+    "card": "Kredit- oder Debitkarte",
+    "cardNote": "Visa, Mastercard oder American Express",
+    "spei": "SPEI-Überweisung",
+    "speiNote": "Sie erhalten eine CLABE für die Zahlung über Ihre Bank",
+    "demo": "Testversion: Es wird nichts abgebucht. Beim Bezahlen wird der Tarif sofort aktiviert.",
+    "pay": "{price} bezahlen",
+    "busy": "Wird verarbeitet…",
+    "summary": "Ihre Bestellung",
+    "subtotal": "Zwischensumme",
+    "iva": "MwSt. (16 %)",
+    "total": "Gesamt",
+    "until": "Gültig bis {date}",
+    "extend": "Wird zu Ihrem aktuellen Tarif addiert",
+    "keep": "Ihre Videos und QR-Codes ändern sich nicht",
+    "loginTitle": "Melden Sie sich an, um fortzufahren",
+    "loginText": "Der Tarif wird in Ihrem QRveo-Konto aktiviert. Noch kein Konto? Erstellen Sie es kostenlos – das dauert eine Minute.",
+    "loginBtn": "Anmelden",
+    "registerBtn": "Kostenloses Konto erstellen",
+    "doneTitle": "Fertig! Ihr Tarif {plan} ist aktiv",
+    "doneText": "Sie können jetzt mehr Videos hochladen. Gültig bis {date}.",
+    "order": "Bestellnummer",
+    "invoice": "Brauchen Sie eine Rechnung? Schreiben Sie uns auf WhatsApp mit Ihrer Bestellnummer.",
+    "goPanel": "Zu meinem Dashboard",
+    "child": "Unterkonten können keine Tarife kaufen. Bitten Sie den Kontoadministrator darum.",
+    "off": "Online-Zahlung ist noch nicht verfügbar. Schreiben Sie uns auf WhatsApp, wir helfen Ihnen.",
+    "session": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an, um fortzufahren.",
+    "cardNumber": "Kartennummer",
+    "cardName": "Name auf der Karte",
+    "cardNamePh": "Wie auf der Karte angegeben",
+    "cardExp": "Ablaufdatum",
+    "cardCvc": "Sicherheitscode",
+    "cardCvcHint": "3 Ziffern auf der Rückseite (4 auf der Vorderseite bei American Express)",
+    "cardBad": "Prüfen Sie die Kartennummer.",
+    "cardBrandBad": "Wir akzeptieren Visa, Mastercard und American Express.",
+    "expBad": "Prüfen Sie das Datum: Monat und Jahr, z. B. 08/29.",
+    "expPast": "Diese Karte ist abgelaufen.",
+    "cvcBad": "Geben Sie den vollständigen Sicherheitscode ein.",
+    "speiIntro": "Überweisen Sie mit diesen Daten über die App oder Website Ihrer Bank. Geben Sie die Referenz als Verwendungszweck an, damit wir Ihre Zahlung zuordnen können.",
+    "speiBank": "Bank",
+    "speiClabe": "CLABE",
+    "speiHolder": "Empfänger",
+    "speiAmount": "Genauer Betrag",
+    "speiRef": "Verwendungszweck / Referenz",
+    "speiPay": "Ich habe überwiesen",
+    "speiWhen": "Wir aktivieren Ihren Tarif, sobald die Zahlung eingeht: Mit SPEI dauert das meist nur Minuten.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "paidWith": "Bezahlt mit {brand}, endet auf {last4}",
+    "paidSpei": "Bezahlt per SPEI-Überweisung · Referenz {ref}"
   }
 }

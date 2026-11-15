@@ -1,0 +1,788 @@
+/* 生成器（/crear-qr/）+ 桌面舞台。舞台和首页落版是同一只纸箱：用户自己的二维码贴纸贴在箱子上。
+   颜色只用首页的纸、墨、橙；唯一的动效是“印出二维码”那一下（见 .is-printing）。 */
+
+.qr-icon {
+  flex: none;
+  width: 19px;
+  height: 19px;
+}
+
+/* —— 桌面舞台 —— 以 1536×1024 的 mesa.webp 为底，纸箱在图里横向 6%–56%、纵向 9%–65%。
+   照片放大到 170% 宽，让箱子占满舞台；贴纸和手机按舞台宽度（cqw）定位，任何宽度下都贴在箱面上 */
+.desk {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--desk);
+  isolation: isolate;
+}
+.desk-photo {
+  position: absolute;
+  left: -5cqw;
+  top: 0;
+  width: 170cqw;
+  max-width: none;
+  height: auto;
+  z-index: -1;
+}
+.desk-boxlabel {
+  position: absolute;
+  left: 11cqw;
+  top: 13cqw;
+  font: 800 2.1cqw / 1 var(--f-display);
+  font-stretch: 115%;
+  letter-spacing: 0.05em;
+  color: rgba(20, 18, 16, 0.55);
+  white-space: nowrap;
+}
+.desk-sticker {
+  position: absolute;
+  left: 16cqw;
+  top: 21cqw;
+  width: 30cqw;
+  rotate: -4deg;
+  view-transition-name: qr-sticker;
+  filter: drop-shadow(0 0.3cqw 0 rgba(0, 0, 0, 0.12)) drop-shadow(0 1.4cqw 1.6cqw rgba(20, 18, 16, 0.32));
+  transition: left 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), top 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.desk-sticker > .sticker {
+  --w: 30cqw;
+}
+.desk-sticker > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* 只要二维码、不要标签时，是一张白色方贴纸 */
+.desk-sticker[data-template="none"] > svg {
+  border-radius: 1.2cqw;
+}
+/* 网址模式没有手机，贴纸更大、更靠中间 */
+.desk[data-mode="url"] .desk-sticker {
+  left: 27cqw;
+  top: 18cqw;
+  width: 36cqw;
+}
+.desk-phone {
+  position: absolute;
+  right: 3cqw;
+  top: 7cqw;
+  width: 27cqw;
+  aspect-ratio: 390 / 844;
+  padding: 1cqw;
+  border-radius: 4.4cqw;
+  background: var(--ink);
+  box-shadow: 0 2cqw 4cqw -2cqw rgba(20, 18, 16, 0.55);
+  transition: opacity 0.3s, translate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.desk[data-mode="url"] .desk-phone {
+  opacity: 0;
+  translate: 8cqw 0;
+  pointer-events: none;
+}
+.desk-phone-screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 3.4cqw;
+  background: #000;
+}
+/* 和真实观看页一样：深色底，视频按原比例放在中间偏上，下面是标题 */
+.desk-phone-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.4cqw;
+  background: var(--ink);
+}
+.desk-phone-screen img,
+.desk-phone-screen video {
+  display: block;
+  width: 100%;
+  max-height: 70%;
+  object-fit: contain;
+  background: #000;
+}
+.desk-phone-title {
+  padding: 0 2cqw;
+  color: var(--paper);
+  font: 700 1.7cqw / 1.3 var(--f-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desk-phone-screen [hidden] {
+  display: none;
+}
+/* 回到页面时本地视频已经没了：手机里直接放真实观看页（同源可嵌入），按 390 宽排版再缩小 */
+.desk-phone-screen iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  border: 0;
+  transform-origin: 0 0;
+  background: var(--ink);
+}
+/* 指向贴纸的标注：用户自己的码印出来后才出现 */
+.desk-pointer {
+  position: absolute;
+  left: 17cqw;
+  top: 61cqw;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6cqw;
+  padding: 0.8cqw 1.6cqw 0.8cqw 1.2cqw;
+  border-radius: 99px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 max(12px, 1.9cqw) / 1.2 var(--f-text);
+  white-space: nowrap;
+  box-shadow: 0 1cqw 2cqw -1cqw rgba(20, 18, 16, 0.5);
+  animation: desk-pointer-in 0.4s 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transition: left 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), top 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.desk-pointer svg {
+  width: max(13px, 2cqw);
+  height: max(13px, 2cqw);
+  flex: none;
+}
+.desk[data-mode="url"] .desk-pointer {
+  left: 30cqw;
+  top: 66cqw;
+}
+.desk-pointer[hidden] {
+  display: none;
+}
+@keyframes desk-pointer-in {
+  from { opacity: 0; translate: 0 1.5cqw; }
+}
+
+/* 印出二维码：码点从上往下印出来，贴纸被按一下 */
+.desk-sticker.is-printing {
+  animation: desk-press 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.desk-sticker.is-printing .qr-mods {
+  animation: desk-print 1s steps(14, end) both;
+}
+@keyframes desk-press {
+  from {
+    scale: 1.08;
+  }
+}
+@keyframes desk-print {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* 页面之间：首页落版、生成器、注册登录页上的贴纸是同一张，跳转时由浏览器平滑过渡（不支持的浏览器照常跳转） */
+@view-transition {
+  navigation: auto;
+}
+.endcard .ec-sticker {
+  view-transition-name: qr-sticker;
+}
+::view-transition-group(qr-sticker) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* —— 生成器页 —— */
+.gen {
+  padding: clamp(32px, 4.4vw, 64px) 0 var(--sec);
+}
+.gen-head h1 {
+  font: 800 clamp(40px, 4.6vw, 64px) / 1 var(--f-display);
+  font-stretch: 110%;
+  letter-spacing: -0.03em;
+}
+.gen-head p {
+  margin-top: 12px;
+  color: var(--ink-2);
+  font-size: 19px;
+}
+.gen-tabs {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: 4px;
+  margin-top: 28px;
+  padding: 5px;
+  border-radius: 14px;
+  background: var(--paper-2);
+}
+.gen-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 132px;
+  height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-2);
+  font: 650 16px / 1 var(--f-text);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.gen-tabs button:hover {
+  color: var(--ink);
+}
+.gen-tabs button[aria-selected="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.gen-tabs button[aria-selected="true"] .qr-icon,
+.btn-ink .qr-icon {
+  filter: invert(1);
+}
+.gen-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: clamp(40px, 6vw, 96px);
+  align-items: start;
+}
+.gen-tabs ~ .gen-panel {
+  margin-top: 28px;
+}
+.gen-panel[hidden] {
+  display: none;
+}
+.gen-stage {
+  position: sticky;
+  top: calc(var(--topbar) + 24px);
+  margin: 0;
+}
+.gen-stage-cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  min-height: 40px;
+  margin-top: 14px;
+  color: var(--ink-3);
+  font-size: 15px;
+}
+.gen-downloads {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.gen-downloads[hidden],
+.gen-stage-cap [hidden] {
+  display: none;
+}
+.gen-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
+.gen-note {
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.gen-msg {
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.gen-msg[data-error="true"] {
+  color: var(--orange-ink);
+}
+.gen-msg[hidden] {
+  display: none;
+}
+.gen-icon-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  cursor: pointer;
+}
+.gen-icon-btn:hover {
+  background: var(--paper-2);
+}
+.gen-icon-btn[hidden] {
+  display: none;
+}
+.gen-input {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  border: 1.5px solid rgba(20, 18, 16, 0.18);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.gen-input:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(255, 90, 31, 0.18);
+}
+.gen-input[aria-invalid="true"] {
+  border-color: var(--orange-ink);
+}
+
+/* 视频：拖放区 */
+.gen-drop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 40px 28px 32px;
+  border: 1.5px solid rgba(20, 18, 16, 0.18);
+  border-radius: 22px;
+  background: var(--white);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.gen-drop:hover,
+.gen-drop.is-over {
+  border-color: var(--orange);
+  background: #fff8f4;
+}
+.gen-drop:focus-within {
+  outline: 3px solid var(--orange);
+  outline-offset: 3px;
+}
+.gen-drop input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.gen-drop > .qr-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+  padding: 19px;
+  border-radius: 50%;
+  background: var(--orange);
+}
+.gen-drop b {
+  font: 750 22px / 1.2 var(--f-display);
+  letter-spacing: -0.01em;
+}
+.gen-drop-or {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.gen-drop .gen-note {
+  margin-top: 12px;
+}
+.gen-drop[hidden],
+.gen-video [hidden] {
+  display: none;
+}
+.gen-file {
+  padding: 16px 12px 16px 18px;
+  border: 1.5px solid rgba(20, 18, 16, 0.18);
+  border-radius: 16px;
+  background: var(--white);
+}
+.gen-file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gen-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.gen-file-meta {
+  color: var(--ink-3);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.gen-progress {
+  height: 6px;
+  margin: 12px 6px 2px 0;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--paper-2);
+}
+.gen-progress span {
+  display: block;
+  width: var(--p, 0%);
+  height: 100%;
+  background: var(--orange);
+  transition: width 0.3s;
+}
+.gen-video {
+  display: grid;
+  /* 列宽不许被里面的内容撑开（结果卡里有贴纸样式控件） */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.gen-captcha > label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.gen-ready-t {
+  font: 750 22px / 1.25 var(--f-display);
+  letter-spacing: -0.01em;
+}
+.gen-expiry {
+  color: var(--orange-ink);
+  font-weight: 600;
+  font-size: 15px;
+}
+/* 保留：倒计时和注册放在一个浅色框里，和下载分开 */
+.gen-keepbox {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--paper-2);
+}
+.gen-keepbox .gen-keep {
+  margin-top: 12px;
+}
+.gen-again {
+  font-size: 15px;
+}
+.gen-again .gen-link {
+  color: var(--ink-2);
+}
+/* 再做一个：警告放在上传框上面，点了才出现 */
+.gen-again-back {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--paper-2);
+  color: var(--ink-2);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.gen-again-back .gen-link {
+  margin-top: 6px;
+}
+.gen-keep {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+.gen-keepnote {
+  padding-left: 14px;
+  border-left: 3px solid var(--orange);
+  color: var(--ink-2);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* 网址：三步。确实是先后顺序，所以用编号 */
+.gen-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.gen-steps > li {
+  position: relative;
+  padding: 0 0 30px 46px;
+  counter-increment: step;
+}
+.gen-steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 15px / 1 var(--f-display);
+}
+.gen-steps > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 38px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--line);
+}
+.gen-steps > li:last-child {
+  padding-bottom: 0;
+}
+.gen-step-t {
+  display: block;
+  margin: 3px 0 12px;
+  font-weight: 700;
+  font-size: 17px;
+}
+.gen-step-sub {
+  margin-top: 22px;
+  font-size: 15px;
+}
+.gen-steps .gen-note {
+  margin-top: 8px;
+}
+.gen-chips {
+  /* 按文字长短分宽度，放不下就换行：长语言（葡语“Somente QR”）不被截断 */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gen-chip {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.gen-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gen-chip span {
+  display: block;
+  padding: 8px 4px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1.5px solid rgba(20, 18, 16, 0.2);
+  border-radius: 999px;
+  background: var(--white);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.gen-chip span:hover {
+  border-color: var(--ink);
+}
+.gen-chip input:checked + span {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+.gen-chip input:focus-visible + span {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+.gen-caption {
+  display: block;
+  margin-top: 12px;
+}
+.gen-caption[hidden] {
+  display: none;
+}
+.gen-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.gen-swatch {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 3px solid var(--white);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--label) 50%, var(--ink) 50%);
+  box-shadow: 0 0 0 1.5px rgba(20, 18, 16, 0.2);
+  cursor: pointer;
+}
+.gen-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2.5px var(--ink);
+}
+.gen-swatch-custom {
+  background: conic-gradient(#a6370f, #7a5a00, #20594d, #214d80, #5b2a86, #a6370f);
+}
+.gen-swatch-custom.is-on {
+  box-shadow: 0 0 0 2.5px var(--ink);
+}
+.gen-swatch-custom input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.gen-swatch-custom:focus-within {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+.gen-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.gen-logo .gen-note {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gen-file-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid rgba(20, 18, 16, 0.2);
+  border-radius: 10px;
+  background: var(--white);
+  font-weight: 600;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+.gen-file-btn:hover {
+  border-color: var(--ink);
+}
+.gen-file-btn:focus-within {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+.gen-file-btn input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.gen-quota {
+  margin-top: 10px;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+.gen-fine {
+  margin-top: 18px;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+.gen-fine summary {
+  display: inline-flex;
+  gap: 6px;
+  list-style: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gen-fine summary::-webkit-details-marker {
+  display: none;
+}
+.gen-fine summary::after {
+  content: "+";
+}
+.gen-fine[open] summary::after {
+  content: "−";
+}
+.gen-fine p {
+  margin-top: 8px;
+  line-height: 1.55;
+}
+
+/* 首页首屏按钮上的“免注册”小标 */
+.btn-tag {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 12.5px / 1 var(--f-text);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .gen-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gen-panels {
+    max-width: 560px;
+  }
+  .gen-stage {
+    position: static;
+  }
+  .desk {
+    border-radius: 20px;
+  }
+}
+@media (max-width: 520px) {
+  .gen-chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gen-tabs {
+    display: grid;
+  }
+  .gen-tabs button {
+    min-width: 0;
+  }
+  .gen-downloads {
+    margin-left: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+  .desk-sticker,
+  .desk-phone,
+  .desk-pointer {
+    transition: none;
+  }
+  .desk-pointer,
+  .desk-sticker.is-printing,
+  .desk-sticker.is-printing .qr-mods {
+    animation: none;
+  }
+}
+/* 已登录：第①步换成“上传到你的账号”，样子和上传框一样，点了去后台 */
+.gen-member {
+  color: var(--ink);
+  text-decoration: none;
+}
+.gen-member[hidden] {
+  display: none;
+}
+.gen-keepbox .gen-ready-t {
+  font-size: 19px;
+}
+.gen-keepbox .gen-expiry {
+  margin-top: 6px;
+}
+/* 视频面板里写成按钮的文字链接（再做一个、返回我的二维码） */
+.gen-video button.gen-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+/* 手机上“注册并保留视频”占满一行，德语等长文字不折成两行 */
+@media (max-width: 520px) {
+  .gen-keepbox .gen-keep .btn {
+    width: 100%;
+  }
+}

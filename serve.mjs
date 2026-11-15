@@ -9,7 +9,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "dist");
+const ROOT = process.env.SITE_DIST ? path.resolve(process.env.SITE_DIST) : path.join(path.dirname(fileURLToPath(import.meta.url)), "dist");
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 4321);
 const BASE = "/mexico/";

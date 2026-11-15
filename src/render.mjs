@@ -1,3 +1,5 @@
+import { inlineAuthStyles, prefetchLoginAssets } from "./scripts/login-prefetch.mjs";
+
 // QRveo 官网模板（v2，多页 B2B）。所有文案来自 content/es.json；这里只负责结构。
 // 约定：文案里用 *星号* 包住的词会显示为橙色强调。
 // o（页面参数）：root 到站点根目录的相对路径，path 当前页路径，v 资源版本号，qr(url) 生成二维码 SVG，watch 观看页域名。
@@ -12,6 +14,10 @@ export const CONSOLE = "https://console.qrveo.com";
 export const ROUTES = { register: "/#/register", login: "/#/login", upgrade: "/#/secure/upgrade", panel: "/#/secure/overview" };
 // 注册、登录、找回密码是官网自己的页面（调用后台接口，成功后带着登录状态进入控制台）；升级付款仍在控制台里
 export const AUTH = { register: "registro/", login: "iniciar-sesion/", recover: "recuperar/" };
+// 官网结账页：付费套餐的按钮都指向这里（?plan=estandar|premium）
+export const PAY = "pago/";
+export const GENERATOR = "crear-qr/";
+const planLink = (o, pl) => (pl.action === "checkout" ? `href="${o.L}${PAY}?plan=${encodeURIComponent(pl.id)}" data-pay-plan="${esc(pl.id)}"` : acct(o, pl.action || "register"));
 export const acct = (o, action) =>
   AUTH[action] ? `href="${o.L}${AUTH[action]}" data-auth="${action}"` : `href="${CONSOLE}${ROUTES[action]}" data-console="${action}"`;
 
@@ -34,12 +40,12 @@ const exampleAttrs = (ex, o) => `href="${esc(exampleHref(ex, o))}"${ex.vid ? ` d
 export const sticker = (c, o, { cls = "", href = "", label = "", url = "", vid = "" } = {}) => {
   const tag = href ? "a" : "div";
   const attrs = href ? ` href="${href}" data-demo${vid ? ` data-watch="${esc(vid)}"` : ""} aria-label="${esc(label)}"` : ' aria-hidden="true"';
-  return `<${tag} class="sticker ${cls}"${attrs}><span class="sticker-qr" data-qr>${o.qr(url || o.demo)}</span><span class="sticker-txt">${esc(
+  return `<${tag} class="sticker ${cls}"${attrs}><span class="sticker-qr" data-qr${url ? ` data-qr-url="${esc(url)}"` : ""}>${o.qr(url || o.demo)}</span><span class="sticker-txt">${esc(
     c.home.hero.endCard.sticker1,
   )}<br>${esc(c.home.hero.endCard.sticker2)}</span></${tag}>`;
 };
 
-const head = (c, o, { title, description, noindex = false }) => `<!doctype html>
+const head = (c, o, { title, description, noindex = false, previewPlayer = false }) => `<!doctype html>
 <html lang="${esc(o.lang.hreflang)}">
 <head>
 <meta charset="utf-8">
@@ -55,19 +61,27 @@ ${o.langs.map((l) => `<link rel="alternate" hreflang="${l.hreflang}" href="${esc
 <meta property="og:site_name" content="${esc(c.brand.name)}">
 <meta property="og:title" content="${esc(o.path ? title : c.meta.ogTitle)}">
 <meta property="og:description" content="${esc(o.path ? description : c.meta.ogDescription)}">
-<meta property="og:image" content="${esc(o.origin + o.base)}img/og.jpg">
+<meta property="og:image" content="${esc(o.origin + o.base)}img/og.jpg?v=ff80a0134bc7">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="${esc(o.origin + o.base + o.full)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#F7F4EE">
-${c.demo.url ? `<meta name="qrveo-demo" content="${esc(c.demo.url)}">` : ""}
+${c.demo.url || o.demo ? `<meta name="qrveo-demo" content="${esc(c.demo.url || o.demo)}"${c.demo.url ? "" : " data-runtime-demo"}>` : ""}
 <link rel="icon" href="${o.root}favicon.svg" type="image/svg+xml">
 <link rel="preload" href="${o.root}fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${o.root}fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="${o.root}assets/site.css?v=${o.v}">
+${o.authCss && Object.values(AUTH).includes(o.path)
+  ? `<style data-qrveo-auth-style>${inlineAuthStyles(o.authCss, o.base)}</style>`
+  : `<link rel="stylesheet" href="${o.root}assets/site.css?v=${o.v}">`}
+${!Object.values(AUTH).includes(o.path) && o.path !== PAY
+  ? `<script data-qrveo-login-prefetch>(${prefetchLoginAssets.toString()})(${JSON.stringify([
+    `${o.root}assets/site.js?v=${o.v}`, `${o.root}fonts/archivo.woff2`, `${o.root}fonts/inter.woff2`,
+  ])});</script>` : ""}
 <script>document.documentElement.classList.add("js");if(matchMedia("(min-width: 900px) and (prefers-reduced-motion: no-preference)").matches&&!(navigator.connection&&navigator.connection.saveData))document.documentElement.classList.add("autoplay");</script>
 <script type="module" src="${o.root}assets/site.js?v=${o.v}"></script>
+${previewPlayer ? `<link rel="stylesheet" href="${o.root}assets/hero-player.css?v=20261107-hd">
+<script type="module" src="${o.root}assets/hero-player.mjs?v=20261107-hd"></script>` : ""}
 </head>`;
 
 const isCurrent = (o, href) => (href ? o.path.startsWith(href) : o.path === "");
@@ -117,7 +131,7 @@ const topbar = (c, o) => `<a class="skip" href="#contenido">${esc(c.ui.skip)}</a
         .join("")}</ul>
       <div class="topnav-actions">
         <a class="link-login" ${acct(o, "login")} data-panel-label="${esc(c.ui.panel)}">${esc(c.header.login)}</a>
-        <a class="btn btn-primary btn-sm" ${acct(o, "register")}>${esc(c.header.cta)}</a>
+        <a class="btn btn-primary btn-sm" href="${o.L}${GENERATOR}">${esc(c.generator.nav)}</a>
       </div>
     </nav>
     ${langSwitch(c, o)}
@@ -135,7 +149,7 @@ const topbar = (c, o) => `<a class="skip" href="#contenido">${esc(c.ui.skip)}</a
         )
         .join("")}</ul>
       <div class="nav-mobile-actions">
-        <a class="btn btn-primary btn-lg btn-block" ${acct(o, "register")}>${esc(c.home.hero.ctaPrimary)}</a>
+        <a class="btn btn-primary btn-lg btn-block" href="${o.L}${GENERATOR}">${esc(c.generator.nav)}</a>
         <a class="btn btn-ghost btn-lg btn-block" ${acct(o, "login")} data-panel-label="${esc(c.ui.panel)}">${esc(c.header.login)}</a>
       </div>
     </div>
@@ -165,14 +179,23 @@ const footer = (c, o) => `<footer class="foot">
 </footer>
 <a class="wa-float" href="${waHref(c)}" target="_blank" rel="noopener" aria-label="${esc(c.final.whatsapp)}" data-wa-float>${waIcon}</a>`;
 
+// 账号页只放一行页脚：表单下面不再挂一整块导航
+const footMini = (c, o) => `<footer class="foot foot-mini">
+  <div class="wrap foot-base">
+    <span>${esc(c.footer.rights)} ${esc(c.contact.company)}</span>
+    <span class="foot-legal">${c.footer.legal.map((l) => `<a href="${o.L}${esc(l.href)}">${esc(l.label)}</a>`).join("")}<a href="${waHref(c)}" target="_blank" rel="noopener">${esc(c.contact.whatsappLabel)}</a></span>
+  </div>
+</footer>`;
+
 // 页面外壳
 const page = (c, o, meta, body, cls = "") => `${head(c, o, meta)}
 <body class="${cls}">
 ${topbar(c, o)}
 <main id="contenido">
 ${body}
+${meta.previewPlayer ? previewDialog(c, o) : ""}
 </main>
-${footer(c, o)}
+${cls.split(" ").includes("page-auth") ? footMini(c, o) : footer(c, o)}
 </body>
 </html>
 `;
@@ -206,9 +229,12 @@ const finalCta = (c, o) => `<section class="final" aria-labelledby="t-final">
 </section>`;
 
 // 手机外框里的真实观看页截图
-const phone = (src, alt, cls = "", video = "") => `<div class="phone ${cls}"><div class="phone-screen"><img src="${src}" alt="${esc(alt)}" width="390" height="844" loading="lazy" decoding="async">${
-  video ? `<video class="phone-video" muted loop playsinline preload="none" data-inview-video aria-hidden="true"><source src="${video}" type="video/mp4"></video>` : ""
-}</div></div>`;
+const phone = (c, o, ex, src, alt, cls = "") => `<div class="phone ${cls}"><div class="phone-screen"><img src="${src}" alt="${esc(alt)}" width="390" height="844" loading="lazy" decoding="async"><video class="phone-video" muted loop playsinline preload="none" data-inview-video data-demo-src="${o.root}video/demo-${esc(ex.id)}.mp4" data-hd-src="${o.root}video/demo-${esc(ex.id)}-hd.mp4" aria-hidden="true"><source src="${o.root}video/demo-${esc(ex.id)}.mp4" type="video/mp4"></video><button class="phone-player-open" type="button" data-preview-expand data-preview-title="${esc(ex.title)}" hidden title="${esc(c.home.hero.playFilm)}" aria-label="${esc(c.home.hero.playFilm)}: ${esc(ex.title)}" aria-haspopup="dialog" aria-controls="desk-player"><img src="${o.root}img/qr-icons/external-link.svg" width="20" height="20" alt=""></button></div></div>`;
+
+const previewDialog = (c, o) => `<dialog class="stage-dialog desk-dialog" id="desk-player" data-desk-dialog aria-label="${esc(c.generator.preview)}">
+  <div class="stage-dialog-bar"><span data-desk-player-title>${esc(c.generator.preview)}</span><button class="stage-dialog-close" type="button" data-desk-close title="${esc(o.lang.close)}" aria-label="${esc(o.lang.close)}"><img class="qr-icon" src="${o.root}img/qr-icons/x.svg" width="19" height="19" alt="" aria-hidden="true"></button></div>
+  <video controls playsinline preload="none" data-desk-player></video>
+</dialog>`;
 // 控制台截图的语言版本：中英日韩用控制台对应界面语言截的图（img/consola-*-<代码>.webp），
 // 控制台没有葡、法、德界面，这三种用英文版。各语言按钮位置略有不同，截图上的光标跟着调整
 const SHOT = { zh: "zh", en: "en", ja: "ja", ko: "ko", pt: "en", fr: "en", de: "en" };
@@ -236,7 +262,7 @@ const exampleCard = (c, o, ex, { big = false } = {}) => {
   const sol = c.solutions.find((s) => s.slug === ex.solution);
   const href = exampleHref(ex, o);
   return `<article class="ex-card${big ? " ex-card-big" : ""}">
-    ${phone(o.root + ex.shot, c.ui.phoneAlt.replace("{title}", ex.title), "ex-phone", `${o.root}video/demo-${ex.id}.mp4`)}
+    ${phone(c, o, ex, o.root + ex.shot, c.ui.phoneAlt.replace("{title}", ex.title), "ex-phone")}
     <div class="ex-body">
       <p class="ex-sol">${esc(sol ? sol.name : "")} · ${esc(ex.place)}</p>
       <h3>${esc(ex.title)}</h3>
@@ -247,6 +273,153 @@ const exampleCard = (c, o, ex, { big = false } = {}) => {
       </div>
     </div>
   </article>`;
+};
+
+// 桌面舞台：首页落版里的同一只纸箱（img/mesa.webp），生成器、注册登录页都把二维码贴纸贴在箱子上，三处是同一个场景。
+// slot 里放贴纸（服务端的示例贴纸，或浏览器里画出的用户二维码）；phone 为真时右侧放一部手机，用来播放视频
+export const deskStage = (c, o, { slot = "", phone: withPhone = false, attrs = "", cls = "", pointer = "" } = {}) => {
+  const ex = c.examples[0];
+  return `<div class="desk ${cls}" ${attrs}>
+    <img class="desk-photo" src="${o.root}img/mesa.webp" alt="" width="1536" height="1024" decoding="async">
+    <span class="desk-boxlabel" aria-hidden="true">${esc(c.home.hero.endCard.boxLabel)}</span>
+    <div class="desk-sticker" data-desk-sticker>${slot}</div>
+    ${pointer ? `<span class="desk-pointer" data-desk-pointer hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(pointer)}</span>` : ""}
+    ${withPhone ? `<div class="desk-phone" data-desk-phone><div class="desk-phone-screen"><img src="${o.root}img/bf20-poster.webp" alt="" width="1280" height="720" loading="lazy" decoding="async" data-desk-poster><video muted loop playsinline preload="none" data-desk-video data-demo-src="${o.root}video/demo-${esc(ex.id)}.mp4" data-hd-src="${o.root}video/demo-${esc(ex.id)}-hd.mp4" aria-hidden="true" hidden></video><span class="desk-phone-title" data-desk-title>${esc(ex.title)}</span></div><button class="desk-player-open" type="button" data-desk-expand hidden title="${esc(c.home.hero.playFilm)}" aria-label="${esc(c.home.hero.playFilm)}" aria-haspopup="dialog" aria-controls="desk-player"><img src="${o.root}img/qr-icons/external-link.svg" width="20" height="20" alt=""></button></div>` : ""}
+  </div>`;
+};
+
+export const pageGenerator = (c, o) => {
+  const G = c.generator;
+  const icon = (name) => `<img class="qr-icon" src="${o.root}img/qr-icons/${name}.svg" width="19" height="19" alt="" aria-hidden="true">`;
+  const types = ["none", "product", "education", "promotion"];
+  // 颜色：标签底色 + 二维码颜色。第一种是 QRveo 的橙色贴纸（码用墨色），其余标签和码同色
+  const swatches = [["#ff5a1f", "#141210"], ["#141210", "#141210"], ["#20594d", "#20594d"], ["#214d80", "#214d80"], ["#a6370f", "#a6370f"]];
+  const ex = c.examples[0];
+  const demo = sticker(c, o, { cls: "desk-demo", href: exampleHref(ex, o), vid: ex.vid, label: c.ui.openDemo });
+  return page(c, o, { title: `${G.title} · QRveo`, description: G.homeNote, previewPlayer: true }, `
+<section class="gen" data-qr-generator>
+  <div class="wrap">
+    <div class="gen-grid">
+      <div class="gen-panels">
+        <header class="gen-head">
+          <h1>${esc(G.title)}</h1>
+          <p>${esc(G.lead)}</p>
+        </header>
+        <div class="gen-tabs" role="tablist" aria-label="${esc(G.title)}">
+          <button id="qr-tab-video" type="button" role="tab" aria-selected="true" aria-controls="qr-panel-video" data-qr-tab="video">${icon("video")}${esc(G.videoTab)}</button>
+          <button id="qr-tab-url" type="button" role="tab" aria-selected="false" aria-controls="qr-panel-url" tabindex="-1" data-qr-tab="url">${icon("link")}${esc(G.url)}</button>
+        </div>
+        <div id="qr-panel-video" role="tabpanel" aria-labelledby="qr-tab-video" data-qr-panel="video" class="gen-panel">
+          <form class="gen-video" data-trial-form novalidate>
+            <ol class="gen-steps" data-trial-steps>
+              <li>
+                <p class="gen-step-t">${esc(G.videoLabel)}</p>
+                <div class="gen-again-back" data-trial-again-back hidden>
+                  <p>${esc(G.againNote)}</p>
+                  <button type="button" class="gen-link" data-trial-again-cancel>${esc(G.againCancel)}</button>
+                </div>
+                <label class="gen-drop" data-trial-drop>
+                  <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm" data-trial-file>
+                  ${icon("upload")}
+                  <b>${esc(G.dropTitle)}</b>
+                  <span class="gen-drop-or">${esc(G.dropOr)}</span>
+                  <span class="gen-note">MP4, MOV, WebM</span>
+                </label>
+                <div class="gen-file" data-trial-picked hidden>
+                  <div class="gen-file-row"><span class="gen-file-name" data-trial-name></span><span class="gen-file-meta" data-trial-meta></span>
+                    <button type="button" class="gen-icon-btn" data-trial-remove aria-label="${esc(G.trialRemove)}" title="${esc(G.trialRemove)}">${icon("x")}</button></div>
+                  <div class="gen-progress" data-trial-progress hidden><span></span></div>
+                </div>
+                <p class="gen-msg" data-trial-pickmsg data-error="true" role="alert" hidden></p>
+              </li>
+              <li data-style-slot="video"></li>
+              <li>
+                <div class="fld gen-captcha" data-trial-captcha hidden><label for="trial-captcha">${esc(G.trialCaptcha)}</label>
+                  <div class="fld-row"><input id="trial-captcha" name="captcha" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="8"><button class="captcha-img" type="button" data-trial-captcha-new title="${esc(c.auth.login.captchaNew)}" aria-label="${esc(c.auth.login.captchaNew)}"><img alt="" width="120" height="44" data-trial-captcha-img></button></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block" data-trial-submit>${icon("qr-code")}<span>${esc(G.trialSubmit)}</span></button>
+                <p class="gen-quota" data-trial-quota hidden>${esc(G.trialQuota)}</p>
+                <p class="gen-msg" data-trial-msg role="status" aria-live="polite" hidden></p>
+                <div class="gen-keepbox" data-trial-ready hidden>
+                  <p class="gen-ready-t">${esc(G.trialReady)}</p>
+                  <p class="gen-expiry" data-trial-expiry></p>
+                  <div class="gen-keep">
+                    <a class="btn btn-primary" href="${o.L}${AUTH.register}" data-qr-video-auth data-qr-video-start>${esc(G.trialKeep)}</a>
+                    <a class="gen-link" href="${o.L}${AUTH.login}" data-qr-video-auth data-qr-video-login>${esc(G.videoLogin)}</a>
+                  </div>
+                </div>
+                <div class="gen-keep" data-trial-keep hidden>
+                  <a class="btn btn-primary btn-lg" href="${o.L}${AUTH.register}" data-qr-video-auth>${esc(G.videoStart)}</a>
+                  <a class="gen-link" href="${o.L}${AUTH.login}" data-qr-video-auth data-qr-video-login>${esc(G.videoLogin)}</a>
+                </div>
+                <p class="gen-keepnote" data-trial-keepnote>${esc(G.keepNote)}</p>
+                <p class="gen-again" data-trial-again hidden><button type="button" class="gen-link" data-trial-again-start>${esc(G.again)} →</button></p>
+              </li>
+            </ol>
+            <a class="gen-drop gen-member" data-trial-member data-qr-video-panel hidden>
+              ${icon("upload")}
+              <b>${esc(G.memberTitle)}</b>
+              <span class="gen-note">${esc(G.memberNote)}</span>
+            </a>
+          </form>
+        </div>
+        <div id="qr-panel-url" role="tabpanel" aria-labelledby="qr-tab-url" data-qr-panel="url" class="gen-panel" hidden>
+          <form class="gen-form" id="qr-form" data-qr-form novalidate>
+            <ol class="gen-steps">
+              <li>
+                <label class="gen-step-t" for="qr-url">${esc(G.urlLabel)}</label>
+                <input class="gen-input" id="qr-url" name="url" type="url" inputmode="url" autocomplete="url" spellcheck="false" maxlength="600" placeholder="https://" required aria-describedby="qr-url-note">
+                <p class="gen-msg" data-qr-url-error data-error="true" role="alert" hidden></p>
+                <p class="gen-note" id="qr-url-note">${esc(G.urlNote)}</p>
+              </li>
+              <li data-style-slot="url">
+                <div class="gen-style" data-qr-style>
+                <p class="gen-step-t" id="qr-tpl-label">${esc(G.template)}</p>
+                <div class="gen-chips" role="radiogroup" aria-labelledby="qr-tpl-label">
+                  ${types.map((type, i) => `<label class="gen-chip"><input type="radio" name="template" form="qr-form" value="${type}"${i === 1 ? " checked" : ""}><span>${esc(G.templates[i])}</span></label>`).join("")}
+                </div>
+                <label class="gen-caption" data-qr-caption-field><span class="sr">${esc(G.caption)}</span>
+                  <input class="gen-input" type="text" name="caption" form="qr-form" maxlength="48" value="${esc(G.captions.product)}" aria-label="${esc(G.caption)}">
+                </label>
+                <p class="gen-step-t gen-step-sub" id="qr-color-label">${esc(G.color)}</p>
+                <div class="gen-colors" role="group" aria-labelledby="qr-color-label">
+                  ${swatches.map(([label, ink], i) => `<button type="button" class="gen-swatch" style="--label:${label};--ink:${ink}" data-qr-color="${ink}" data-qr-label="${label}" aria-label="${esc(G.color)} ${label}" aria-pressed="${i === 0}"></button>`).join("")}
+                  <label class="gen-swatch gen-swatch-custom" title="${esc(G.colorCustom)}"><input name="color" form="qr-form" type="color" value="#141210" aria-label="${esc(G.colorCustom)}"></label>
+                </div>
+                <div class="gen-logo">
+                  <label class="gen-file-btn">${icon("image-plus")}<span>${esc(G.logoAdd)}</span><input name="logo" form="qr-form" type="file" accept="image/png,image/jpeg,image/webp" aria-label="${esc(G.logoAdd)}"></label>
+                  <span class="gen-note" data-qr-logo-name>${esc(G.logoHint)}</span>
+                  <button type="button" class="gen-icon-btn" data-qr-logo-remove aria-label="${esc(G.logoRemove)}" title="${esc(G.logoRemove)}" hidden>${icon("x")}</button>
+                </div>
+                </div>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-primary btn-lg btn-block" data-qr-generate>${icon("qr-code")}${esc(G.generate)}</button>
+                <p class="gen-quota" data-qr-remaining aria-live="polite" hidden></p>
+              </li>
+            </ol>
+            <p class="gen-msg" data-qr-message role="status" aria-live="polite" hidden></p>
+            <details class="gen-fine"><summary>${esc(G.fineTitle)}</summary>${G.quotaNote ? `<p>${esc(G.quotaNote)}</p>` : ""}<p>${esc(G.privacy)}</p></details>
+          </form>
+        </div>
+      </div>
+      <figure class="gen-stage" aria-label="${esc(G.preview)}">
+        ${deskStage(c, o, { slot: demo, phone: true, attrs: "data-qr-desk", pointer: G.scanHere })}
+        <figcaption class="gen-stage-cap">
+          <span data-desk-cap>${esc(G.videoExample)}</span>
+          <a class="gen-link" ${exampleAttrs(ex, o)} target="_blank" rel="noopener" data-desk-example>${esc(G.seeExample)}</a>
+          <span class="gen-downloads" data-qr-downloads hidden>
+            <button type="button" class="btn btn-ink btn-sm" data-qr-download="png">${icon("download")}PNG</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-qr-download="svg">${icon("download")}SVG</button>
+            <a class="gen-link" data-qr-open target="_blank" rel="noopener noreferrer">${esc(G.open)}</a>
+          </span>
+        </figcaption>
+      </figure>
+    </div>
+    <noscript><p>${esc(G.noscript)}</p></noscript>
+    <script type="application/json" data-qr-text>${JSON.stringify({ ...G, demoLabel: c.home.hero.endCard }).replace(/</g, "\\u003c")}</script>
+  </div>
+</section>`, "qr-page");
 };
 
 // —— 首页 ——
@@ -260,17 +433,17 @@ const homeHero = (c, o) => {
       <h1 id="hero-title">${rich(h.title)}</h1>
       <p class="lead">${esc(h.lead)}</p>
       <div class="cta-row">
-        <a class="btn btn-primary btn-lg" ${acct(o, "register")}>${esc(h.ctaPrimary)}</a>
+        <a class="btn btn-primary btn-lg btn-free" href="${o.L}${GENERATOR}">${esc(c.generator.nav)}<span class="btn-tag">${esc(c.generator.navTag)}</span></a>
         <a class="btn btn-ghost btn-lg" href="${o.L}ejemplos/">${esc(h.ctaSecondary)}</a>
       </div>
-      <p class="cta-note">${esc(h.note)}</p>
+      <p class="cta-note">${esc(c.generator.homeNote)}</p>
       <p class="cta-note"><a class="wa-link" href="${waHref(c)}" target="_blank" rel="noopener">${waIcon}${esc(h.waLink)}</a></p>
     </div>
     <figure class="hero-film">
       <div class="stage" data-stage data-state="end">
         <div class="stage-inner">
           <video class="stage-film" muted playsinline preload="none" poster="${o.root}img/film-poster.webp" aria-label="${esc(c.ui.filmAria)}: ${esc(h.filmCaption)}">
-            <source src="${o.root}video/qrveo-hero.mp4" type="video/mp4">
+            <source src="${o.root}video/qrveo-hero.mp4?v=81852b72cd27" type="video/mp4">
           </video>
           <div class="endcard" data-endcard>
             <img class="ec-photo" src="${o.root}img/mesa.webp" alt="" width="1536" height="1024" decoding="async">
@@ -290,8 +463,21 @@ const homeHero = (c, o) => {
         <button class="stage-btn stage-play" type="button" data-play><span class="tri" aria-hidden="true"></span>${esc(h.playFilm)} <span class="stage-len">${esc(h.filmLength)}</span></button>
         <button class="stage-btn stage-replay" type="button" data-replay><span aria-hidden="true">↺</span> ${esc(h.replay)}</button>
         <button class="stage-btn stage-skip" type="button" data-skip>${esc(h.skip)} <span aria-hidden="true">→</span></button>
+        <button class="stage-btn stage-expand" type="button" data-stage-expand hidden title="${esc(h.playFilm)}" aria-label="${esc(h.playFilm)}" aria-haspopup="dialog" aria-controls="hero-player"><img src="${o.root}img/qr-icons/external-link.svg" width="20" height="20" alt=""></button>
       </div>
       <figcaption class="film-cap">${esc(h.filmCaption)}</figcaption>
+      <dialog class="stage-dialog" id="hero-player" data-stage-dialog aria-label="${esc(h.playFilm)}">
+        <div class="stage-dialog-bar"><span>${esc(c.brand.name)} <small>${esc(h.filmLength)}</small></span><button class="stage-dialog-close" type="button" data-stage-close title="${esc(o.lang.close)}" aria-label="${esc(o.lang.close)}"><img src="${o.root}img/qr-icons/x.svg" width="20" height="20" alt=""></button></div>
+        <iframe data-stage-player data-src="${o.root}hero-player.html" title="${esc(h.filmCaption)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+      </dialog>
+      <aside class="hero-float" data-hero-float hidden aria-label="${esc(h.playFilm)}">
+        <button class="hero-float-open" type="button" data-hero-float-open title="${esc(h.playFilm)}" aria-label="${esc(h.playFilm)}" aria-haspopup="dialog" aria-controls="hero-player">
+          <video muted loop playsinline preload="none" poster="${o.root}img/film-poster.webp" aria-hidden="true"><source src="${o.root}video/qrveo-hero.mp4?v=81852b72cd27" type="video/mp4"></video>
+          <span class="hero-float-play" aria-hidden="true"><img src="${o.root}img/qr-icons/video.svg" width="20" height="20" alt=""></span>
+          <span class="hero-float-caption"><b>${esc(c.brand.name)}</b><span>${esc(h.filmLength)}</span></span>
+        </button>
+        <button class="hero-float-close" type="button" data-hero-float-close title="${esc(o.lang.close)}" aria-label="${esc(o.lang.close)}"><img src="${o.root}img/qr-icons/x.svg" width="20" height="20" alt=""></button>
+      </aside>
     </figure>
   </div>
   <div class="wrap">
@@ -343,7 +529,7 @@ export const pageHome = (c, o) => {
   return page(
     c,
     o,
-    { title: c.meta.title, description: c.meta.description },
+    { title: c.meta.title, description: c.meta.description, previewPlayer: true },
     `${homeHero(c, o)}
 
 <section class="sec" aria-labelledby="t-uses">
@@ -433,7 +619,7 @@ export const pageSolution = (c, o, s) => {
   return page(
     c,
     o,
-    { title: `${s.name} · ${c.brand.name}`, description: s.lead },
+    { title: `${s.name} · ${c.brand.name}`, description: s.lead, previewPlayer: !!ex },
     `<section class="sol-hero">
   <div class="wrap split">
     <div class="split-txt">
@@ -520,7 +706,7 @@ export const pageFeatures = (c, o) => {
   return page(
     c,
     o,
-    { title: `${F.seoTitle} · ${c.brand.name}`, description: F.lead },
+    { title: `${F.seoTitle} · ${c.brand.name}`, description: F.lead, previewPlayer: true },
     `<section class="page-hero">
   <div class="wrap split">
     <div class="split-txt">
@@ -541,7 +727,7 @@ ${F.blocks
       <p class="sec-intro">${esc(b.text)}</p>
       <ul class="ticks">${b.points.map((p) => `<li>${check}${esc(p)}</li>`).join("")}</ul>
     </div>
-    <div class="split-media">${b.phone ? phone(o.root + b.img, b.alt, "phone-feature", `${o.root}video/demo-${c.examples[0].id}.mp4`) : screen(o.root + shot(o, b.img), b.alt, "", shotCursor(o, b.img, b.cursor))}</div>
+    <div class="split-media">${b.phone ? phone(c, o, c.examples[0], o.root + b.img, b.alt, "phone-feature") : screen(o.root + shot(o, b.img), b.alt, "", shotCursor(o, b.img, b.cursor))}</div>
   </div>
 </section>`,
   )
@@ -562,7 +748,7 @@ export const pageExamples = (c, o) =>
   page(
     c,
     o,
-    { title: `${c.examplesPage.seoTitle} · ${c.brand.name}`, description: c.examplesPage.lead },
+    { title: `${c.examplesPage.seoTitle} · ${c.brand.name}`, description: c.examplesPage.lead, previewPlayer: true },
     `${pageHero("", c.examplesPage.title, c.examplesPage.lead)}
 <section class="sec sec-tight">
   <div class="wrap">
@@ -577,6 +763,11 @@ ${finalCta(c, o)}`,
 // —— 价格 ——
 export const pagePricing = (c, o) => {
   const P = c.pricing;
+  // 第一个套餐是免费试用：做成上方的横条；下面两张卡只放付费套餐，写清比上一档多了什么
+  const [trial, ...paid] = P.plans;
+  // 折扣百分比由原价和现价算出，改价格时不会对不上
+  const num = (x) => Number(String(x).replace(/[^\d.]/g, ""));
+  const off = (pl) => Math.round((1 - num(pl.price) / num(pl.listPrice)) * 100);
   return page(
     c,
     o,
@@ -584,19 +775,34 @@ export const pagePricing = (c, o) => {
     `${pageHero("", P.title, P.lead)}
 <section class="sec sec-tight" aria-label="${esc(c.ui.plans)}">
   <div class="wrap">
-    <div class="plans">${P.plans
+    <aside class="trial" aria-labelledby="plan-${esc(trial.id)}">
+      <div class="trial-txt">
+        <h2 class="trial-t" id="plan-${esc(trial.id)}">${esc(P.trial.title)}</h2>
+        <p>${esc(P.trial.text)}</p>
+      </div>
+      <dl class="trial-keys">${P.rows
+        .slice(0, 2)
+        .filter((r) => r.v[0])
+        .map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v[0])}</dd></div>`)
+        .join("")}</dl>
+      <a class="btn btn-ghost" ${acct(o, trial.action || "register")}>${esc(trial.cta)}</a>
+    </aside>
+    <div class="plans">${paid
       .map(
         (pl) => `<article class="plan${pl.badge ? " plan-featured" : ""}" data-plan-id="${esc(pl.id)}" aria-labelledby="plan-${esc(pl.id)}">
         ${pl.badge ? `<p class="plan-badge">${esc(pl.badge)}</p>` : ""}
         <h2 class="plan-name" id="plan-${esc(pl.id)}">${esc(pl.name)}</h2>
         <p class="plan-for">${esc(pl.for)}</p>
-        <p class="plan-price"><b>${esc(pl.price)}</b> <span>${esc(pl.unit)}</span></p>
-        <p class="plan-monthly">${esc(pl.monthly)}</p>
-        <a class="btn ${pl.badge ? "btn-primary" : "btn-ghost"} btn-block" ${acct(o, pl.action || "register")}>${esc(pl.cta)}</a>
-        <ul class="plan-keys">${P.rows
-          .slice(0, 3)
-          .map((r) => `<li><span>${esc(r.k)}</span><b>${esc(r.v[P.plans.indexOf(pl)])}</b></li>`)
-          .join("")}</ul>
+        ${pl.listPrice ? `<p class="plan-promo"><span class="plan-off">−${off(pl)}%</span> ${esc(P.promo.label)}</p>` : ""}
+        <p class="plan-price">${pl.listPrice ? `<s><span class="sr">${esc(P.promo.was)} </span>${esc(pl.listPrice)}</s> ` : ""}<b>${esc(pl.price)}</b> <span>${esc(pl.unit)}</span></p>
+        <p class="plan-monthly">${esc(pl.monthly)}<br>${esc(P.invoice)}</p>
+        <a class="btn ${pl.badge ? "btn-primary" : "btn-ink"} btn-block" ${planLink(o, pl)}>${esc(pl.cta)}</a>
+        <dl class="plan-stats">${P.rows
+          .slice(0, 2)
+          .map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v[P.plans.indexOf(pl)])}</dd></div>`)
+          .join("")}</dl>
+        <p class="plan-more">${esc(pl.extrasTitle)}</p>
+        <ul class="plan-extras">${pl.extras.map((x) => `<li>${check}${esc(x)}</li>`).join("")}</ul>
       </article>`,
       )
       .join("")}</div>
@@ -628,9 +834,9 @@ export const pagePricing = (c, o) => {
       <table class="compare">
         <thead><tr><th scope="col"><span class="sr">${esc(c.ui.feature)}</span></th>${P.plans.map((pl) => `<th scope="col">${esc(pl.name)}</th>`).join("")}</tr></thead>
         <tbody>${P.rows
-          .map((r) => `<tr><th scope="row">${esc(r.k)}</th>${r.v.map((v) => `<td>${v === "Sí" || v === c.ui.yes ? `${check}<span class="sr">${esc(c.ui.yes)}</span>` : esc(v)}</td>`).join("")}</tr>`)
+          .map((r) => `<tr><th scope="row">${esc(r.k)}</th>${r.v.map((v) => `<td>${v === "Sí" || v === c.ui.yes ? `${check}<span class="sr">${esc(c.ui.yes)}</span>` : esc(v).replace(/([~〜–])/g, "$1<wbr>")}</td>`).join("")}</tr>`)
           .join("")}</tbody>
-        <tfoot><tr><td></td>${P.plans.map((pl) => `<td><a class="more" ${acct(o, pl.action || "register")}>${esc(pl.cta)} ${arrow}</a></td>`).join("")}</tr></tfoot>
+        <tfoot><tr><td></td>${P.plans.map((pl) => `<td><a class="more" ${planLink(o, pl)}>${esc(pl.cta)} ${arrow}</a></td>`).join("")}</tr></tfoot>
       </table>
     </div>
     <p class="fine">${esc(P.estimate)}</p>
@@ -763,20 +969,66 @@ const fld = (name, lbl, input, extra = "") => `<div class="fld" data-fld="${name
 const inp = (name, type, attrs = "") => `<input id="a-${name}" name="${name}" type="${type}" aria-describedby="e-${name}" ${attrs}>`;
 const pwd = (A, auto) =>
   `<div class="fld-pw">${inp("password", "password", `autocomplete="${auto}" required minlength="8" maxlength="16"`)}<button class="pw-eye" type="button" data-pw-toggle aria-pressed="false" aria-label="${esc(A.register.show)}" data-show="${esc(A.register.show)}" data-hide="${esc(A.register.hide)}">${eye}</button></div>`;
-const authSide = (c, o) => `<aside class="auth-side" aria-hidden="true">
-      ${swapDemo(c.features.swap, o, c)}
-      <p class="auth-side-t">${rich(c.auth.sideTitle)}</p>
-      <ul class="ticks">${c.auth.sidePoints.map((p) => `<li>${check}${esc(p)}</li>`).join("")}</ul>
+// 账号页固定展示首页宣传片，不把浏览器里保存的试用码当成演示内容。
+const authSide = (c, o) => {
+  const film = `${o.origin}${o.base}hero-player.html`;
+  return `<aside class="auth-side" data-auth-side>
+      ${deskStage(c, o, { slot: sticker(c, o, { cls: "desk-demo", href: film, url: film, label: c.home.hero.playFilm }), cls: "desk-auth" })}
+      <p class="auth-side-t" data-auth-side-t>${rich(c.auth.sideTitle)}</p>
+      <ul class="ticks" data-auth-side-ticks>${c.auth.sidePoints.map((p) => `<li>${check}${esc(p)}</li>`).join("")}</ul>
     </aside>`;
+};
 // 表单提示文字给 site.js 用
-const authText = (c) =>
-  `<script type="application/json" id="auth-text">${JSON.stringify({ ...c.auth.errors, codeWait: c.auth.register.codeWait, codeSent: c.auth.register.codeSent, regDone: c.auth.register.done, loginDone: c.auth.login.done, loggedOut: c.auth.login.loggedOut, sent: c.auth.recover.sent, copied: c.auth.recover.copied, copy: c.auth.recover.copy }).replace(/</g, "\\u003c")}</script>`;
+const facebookText = (c, lang) => ({
+  ...Object.fromEntries(Object.entries(c.auth.google).map(([key, value]) => [key, value.replaceAll("Google", "Facebook")])),
+  emailRequired: {
+    es: "Facebook no compartió un correo válido. Autoriza tu correo en Facebook o entra con correo electrónico.",
+    en: "Facebook did not share a valid email. Allow email access on Facebook or sign in with email.",
+    pt: "O Facebook não compartilhou um email válido. Autorize seu email no Facebook ou entre com email.",
+    fr: "Facebook n'a pas partagé d'adresse e-mail valide. Autorisez votre e-mail sur Facebook ou connectez-vous par e-mail.",
+    de: "Facebook hat keine gültige E-Mail-Adresse geteilt. Erlaube den E-Mail-Zugriff oder melde dich per E-Mail an.",
+    zh: "Facebook 未提供有效邮箱。请允许 Facebook 分享邮箱，或使用邮箱登录。",
+    ja: "Facebook から有効なメールを取得できませんでした。メール共有を許可するか、メールでログインしてください。",
+    ko: "Facebook에서 유효한 이메일을 제공하지 않았습니다. 이메일 공유를 허용하거나 이메일로 로그인하세요.",
+  }[lang] || "Facebook no compartió un correo válido. Autoriza tu correo en Facebook o entra con correo electrónico.",
+});
+const authText = (c, lang) =>
+  `<script type="application/json" id="auth-text">${JSON.stringify({ ...c.auth.errors, google: c.auth.google, facebook: facebookText(c, lang), codeWait: c.auth.register.codeWait, codeSent: c.auth.register.codeSent, regDone: c.auth.register.done, loginDone: c.auth.login.done, loggedOut: c.auth.login.loggedOut, sent: c.auth.recover.sent, copied: c.auth.recover.copied, copy: c.auth.recover.copy }).replace(/</g, "\\u003c")}</script>`;
 
 export const pageAuth = (c, o, kind) => {
   const A = c.auth;
   const submit = (t) => `<button class="btn btn-primary btn-lg btn-block auth-submit" type="submit" data-busy="${esc(t.busy)}"><span>${esc(t.submit)}</span></button>`;
   const msg = `<p class="auth-msg" role="alert" data-auth-msg hidden></p>`;
   const email = fld("email", A.register.email, inp("email", "email", `autocomplete="email" required maxlength="120" placeholder="${esc(A.register.emailPh)}" inputmode="email"`));
+  const googleConsent = esc(A.register.consent)
+    .replace("{terms}", `<a href="${o.L}terminos/" target="_blank" rel="noopener">${esc(A.register.terms)}</a>`)
+    .replace("{privacy}", `<a href="${o.L}aviso-de-privacidad/" target="_blank" rel="noopener">${esc(A.register.privacy)}</a>`);
+  const google = `<div class="auth-google" data-google-auth data-google-locale="${esc(o.lang.code)}">
+        <button class="auth-google-start" type="button" data-google-start><img src="${o.root}img/google-g.png" width="20" height="20" alt="" aria-hidden="true"><span>${esc(A.google.button)}</span></button>
+        <div class="auth-google-button" data-google-button hidden></div>
+        <p class="auth-msg" role="status" aria-live="polite" data-google-status hidden></p>
+        <form class="auth-google-consent" data-google-consent hidden>
+          <div class="fld fld-check"><label><input type="checkbox" name="consent" required><span>${googleConsent}</span></label></div>
+          <button class="btn btn-primary btn-block" type="submit">${esc(A.register.submit)}</button>
+        </form>
+        <form class="auth-google-consent" data-google-link hidden>
+          <label>${esc(A.register.password)}<input class="google-link-password" type="password" name="password" autocomplete="current-password" maxlength="128" required></label>
+          <button class="btn btn-primary btn-block" type="submit">${esc(A.google.link)}</button>
+        </form>
+      </div>
+      <div class="auth-facebook" data-facebook-auth data-facebook-locale="${esc(o.lang.code)}">
+        <button class="auth-google-start auth-facebook-start" type="button" data-facebook-start><span class="facebook-icon" aria-hidden="true">f</span><span>${esc(facebookText(c, o.lang.code).button)}</span></button>
+        <p class="auth-msg" role="status" aria-live="polite" data-facebook-status hidden></p>
+        <form class="auth-google-consent" data-facebook-consent hidden>
+          <div class="fld fld-check"><label><input type="checkbox" name="consent" required><span>${googleConsent}</span></label></div>
+          <button class="btn btn-primary btn-block" type="submit">${esc(A.register.submit)}</button>
+        </form>
+        <form class="auth-google-consent" data-facebook-link hidden>
+          <label>${esc(A.register.password)}<input class="google-link-password" type="password" name="password" autocomplete="current-password" maxlength="128" required></label>
+          <button class="btn btn-primary btn-block" type="submit">${esc(A.google.link)}</button>
+        </form>
+      </div>
+      <div class="auth-divider"><span>${esc(A.google.separator)}</span></div>`;
   let main = "";
   if (kind === "register") {
     const R = A.register;
@@ -785,6 +1037,7 @@ export const pageAuth = (c, o, kind) => {
       .replace("{privacy}", `<a href="${o.L}aviso-de-privacidad/" target="_blank">${esc(R.privacy)}</a>`);
     main = `<h1>${esc(R.title)}</h1>
       <p class="lead">${esc(R.lead)}</p>
+      ${google}
       <form class="auth-form" data-auth-form="register" novalidate>
         ${fld("name", R.name, inp("name", "text", `autocomplete="organization" required maxlength="60" placeholder="${esc(R.namePh)}"`))}
         ${email}
@@ -805,10 +1058,11 @@ export const pageAuth = (c, o, kind) => {
       <div data-auth-fresh>
       <h1>${esc(L.title)}</h1>
       <p class="lead">${esc(L.lead)}</p>
+      ${google}
       <form class="auth-form" data-auth-form="login" novalidate>
         ${email}
         ${fld("password", A.register.password, pwd(A, "current-password"))}
-        <div class="fld" data-fld="captcha" data-captcha-row hidden><label for="a-captcha">${esc(L.captcha)}</label><div class="fld-row">${inp("captcha", "text", 'autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="8"')}<button class="captcha-img" type="button" data-captcha-new title="${esc(L.captchaNew)}" aria-label="${esc(L.captchaNew)}"><img alt="" width="120" height="44" data-captcha-img></button></div><p class="fld-err" id="e-captcha" data-err hidden></p></div>
+        <div class="fld" data-fld="captcha" data-captcha-row><label for="a-captcha">${esc(L.captcha)}</label><div class="fld-row">${inp("captcha", "text", 'autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="8"')}<button class="captcha-img" type="button" data-captcha-new title="${esc(L.captchaNew)}" aria-label="${esc(L.captchaNew)}"><img alt="" width="120" height="44" data-captcha-img></button></div><p class="fld-err" id="e-captcha" data-err hidden></p></div>
         <p class="auth-forgot"><a ${acct(o, "recover")}>${esc(L.forgot)}</a></p>
         ${msg}
         ${submit(L)}
@@ -847,8 +1101,140 @@ export const pageAuth = (c, o, kind) => {
     ${authSide(c, o)}
   </div>
 </section>
-${authText(c)}`,
+${authText(c, o.lang.code)}`,
     `page-auth page-${kind}`,
+  );
+};
+
+// —— 结账页（第一阶段是模拟支付：后台 /billing/demo-checkout 收到资料就开通套餐，不扣款）——
+// 价格以后台为准；这里显示的金额来自 content 的套餐价格（含 IVA），只做展示
+// 银行卡：第一阶段在浏览器里校验格式（Luhn、有效期、安全码），卡号和安全码不发给后台，只发卡组织和后四位
+const CARD_LOGOS = ["VISA", "MC", "AMEX"].map((b) => `<i class="card-logo card-logo-${b.toLowerCase()}">${b}</i>`).join("");
+export const pageCheckout = (c, o) => {
+  const K = c.checkout;
+  const P = c.pricing;
+  const num = (x) => Number(String(x).replace(/[^\d.]/g, ""));
+  const money = (n) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const paid = P.plans.filter((pl) => pl.action === "checkout");
+  const col = (pl) => P.plans.indexOf(pl);
+  const priceLabel = (pl) => `${pl.price} MXN`;
+  const radio = (name, value, checked, body) =>
+    `<label class="pick"><input type="radio" name="${name}" value="${esc(value)}"${checked ? " checked" : ""}><span class="pick-box">${body}</span></label>`;
+  const summary = (pl, i) => {
+    const total = num(pl.price);
+    const sub = Math.round((total / 1.16) * 100) / 100;
+    return `<div class="pay-sum-plan" data-sum="${esc(pl.id)}"${i ? " hidden" : ""}>
+        <p class="pay-sum-name"><b>${esc(pl.name)}</b><span>${esc(K.period)}</span></p>
+        <dl class="pay-sum-keys">${P.rows
+          .slice(0, 2)
+          .map((r) => `<div><dt>${esc(r.k)}</dt><dd>${esc(r.v[col(pl)])}</dd></div>`)
+          .join("")}</dl>
+        <dl class="pay-sum-money">
+          ${pl.listPrice ? `<div class="pay-sum-promo"><dt>${esc(P.promo.label)}</dt><dd><s><span class="sr">${esc(P.promo.was)} </span>${esc(pl.listPrice)}</s></dd></div>` : ""}
+          <div><dt>${esc(K.subtotal)}</dt><dd>${money(sub)}</dd></div>
+          <div><dt>${esc(K.iva)}</dt><dd>${money(Math.round((total - sub) * 100) / 100)}</dd></div>
+          <div class="pay-sum-total"><dt>${esc(K.total)}</dt><dd>${esc(pl.price)} <small>MXN</small></dd></div>
+        </dl>
+      </div>`;
+  };
+  const text = { ...c.auth.errors, ...K, plans: Object.fromEntries(paid.map((pl) => [pl.id, { name: pl.name, price: priceLabel(pl) }])) };
+  return page(
+    c,
+    o,
+    { title: `${K.seo} · ${c.brand.name}`, description: K.lead, noindex: true },
+    `<section class="pay" data-pay-page>
+  <div class="wrap pay-grid">
+    <div class="pay-main">
+      <div data-pay-head>
+        ${label(K.eyebrow)}
+        <h1>${esc(K.title)}</h1>
+        <p class="lead">${esc(K.lead)}</p>
+      </div>
+
+      <div class="pay-login" data-pay-login hidden>
+        <h2>${esc(K.loginTitle)}</h2>
+        <p>${esc(K.loginText)}</p>
+        <div class="cta-row"><a class="btn btn-primary btn-lg" href="${o.L}${AUTH.login}" data-pay-return>${esc(K.loginBtn)}</a><a class="btn btn-ghost btn-lg" href="${o.L}${AUTH.register}" data-pay-return>${esc(K.registerBtn)}</a></div>
+      </div>
+
+      <form class="auth-form pay-form" data-pay-form novalidate hidden>
+        <p class="pay-account"><span>${esc(K.account)}</span> <b data-pay-account></b> <span class="pay-notyou">${esc(K.notYou)} <button type="button" class="link-btn" data-pay-logout>${esc(K.logout)}</button></span></p>
+
+        <fieldset class="pay-set">
+          <legend>${esc(K.planTitle)}</legend>
+          <div class="picks picks-2">${paid
+            .map((pl, i) =>
+              radio("plan", pl.id, i === 0, `<b>${esc(pl.name)}</b><span class="pick-price">${esc(pl.price)} <small>${esc(pl.unit)}</small></span><span class="pick-note">${esc(P.rows[0].v[col(pl)])} · ${esc(pl.for)}</span>`),
+            )
+            .join("")}</div>
+        </fieldset>
+
+        <fieldset class="pay-set">
+          <legend>${esc(K.billingTitle)}</legend>
+          ${fld("name", K.name, inp("name", "text", `autocomplete="organization" required maxlength="120" placeholder="${esc(K.namePh)}"`))}
+          ${fld("email", K.email, inp("email", "email", `autocomplete="email" required maxlength="120" inputmode="email" placeholder="${esc(c.auth.register.emailPh)}"`))}
+          <div class="pay-2">
+            ${fld("rfc", K.rfc, inp("rfc", "text", 'autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16" placeholder="XAXX010101000"'), `<p class="fld-hint">${esc(K.rfcHint)}</p>`)}
+            ${fld("phone", K.phone, inp("phone", "tel", 'autocomplete="tel" maxlength="20" inputmode="tel" placeholder="+52"'))}
+          </div>
+        </fieldset>
+
+        <fieldset class="pay-set">
+          <legend>${esc(K.methodTitle)}</legend>
+          <div class="picks">
+            ${radio("method", "card", true, `<b>${esc(K.card)}</b><span class="pick-note">${esc(K.cardNote)}</span><span class="card-logos" aria-hidden="true">${CARD_LOGOS}</span>`)}
+            <div class="pay-panel" data-method-panel="card">
+              ${fld("cardnum", K.cardNumber, `<div class="fld-card">${inp("cardnum", "text", 'autocomplete="cc-number" inputmode="numeric" maxlength="23" placeholder="1234 1234 1234 1234" spellcheck="false"')}<span class="card-brand" data-card-brand aria-live="polite"></span></div>`)}
+              ${fld("cardname", K.cardName, inp("cardname", "text", `autocomplete="cc-name" maxlength="60" autocapitalize="characters" spellcheck="false" placeholder="${esc(K.cardNamePh)}"`))}
+              <div class="pay-2">
+                ${fld("cardexp", K.cardExp, inp("cardexp", "text", 'autocomplete="cc-exp" inputmode="numeric" maxlength="7" placeholder="MM / AA"'))}
+                ${fld("cardcvc", K.cardCvc, inp("cardcvc", "password", 'autocomplete="cc-csc" inputmode="numeric" maxlength="4" placeholder="•••"'), `<p class="fld-hint">${esc(K.cardCvcHint)}</p>`)}
+              </div>
+            </div>
+            ${radio("method", "spei", false, `<b>${esc(K.spei)}</b><span class="pick-note">${esc(K.speiNote)}</span>`)}
+            <div class="pay-panel" data-method-panel="spei" hidden>
+              <p>${esc(K.speiIntro)}</p>
+              <dl class="spei">
+                <div><dt>${esc(K.speiBank)}</dt><dd>${esc(c.contact.bank)}</dd></div>
+                <div><dt>${esc(K.speiClabe)}</dt><dd><code>${esc(c.contact.clabe.replace(/^(\d{3})(\d{3})(\d{11})(\d)$/, "$1 $2 $3 $4"))}</code><button type="button" class="copy-btn" data-copy-text="${esc(c.contact.clabe)}">${esc(K.copy)}</button></dd></div>
+                <div><dt>${esc(K.speiHolder)}</dt><dd>${esc(c.contact.company)}</dd></div>
+                <div><dt>${esc(K.speiAmount)}</dt><dd><code data-spei-amount></code><button type="button" class="copy-btn" data-copy-from="[data-spei-amount]">${esc(K.copy)}</button></dd></div>
+                <div><dt>${esc(K.speiRef)}</dt><dd><code data-spei-ref></code><button type="button" class="copy-btn" data-copy-from="[data-spei-ref]">${esc(K.copy)}</button></dd></div>
+              </dl>
+              <p class="fine">${esc(K.speiWhen)}</p>
+            </div>
+          </div>
+        </fieldset>
+
+        <p class="pay-demo">${esc(K.demo)}</p>
+        <p class="auth-msg" role="alert" data-auth-msg hidden></p>
+        <button class="btn btn-primary btn-lg btn-block auth-submit" type="submit" data-busy="${esc(K.busy)}"><span data-pay-btn>${esc(K.pay.replace("{price}", priceLabel(paid[0])))}</span></button>
+      </form>
+
+      <div class="pay-done" data-pay-done hidden tabindex="-1">
+        <span class="pay-done-mark" aria-hidden="true">${check}</span>
+        <h1 data-done-title></h1>
+        <p class="lead" data-done-text></p>
+        <p class="pay-done-paid" data-done-paid></p>
+        <dl class="pay-done-order"><div><dt>${esc(K.order)}</dt><dd data-done-order></dd></div></dl>
+        <div class="cta-row"><a class="btn btn-primary btn-lg" href="${CONSOLE}${ROUTES.panel}" data-console="panel">${esc(K.goPanel)}</a></div>
+        <p class="fine">${esc(K.invoice)} <a href="${waHref(c)}" target="_blank" rel="noopener" data-done-wa>${esc(c.contact.whatsappLabel)}</a></p>
+      </div>
+    </div>
+
+    <aside class="pay-sum" aria-label="${esc(K.summary)}" data-pay-sum>
+      <p class="pay-sum-t">${esc(K.summary)}</p>
+      ${paid.map(summary).join("")}
+      <ul class="ticks pay-sum-notes">
+        <li data-pay-until hidden>${check}<span></span></li>
+        <li>${check}${esc(K.keep)}</li>
+        <li>${check}${esc(P.invoice)}</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+<script type="application/json" id="pay-text">${JSON.stringify(text).replace(/</g, "\u003c")}</script>`,
+    "page-pay",
   );
 };
 

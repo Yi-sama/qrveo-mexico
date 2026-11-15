@@ -28,6 +28,10 @@ const PUBLIC_POSTS = new Set([
   "/auth/send-reset-password-email",
   "/auth/reset-password",
 ]);
+const AUTHENTICATED_POSTS = new Set([
+  "/auth/logout",
+  "/billing/demo-checkout",
+]);
 const CONSOLE_READS = new Set([
   "/user/get-user",
   "/auth/login/login-status",
@@ -39,6 +43,9 @@ const CONSOLE_READS = new Set([
   "/custom-domain/current",
   "/video/get-video-list",
 ]);
+function consoleManagementPath(pathname) {
+  return /^\/(?:custom-page(?:\/|$)|material(?:\/|$)|cos\/get-(?:meterial|upload)-credential$|secure\/uploadvideo_v2(?:\/|$)|video(?:\/|$)|cata(?:\/|$)|user-children(?:\/|$)|user-video-category(?:\/|$))/.test(pathname);
+}
 const EXCLUDED_HEADERS = new Set([
   "connection",
   "transfer-encoding",
@@ -100,7 +107,7 @@ function replaceNuxtConfig(text, key, value) {
 }
 
 function rewriteNuxt(text, config, target) {
-  if (!/^\/videos\/[^/]+_h\/?$/.test(target.path)) return text;
+  if (!/^\/videos\/[^/]+_[a-z0-9]\/?$/i.test(target.path)) return text;
   const prefix = config.prefix;
   let result = text
     .replace(/((?:src|href)=["'])\/_nuxt\//gi, `$1${prefix}/_nuxt/`)
@@ -133,7 +140,7 @@ function rewriteText(text, config, target) {
   if (target.service === "front") result = rewriteNuxt(result, config, target);
   if (target.service === "admin") result = rewriteAdmin(result, config, target.bootstrap);
   if (target.service === "admin" && target.path === "/") {
-    const injection = `<script>window.__VOD_PRIVATE__=Object.assign(window.__VOD_PRIVATE__||{},{officialOrigin:${JSON.stringify(config.publicOrigin)}});</script>`;
+    const injection = `<script>window.__VOD_PRIVATE__=Object.assign(window.__VOD_PRIVATE__||{},{officialOrigin:${JSON.stringify(config.publicOrigin)},officialBase:"/qrveo/"});</script>`;
     result = result.replace("</head>", `${injection}</head>`);
   }
   return result;
@@ -169,18 +176,29 @@ function resolveTarget(method, pathname, prefix = PREFIX) {
   if (method === "POST" && path === `${apiBase}/overview/playback/event`) return { service: "api", path: "/overview/playback/event", playback: true };
   if (path.startsWith(`${apiBase}/`)) {
     const apiPath = path.slice(apiBase.length);
+    if (method === "OPTIONS" && (PUBLIC_POSTS.has(apiPath) || AUTHENTICATED_POSTS.has(apiPath) || CONSOLE_READS.has(apiPath))) {
+      return { service: "api", path: apiPath };
+    }
     if (method === "POST" && PUBLIC_POSTS.has(apiPath)) return { service: "api", path: apiPath };
-    if (method === "POST" && apiPath === "/auth/logout") return { service: "api", path: apiPath, requiresAuth: true };
+    if (method === "POST" && AUTHENTICATED_POSTS.has(apiPath)) {
+      return { service: "api", path: apiPath, requiresAuth: true, upstreamAuth: apiPath === "/billing/demo-checkout" };
+    }
     if (["GET", "HEAD"].includes(method) && CONSOLE_READS.has(apiPath)) return { service: "api", path: apiPath, requiresAuth: true };
     if (["GET", "HEAD"].includes(method) && ["/deploy-info", "/auth/kaptcha"].includes(apiPath)) return { service: "api", path: apiPath };
     if (["GET", "HEAD"].includes(method) && sampleVideoApiPath(apiPath)) return { service: "api", path: apiPath };
+    if (["GET", "HEAD"].includes(method) && /^\/vod\/video\/[A-Za-z0-9]{16,64}_[a-z0-9]\.json$/i.test(apiPath)) return { service: "api", path: apiPath };
+    if (["GET", "HEAD", "POST", "OPTIONS"].includes(method) && consoleManagementPath(apiPath)) {
+      return { service: "api", path: apiPath, requiresAuth: method !== "OPTIONS" };
+    }
   }
+  const upload = /^\/__qrveo\/media(\/vod-(?:material|upload)\/[A-Za-z0-9]{1,64}\/(?:uploadmaterial|uploadvideo)\/[A-Za-z0-9_./-]+)$/.exec(path);
+  if (method === "PUT" && upload) return { service: "storage", path: upload[1], signedUpload: true };
   if (!["GET", "HEAD"].includes(method)) return null;
   if (path === "/__qrveo/console-bootstrap.js") return { service: "admin", bootstrap: true };
   if (path === consoleBase || path === `${consoleBase}/`) return { service: "admin", path: "/" };
   if (path === `${consoleBase}/favicon.ico`) return { service: "admin", path: "/favicon.ico" };
   if (path.startsWith(`${consoleBase}/assets/`)) return { service: "admin", path: path.slice(consoleBase.length) };
-  if (publicVideoPath(path) || publicPayloadPath(path) || /^\/_nuxt\/[A-Za-z0-9_./-]+$/.test(path) || path === "/favicon.ico") {
+  if (publicVideoPath(path) || /^\/videos\/[A-Za-z0-9]{16,64}_[a-z0-9]\/?$/i.test(path) || /^\/pages\/[a-f0-9-]{36}\/?$/i.test(path) || /^\/page-assets\/pdfjs\/[A-Za-z0-9_./-]+$/.test(path) || publicPayloadPath(path) || /^\/_nuxt\/[A-Za-z0-9_./-]+$/.test(path) || path === "/favicon.ico") {
     return { service: "front", path };
   }
   for (const [base, service, allowed] of [
@@ -195,8 +213,12 @@ function resolveTarget(method, pathname, prefix = PREFIX) {
   }
   const ownedMedia = /^\/__qrveo\/(hls|media)(\/vod-mp4\/([A-Za-z0-9]{1,64})\/[A-Za-z0-9]{1,64}\/[A-Za-z0-9_./-]+)$/.exec(path);
   if (ownedMedia) {
-    return { service: ownedMedia[1] === "hls" ? "hls" : "storage", path: ownedMedia[2], requiresAuth: true, cookieAuth: true, ownerId: ownedMedia[3] };
+    return { service: ownedMedia[1] === "hls" ? "hls" : "storage", path: ownedMedia[2], requiresAuth: true, cookieAuth: true, ownerId: ownedMedia[3], publicVideoId: ownedMedia[2].split("/")[3] };
   }
+  const material = /^\/__qrveo\/media(\/vod-material\/[A-Za-z0-9]{1,64}\/uploadmaterial\/[A-Za-z0-9_./-]+\.(?:pdf|png|jpe?g|gif|webp|mp3))$/i.exec(path);
+  if (material) return { service: "storage", path: material[1], dynamic: true };
+  const draft = /^\/__qrveo\/media(\/vod-material\/([A-Za-z0-9]{1,64})\/uploadmaterial\/[A-Za-z0-9_./-]+\.(?:html|css|js))$/i.exec(path);
+  if (draft) return { service: "storage", path: draft[1], requiresAuth: true, cookieAuth: true, ownerId: draft[2] };
   return null;
 }
 
@@ -218,16 +240,19 @@ function requestHeaders(req, body) {
   for (const name of ["range", "accept", "content-type", "accept-language", "x-auth-token"]) {
     if (req.headers[name]) headers[name] = req.headers[name];
   }
+  for (const name of ["origin", "access-control-request-method", "access-control-request-headers"]) {
+    if (req.headers[name]) headers[name] = req.headers[name];
+  }
   if (body) headers["content-length"] = String(body.length);
   return headers;
 }
 
-async function readRequestBody(req, res) {
+async function readRequestBody(req, res, limit = 16384) {
   const chunks = [];
   let size = 0;
   for await (const chunk of req) {
     size += chunk.length;
-    if (size > 16384) {
+    if (size > limit) {
       res.writeHead(413).end();
       return null;
     }
@@ -258,9 +283,20 @@ async function authenticate(req, target, config) {
   }
 }
 
+async function isPublicVideo(target, config) {
+  const id = target.publicVideoId;
+  if (!id || id.length < 16) return false;
+  const response = await requestUpstream(config.upstreams.api, `/vod/video/${id}_${id[0]}.json`, "GET", { "accept-encoding": "identity" });
+  try {
+    const body = JSON.parse(response.body.toString("utf8"));
+    return response.status === 200 && body.success === true && body.statusCode === 200 &&
+      body.data?.sourceVideoId === id && body.data.passwordRequired === false && id.startsWith(target.ownerId);
+  } catch { return false; }
+}
+
 function copyHeaders(res, headers, transform, config, target) {
   for (const [name, value] of Object.entries(headers)) {
-    if (value === undefined || EXCLUDED_HEADERS.has(name) || name === "cache-control") continue;
+    if (value === undefined || (EXCLUDED_HEADERS.has(name) && !(name === "access-control-allow-origin" && target.service === "api")) || name === "cache-control") continue;
     if (transform && ["content-length", "content-encoding", "etag"].includes(name)) continue;
     if (name === "location") {
       res.setHeader(name, rewriteText(String(value), config, target));
@@ -325,8 +361,22 @@ function createGateway(options = {}) {
       }
       let body;
       let input;
+      if (target.signedUpload) {
+        if (!/^AWS4-HMAC-SHA256 /.test(req.headers.authorization || "") || !req.headers["x-amz-security-token"]) {
+          res.writeHead(401).end("Signed upload required");
+          return;
+        }
+        const chunks = [];
+        let size = 0;
+        for await (const chunk of req) {
+          size += chunk.length;
+          if (size > 50 * 1024 * 1024) { res.writeHead(413).end(); return; }
+          chunks.push(chunk);
+        }
+        body = Buffer.concat(chunks);
+      }
       if (req.method === "POST") {
-        const parsed = await readRequestBody(req, res);
+        const parsed = await readRequestBody(req, res, target.service === "api" && target.path.startsWith("/custom-page/") ? 2 * 1024 * 1024 : 16384);
         if (!parsed) return;
         body = parsed.body;
         input = parsed.json;
@@ -335,7 +385,8 @@ function createGateway(options = {}) {
           return;
         }
       }
-      if (target.requiresAuth) {
+      // Checkout checks its feature switch before authentication, including its disabled 404.
+      if (target.requiresAuth && !target.upstreamAuth && !(target.publicVideoId && await isPublicVideo(target, config))) {
         const user = await authenticate(req, target, config);
         if (!user) {
           res.writeHead(401, { "Content-Type": "application/json" }).end(JSON.stringify({ success: false, code: 401, errorCode: "AUTH_REQUIRED", message: "Please sign in again." }));
@@ -346,9 +397,14 @@ function createGateway(options = {}) {
           return;
         }
       }
+      const headers = requestHeaders(req, body);
+      if (target.signedUpload) {
+        for (const name of ["authorization", "x-amz-date", "x-amz-content-sha256", "x-amz-security-token"]) headers[name] = req.headers[name];
+        headers.host = new URL(config.publicOrigin).host;
+      }
       const upstream = target.bootstrap
         ? await loadBootstrap(req, config)
-        : await requestUpstream(config.upstreams[target.service], target.path + url.search, req.method === "HEAD" ? "GET" : (req.method || "GET"), requestHeaders(req, body), body);
+        : await requestUpstream(config.upstreams[target.service], target.path + url.search, req.method === "HEAD" ? "GET" : (req.method || "GET"), headers, body);
       const contentType = String(upstream.headers["content-type"] || "");
       const transform = target.bootstrap || /text\/|javascript|json|mpegurl|xml/.test(contentType);
       if (target.bootstrap && !contentType) res.setHeader("Content-Type", "application/javascript; charset=utf-8");

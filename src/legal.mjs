@@ -9,7 +9,7 @@ export const legalPages = [
       {
         h: "Responsable",
         p: [
-          "QRveo México, con domicilio en Guadalajara, Jalisco, es responsable del tratamiento de tus datos personales. Contacto: hola@qrveo.com.",
+          "QRveo México, con domicilio en Guadalajara, Jalisco, es responsable del tratamiento de tus datos personales. Contacto: mx@qrveo.com.",
         ],
       },
       {
@@ -23,7 +23,7 @@ export const legalPages = [
         h: "Para qué los usamos",
         p: [
           "Finalidades necesarias: crear y administrar tu cuenta, prestar el servicio, alojar y reproducir tus videos, facturar y darte soporte.",
-          "Finalidades opcionales: enviarte novedades del servicio. Puedes pedirnos que dejemos de hacerlo en cualquier momento escribiendo a hola@qrveo.com.",
+          "Finalidades opcionales: enviarte novedades del servicio. Puedes pedirnos que dejemos de hacerlo en cualquier momento escribiendo a mx@qrveo.com.",
         ],
       },
       {
@@ -35,7 +35,7 @@ export const legalPages = [
       {
         h: "Tus derechos",
         p: [
-          "Puedes acceder, rectificar o cancelar tus datos, oponerte a su uso o revocar tu consentimiento escribiendo a hola@qrveo.com. Te responderemos en los plazos que marca la ley.",
+          "Puedes acceder, rectificar o cancelar tus datos, oponerte a su uso o revocar tu consentimiento escribiendo a mx@qrveo.com. Te responderemos en los plazos que marca la ley.",
         ],
       },
       {
@@ -49,6 +49,34 @@ export const legalPages = [
     ],
   },
   {
+    path: "eliminacion-de-datos/",
+    title: "Eliminación de datos",
+    intro: "Puedes solicitar la eliminación de tus datos de QRveo o retirar la vinculación con Facebook escribiendo a mx@qrveo.com.",
+    sections: [
+      {
+        h: "Cómo enviar tu solicitud",
+        p: [
+          "Escribe a mx@qrveo.com desde el correo asociado a tu cuenta QRveo, con el asunto «Solicitud de eliminación de datos». Indica si quieres retirar la vinculación con Facebook o solicitar la eliminación de tu cuenta QRveo.",
+          "Si no tienes acceso a ese correo, indícalo en tu mensaje. Antes de actuar, necesitaremos verificar que eres titular de la cuenta. No envíes contraseñas, códigos de acceso ni documentos de identidad en el primer mensaje.",
+        ],
+      },
+      {
+        h: "Datos vinculados con Facebook",
+        p: [
+          "Si utilizaste Facebook para iniciar sesión, puedes pedir que eliminemos la vinculación y los datos recibidos de Facebook asociados a ese acceso. Antes de retirarla, asegúrate de disponer de otro método para entrar a QRveo.",
+          "También puedes retirar el acceso de QRveo desde la sección de aplicaciones y sitios web de la configuración de Facebook. Retirar ese permiso en Facebook no elimina por sí solo tu cuenta ni los datos que ya existen en QRveo; envíanos la solicitud para que podamos atenderla.",
+        ],
+      },
+      {
+        h: "Alcance y confirmación",
+        p: [
+          "Eliminar la vinculación con Facebook no equivale a eliminar tu cuenta QRveo, tus videos o tu plan. Si solicitas eliminar la cuenta completa, revisaremos contigo el alcance y las consecuencias antes de realizar cambios irreversibles.",
+          "Te responderemos por correo para verificar la titularidad, confirmar el alcance de la solicitud e informarte de su resultado o de los datos que deban conservarse por obligaciones aplicables.",
+        ],
+      },
+    ],
+  },
+  {
     path: "terminos/",
     title: "Términos y condiciones",
     intro: "Estas condiciones aplican cuando creas una cuenta en QRveo o contratas uno de sus planes.",
@@ -56,23 +84,23 @@ export const legalPages = [
       {
         h: "El servicio",
         p: [
-          "QRveo te permite subir videos de tus productos, generar un código QR para cada uno y que tus clientes los vean en su celular sin instalar una app ni registrarse.",
+          "QRveo te permite subir videos, generar un código QR para cada uno y que cualquier persona los vea en su celular sin instalar una app ni registrarse.",
         ],
       },
       {
         h: "Prueba gratis",
-        p: ["La prueba dura 30 días, no requiere tarjeta e incluye 5 GB de espacio. Al terminar, puedes contratar un plan anual."],
+        p: ["La prueba dura 30 días, no requiere tarjeta e incluye 5 GB de espacio. Los QR que imprimas durante la prueba siguen funcionando al terminar. Al terminar, puedes contratar un plan anual."],
       },
       {
         h: "Planes y pagos",
         p: [
-          "Los precios publicados están en pesos mexicanos e incluyen IVA. Los planes se pagan por año con tarjeta de crédito o débito, o por transferencia SPEI. Emitimos factura (CFDI) a solicitud.",
+          "Los precios publicados están en pesos mexicanos e incluyen IVA (16%). Los planes se pagan por año con tarjeta de crédito o débito, o por transferencia SPEI. Emitimos factura (CFDI) a solicitud.",
         ],
       },
       {
         h: "Si no renuevas",
         p: [
-          "Al vencer tu plan ya no podrás subir ni editar videos, pero los códigos QR que ya imprimiste siguen funcionando para que tus clientes no se queden sin instructivo.",
+          "Al vencer tu plan ya no podrás subir ni editar videos, pero los códigos QR que ya imprimiste siguen funcionando, para que quien los escanee pueda seguir viendo tus videos.",
         ],
       },
       {

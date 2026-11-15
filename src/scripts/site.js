@@ -1,10 +1,14 @@
 // QRveo 官网的浏览器脚本：控制台链接、示例二维码、首屏短片、套餐选择、贴纸动画。
 import qrcode from "./qrcode.mjs";
+import { track } from "./analytics.mjs?v=__ANALYTICS_VERSION__";
+import "./site-metrics.mjs?v=__SITE_METRICS_VERSION__";
+import "./navigation-media.mjs?v=__NAVIGATION_VERSION__";
 
 const RUNTIME = window.__VOD_PRIVATE__ || {};
 const DEV = window.__QRVEO_DEV__ || {};
 const ROUTES = { register: "/#/register", login: "/#/login", upgrade: "/#/secure/upgrade", panel: "/#/secure/overview" };
 const LANG = (document.documentElement.lang || "es").slice(0, 2);
+restoreLanguage();
 
 // 1 · 控制台（升级付款、我的面板）：部署时由 private-runtime.js 提供地址（与旧官网同一约定）。注册 / 登录是官网自己的页面，见 16
 const consoleOrigin = String(RUNTIME.consoleOrigin || "").replace(/\/$/, "");
@@ -44,15 +48,20 @@ document.querySelectorAll("a[data-watch]").forEach((a) => {
 });
 
 function demoUrl() {
-  const fixed = document.querySelector('meta[name="qrveo-demo"]')?.content;
-  if (fixed) return fixed;
+  const fixed = document.querySelector('meta[name="qrveo-demo"]');
+  if (fixed?.content) {
+    const url = new URL(fixed.content, location.href);
+    const videoPath = url.pathname.match(/\/videos\/[^/]+$/)?.[0];
+    return lanify(fixed.dataset?.runtimeDemo !== undefined && videoPath && watchOrigin
+      ? watchOrigin + videoPath + url.search + url.hash : fixed.content);
+  }
   const link = document.querySelector("a[data-demo]");
   return lanify(link ? link.href : "ejemplo/");
 }
 
 const demo = demoUrl();
 document.querySelectorAll("[data-qr]").forEach((el) => {
-  el.innerHTML = qrSvg(demo);
+  el.innerHTML = qrSvg(el.dataset.qrUrl ? lanify(el.dataset.qrUrl) : demo);
 });
 // 示例卡上的二维码：指向各自的观看页
 document.querySelectorAll("a[data-qr-for]").forEach((a) => {
@@ -168,6 +177,7 @@ if (waForm) {
     const lines = waLines(waForm, name, String(d.get("company") || "").trim(), d.get("use"));
     const msg = String(d.get("message") || "").trim();
     if (msg) lines.push(msg);
+    void track("contact_click", { method: "whatsapp", interaction: "form" });
     window.open(`https://wa.me/${waForm.dataset.wa}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener");
   });
 }
@@ -180,13 +190,20 @@ if (topbar) {
   onScroll();
 }
 
-// 6 · 离开首屏后才出现 WhatsApp 浮动按钮
+// 6 · WhatsApp 浮动按钮：滚过第一屏才出现；页尾自带 WhatsApp 的区块在视野里时让开；联系页和账号页不显示
 const wa = document.querySelector("[data-wa-float]");
-const hero = document.querySelector(".hero");
-if (wa && hero) {
-  new IntersectionObserver(([e]) => wa.classList.toggle("is-on", !e.isIntersecting), {
-    rootMargin: "0px 0px -35% 0px",
-  }).observe(hero);
+if (wa && document.querySelector(".contact-form, .auth")) wa.remove();
+else if (wa) {
+  const ends = [...document.querySelectorAll(".final, .foot")];
+  const seen = new Set();
+  const update = () => wa.classList.toggle("is-on", scrollY > innerHeight * 0.6 && !seen.size);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => (e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)));
+    update();
+  });
+  ends.forEach((el) => io.observe(el));
+  addEventListener("scroll", update, { passive: true });
+  update();
 }
 
 // 7 · 贴纸进入视野时“拍”上来
@@ -394,6 +411,63 @@ if (waForm && waPreview) {
 }
 
 // 16 · 语言：顶栏“语言”标签展开菜单；选过的语言记在浏览器里（与旧官网同一个键 vqr-lang）
+let qrGeneratorReady, changingLanguage = false;
+function rememberLanguage(code) {
+  try {
+    const locales = { es: "es_ES", en: "en_US", pt: "pt_BR", fr: "fr_FR", de: "de_DE", zh: "zh_CN", ja: "ja_JP", ko: "ko_KR" };
+    if (!locales[code]) return;
+    localStorage.setItem("vqr-lang", code);
+    localStorage.setItem("qrveo-official-language", code);
+    if (code !== "zh" || localStorage.getItem("cuplayer-admin-language") !== "zh_TW") {
+      localStorage.setItem("cuplayer-admin-language", locales[code]);
+    }
+  } catch {
+    /* 无痕模式下忽略 */
+  }
+}
+function restoreLanguage() {
+  try {
+    const saved = localStorage.getItem("vqr-lang") || localStorage.getItem("qrveo-official-language") ||
+      (localStorage.getItem("cuplayer-admin-language") || "").slice(0, 2);
+    const link = document.querySelector(`[data-lang-menu] [data-set-lang="${saved}"]`);
+    if (LANG === "es" && saved !== "es" && link) {
+      const target = new URL(link.href);
+      target.search = location.search;
+      target.hash = location.hash;
+      location.replace(target.href);
+      return;
+    }
+  } catch {
+    /* Storage restrictions must not prevent the page from loading. */
+  }
+  rememberLanguage(LANG);
+}
+async function changeLanguage(event) {
+  const link = event.currentTarget;
+  if (!document.querySelector("[data-qr-generator]") ||
+      event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) {
+    rememberLanguage(link.dataset.setLang);
+    return;
+  }
+  event.preventDefault();
+  if (link.dataset.setLang === LANG || changingLanguage) return;
+  changingLanguage = true;
+  try {
+    const generator = await qrGeneratorReady;
+    if (!generator) throw new Error("generator");
+    const target = new URL(link.href);
+    target.searchParams.set("tipo", await generator.prepareLanguageSwitch());
+    rememberLanguage(link.dataset.setLang);
+    location.assign(target.href);
+  } catch {
+    changingLanguage = false;
+    const root = document.querySelector("[data-qr-generator]");
+    const T = JSON.parse(root.querySelector("[data-qr-text]").textContent);
+    const message = root.querySelector("[data-qr-message]");
+    message.textContent = T.errors.draft || T.errors.generic;
+    message.hidden = false;
+  }
+}
 const langBox = document.querySelector("[data-lang]");
 if (langBox) {
   const btn = langBox.querySelector("[data-lang-btn]");
@@ -411,17 +485,17 @@ if (langBox) {
       btn.focus();
     }
   });
-  langBox.querySelectorAll("[data-set-lang]").forEach((a) =>
-    a.addEventListener("click", () => {
-      try {
-        localStorage.setItem("vqr-lang", a.dataset.setLang);
-      } catch {
-        /* 无痕模式下忽略 */
-      }
-    }),
-  );
+  const languageReturn = new URLSearchParams(location.search).get("return");
+  langBox.querySelectorAll("[data-set-lang]").forEach((a) => {
+    if (languageReturn) {
+      const url = new URL(a.href);
+      url.searchParams.set("return", languageReturn);
+      a.href = url.href;
+    }
+    a.addEventListener("click", changeLanguage);
+  });
 
-  // 第一次来、浏览器语言和本页不同：顶部轻轻提示一次，可以关掉
+  // 第一次来、浏览器语言和本页不同：轻轻提示一次，可以关掉
   let saved = "";
   try {
     saved = localStorage.getItem("vqr-lang") || "";
@@ -441,21 +515,17 @@ if (langBox) {
     a.textContent = `${pick.dataset.suggest} →`;
     x.textContent = "×";
     x.setAttribute("aria-label", pick.dataset.close);
-    a.addEventListener("click", () => localStorage.setItem("vqr-lang", pick.dataset.setLang));
+    a.addEventListener("click", changeLanguage);
     x.addEventListener("click", () => {
       bar.remove();
-      try {
-        localStorage.setItem("vqr-lang", LANG);
-      } catch {
-        /* 忽略 */
-      }
+      rememberLanguage(LANG);
     });
-    document.querySelector("[data-topbar]")?.after(bar);
+    document.body.append(bar);
   }
 }
 
 // 17 · 账号：官网的注册 / 登录 / 找回密码直接调用后台 /auth 接口（字段与控制台的表单一致），
-// 成功后把令牌写进 x-auth-token cookie（正式环境写到 .qrveo.com，官网和控制台都能读到），再打开控制台
+// 成功后把令牌写进 cookie；只有跨子域名的控制台才需要共享到 .qrveo.com。
 const API = String(RUNTIME.apiOrigin || "https://api.qrveo.com").replace(/\/$/, "");
 const CONSOLE_HOME = consoleOrigin || "https://console.qrveo.com";
 const TOKEN = "x-auth-token";
@@ -464,11 +534,19 @@ const readToken = () => {
   return m ? decodeURIComponent(m[1]) : "";
 };
 const cookieTail = () =>
-  `; Path=/; SameSite=Lax${/(^|\.)qrveo\.com$/.test(location.hostname) ? "; Domain=.qrveo.com" : ""}${location.protocol === "https:" ? "; Secure" : ""}`;
+  `; Path=/; SameSite=Lax${new URL(CONSOLE_HOME, location.href).origin !== location.origin && /(^|\.)qrveo\.com$/.test(location.hostname) ? "; Domain=.qrveo.com" : ""}${location.protocol === "https:" ? "; Secure" : ""}`;
 const writeToken = (t) => (document.cookie = `${TOKEN}=${encodeURIComponent(t)}${cookieTail()}; Max-Age=${7 * 86400}`);
 const clearToken = () => {
   document.cookie = `${TOKEN}=${cookieTail()}; Max-Age=0`;
   document.cookie = `${TOKEN}=; Path=/; Max-Age=0`;
+  if (/(^|\.)qrveo\.com$/.test(location.hostname)) {
+    document.cookie = `${TOKEN}=; Path=/; Domain=.qrveo.com; Max-Age=0`;
+  }
+  document.querySelectorAll("[data-panel-label]").forEach((a) => {
+    if (!a.dataset.loginLabel) return;
+    a.textContent = a.dataset.loginLabel;
+    a.href = a.dataset.loginHref;
+  });
 };
 const panelUrl = () => `${CONSOLE_HOME}${ROUTES.panel}?from=official&lang=${LANG}`;
 document.querySelectorAll('[data-console="panel"]').forEach((a) => (a.href = panelUrl()));
@@ -476,13 +554,15 @@ document.querySelectorAll('[data-console="panel"]').forEach((a) => (a.href = pan
 // 已登录：顶栏的“登录”换成“我的面板”
 if (readToken()) {
   document.querySelectorAll("[data-panel-label]").forEach((a) => {
+    a.dataset.loginLabel = a.textContent;
+    a.dataset.loginHref = a.href;
     a.textContent = a.dataset.panelLabel;
     a.href = panelUrl();
   });
 }
 
-async function api(path, { method = "GET", body, token } = {}) {
-  const headers = { "Accept-Language": LANG };
+async function api(path, { method = "GET", body, token, headers: extra } = {}) {
+  const headers = { "Accept-Language": LANG, ...extra };
   if (body) headers["Content-Type"] = "application/json";
   if (token) headers[TOKEN] = token;
   let res;
@@ -493,14 +573,41 @@ async function api(path, { method = "GET", body, token } = {}) {
   }
   const j = await res.json().catch(() => ({}));
   const bad = !res.ok || j.success === false || (typeof j.code === "number" && j.code !== 0 && j.code !== 200);
-  if (bad) throw Object.assign(new Error(j.message || j.msg || ""), { status: res.status, code: j.errorCode || j.code });
+  if (bad) throw Object.assign(new Error(j.message || j.msg || ""), { status: res.status, code: j.errorCode || j.code, num: typeof j.code === "number" ? j.code : j.statusCode, errors: j.errors });
   return j || {};
 }
 const dataOf = (j) => (j && j.data && typeof j.data === "object" ? j.data : j) || {};
 
 // 登录成功后去哪：带 ?return= 进来（例如旧官网的上传页）且是本站地址就回去，否则进控制台
+// 在生成器里传过试用视频的人，登录或注册成功后把视频认领到账号里（二维码地址不变）。最多等 5 秒，失败也照常进入控制台
+const generatorModule = () => import("./qr-generator.mjs?v=__QR_GENERATOR_VERSION__");
+async function claimTrial(token) {
+  try {
+    if (!localStorage.getItem("qrveo-last-qr")) return;
+    const { readLastQr, clearLastQr } = await generatorModule();
+    const last = readLastQr();
+    if (!last || last.kind !== "video" || !last.trialId) return;
+    const body = { trialId: last.trialId, trialToken: last.trialToken };
+    const deadline = Date.now() + 8000;
+    for (;;) {
+      try {
+        await api("/trial/claim", { method: "POST", token, body });
+        break;
+      } catch (error) {
+        // 视频还在探测：后端要求 3 秒后再试；其他失败（到期、空间不足）保留记录，24 小时内还能再认领
+        if (error.code !== "TRIAL_NOT_READY" || Date.now() + 3000 > deadline) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    }
+    clearLastQr();
+  } catch {
+    /* 认领失败不挡登录；试用码 24 小时内还能再认领 */
+  }
+}
+
 function afterLogin(token) {
   writeToken(token);
+  const claimed = claimTrial(token);
   const ret = new URLSearchParams(location.search).get("return");
   let next = panelUrl();
   if (ret) {
@@ -511,14 +618,296 @@ function afterLogin(token) {
       /* 地址不对就进控制台 */
     }
   }
-  setTimeout(() => location.assign(next), 600);
+  const target = new URL(next, location.href);
+  const admin = new URL(CONSOLE_HOME, location.href);
+  if (target.origin === admin.origin && target.pathname.replace(/\/+$/, "") === admin.pathname.replace(/\/+$/, "")) {
+    const split = target.hash.indexOf("?");
+    const params = new URLSearchParams(split < 0 ? "" : target.hash.slice(split + 1));
+    params.set("lang", LANG);
+    target.searchParams.delete("lang");
+    target.hash = (split < 0 ? target.hash || "#/secure/overview" : target.hash.slice(0, split)) + "?" + params;
+    next = target.href;
+  }
+  Promise.all([claimed, new Promise((resolve) => setTimeout(resolve, 600))]).then(() => location.assign(next));
 }
 
 const authPage = document.querySelector("[data-auth-page]");
 if (authPage) {
   const T = JSON.parse(document.getElementById("auth-text").textContent);
+  const returnTo = new URLSearchParams(location.search).get("return");
+  if (returnTo) authPage.querySelectorAll("a[data-auth]").forEach((link) => {
+    const url = new URL(link.href);
+    url.searchParams.set("return", returnTo);
+    link.href = url.href;
+  });
   const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const PASSWORD = /^(?=.*[A-Za-z])(?=.*\d).{8,16}$/;
+
+  const googleBox = authPage.querySelector("[data-google-auth]");
+  if (googleBox) {
+    const mount = googleBox.querySelector("[data-google-button]");
+    const status = googleBox.querySelector("[data-google-status]");
+    const startButton = googleBox.querySelector("[data-google-start]");
+    const consent = googleBox.querySelector("[data-google-consent]");
+    const link = googleBox.querySelector("[data-google-link]");
+    let challenge, credential = "", sending = false, starting = false, requested = false, renderedWidth = 0;
+    const showGoogleStatus = (text) => {
+      status.textContent = text;
+      status.hidden = !text;
+    };
+    const loadGoogle = () => new Promise((resolve, reject) => {
+      if (window.google?.accounts?.id) return resolve();
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      const timer = setTimeout(() => { script.remove(); reject(new Error("google-sdk-timeout")); }, 10000);
+      script.onload = () => { clearTimeout(timer); window.google?.accounts?.id ? resolve() : reject(new Error("google-sdk-unavailable")); };
+      script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error("google-sdk-network")); };
+      document.head.append(script);
+    });
+    const renderGoogle = () => {
+      if (mount.hidden || !challenge || !window.google?.accounts?.id) return;
+      const width = Math.max(200, Math.min(400, Math.floor(googleBox.clientWidth)));
+      if (width === renderedWidth) return;
+      renderedWidth = width;
+      mount.replaceChildren();
+      window.google.accounts.id.renderButton(mount, {
+        type: "standard", theme: "outline", size: "large", text: "continue_with",
+        shape: "rectangular", width, locale: googleBox.dataset.googleLocale,
+      });
+    };
+    const submitGoogle = async (accepted = false, password) => {
+      if (sending || !credential || !challenge) return;
+      sending = true;
+      googleBox.setAttribute("aria-busy", "true");
+      consent.querySelector("button").disabled = true;
+      link.querySelector("button").disabled = true;
+      showGoogleStatus(T.google.loading);
+      try {
+        const result = dataOf(await api("/auth/login/google", {
+          method: "POST", body: { credential, nonce: challenge.nonce, consent: accepted, ...(password ? { password } : {}) },
+        }));
+        if (!result.token) throw new Error("google-token-missing");
+        credential = "";
+        link.reset();
+        showGoogleStatus(T.loginDone);
+        authPage.querySelectorAll('button[type="submit"]').forEach((button) => (button.disabled = true));
+        if (result.isNew === true) await track("sign_up", { method: "google" });
+        afterLogin(result.token);
+      } catch (error) {
+        if (error.code === "GOOGLE_CONSENT_REQUIRED") {
+          consent.hidden = false;
+          link.hidden = true;
+          mount.hidden = true;
+          showGoogleStatus(T.google.consentRequired);
+          consent.elements.consent.focus();
+        } else if (error.code === "GOOGLE_LINK_REQUIRED") {
+          consent.hidden = true;
+          link.hidden = false;
+          mount.hidden = true;
+          showGoogleStatus(T.google.linkRequired);
+          link.elements.password.focus();
+        } else {
+          credential = "";
+          consent.hidden = true;
+          link.hidden = true;
+          mount.hidden = true;
+          startButton.hidden = false;
+          showGoogleStatus(error.network ? T.network : T.google.failed);
+        }
+      } finally {
+        sending = false;
+        googleBox.removeAttribute("aria-busy");
+        consent.querySelector("button").disabled = false;
+        link.querySelector("button").disabled = false;
+      }
+    };
+    const startGoogle = async (interactive = false) => {
+      if (starting) {
+        if (interactive) {
+          requested = true;
+          startButton.disabled = true;
+          showGoogleStatus(T.google.loading);
+        }
+        return;
+      }
+      if (sending) return;
+      starting = true;
+      requested = interactive;
+      startButton.disabled = interactive;
+      consent.hidden = true;
+      consent.reset();
+      link.hidden = true;
+      link.reset();
+      credential = "";
+      challenge = null;
+      renderedWidth = 0;
+      mount.hidden = true;
+      if (interactive) showGoogleStatus(T.google.loading);
+      try {
+        challenge = dataOf(await api("/auth/google/challenge", { method: "POST", body: {} }));
+        if (!challenge.clientId || !challenge.nonce) throw new Error("google-not-configured");
+        await loadGoogle();
+        window.google.accounts.id.initialize({
+          client_id: challenge.clientId, nonce: challenge.nonce,
+          ux_mode: "popup", auto_select: false,
+          callback: (response) => {
+            if (sending || !response.credential) return;
+            credential = response.credential;
+            void submitGoogle();
+          },
+        });
+        mount.hidden = false;
+        renderGoogle();
+        startButton.hidden = true;
+        showGoogleStatus("");
+      } catch {
+        challenge = null;
+        mount.hidden = true;
+        startButton.hidden = false;
+        if (requested) showGoogleStatus(T.google.unavailable);
+      } finally {
+        starting = false;
+        requested = false;
+        startButton.disabled = false;
+      }
+    };
+    consent.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (consent.reportValidity()) void submitGoogle(true);
+    });
+    link.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (link.reportValidity()) void submitGoogle(false, link.elements.password.value);
+    });
+    startButton.addEventListener("click", () => void startGoogle(true));
+    new ResizeObserver(() => renderGoogle()).observe(googleBox);
+    void startGoogle();
+  }
+
+  const facebookBox = authPage.querySelector("[data-facebook-auth]");
+  if (facebookBox && T.facebook) {
+    const button = facebookBox.querySelector("[data-facebook-start]");
+    const status = facebookBox.querySelector("[data-facebook-status]");
+    const consent = facebookBox.querySelector("[data-facebook-consent]");
+    const link = facebookBox.querySelector("[data-facebook-link]");
+    let challenge, accessToken = "", preparing = false, sending = false, popup = false, completed = false;
+    const say = text => {
+      status.textContent = text;
+      status.hidden = !text;
+    };
+    const loadFacebook = () => new Promise((resolve, reject) => {
+      if (window.FB?.init) return resolve();
+      const script = document.createElement("script");
+      script.src = "https://connect.facebook.net/en_US/sdk.js";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      const timer = setTimeout(() => { script.remove(); reject(new Error("facebook-sdk-timeout")); }, 10000);
+      script.onload = () => {
+        clearTimeout(timer);
+        window.FB?.init ? resolve() : reject(new Error("facebook-sdk-unavailable"));
+      };
+      script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error("facebook-sdk-network")); };
+      document.head.append(script);
+    });
+    const prepareFacebook = async (interactive = false) => {
+      if (preparing || sending || popup) return;
+      preparing = true;
+      button.disabled = true;
+      challenge = null;
+      if (interactive) say(T.facebook.loading);
+      try {
+        const next = dataOf(await api("/auth/facebook/challenge", { method: "POST", body: {} }));
+        if (!next.appId || !next.nonce || !next.version) throw new Error("facebook-not-configured");
+        await loadFacebook();
+        window.FB.init({ appId: next.appId, version: next.version, cookie: false, xfbml: false, status: false });
+        challenge = next;
+        say("");
+      } catch {
+        if (interactive) say(T.facebook.unavailable);
+      } finally {
+        preparing = false;
+        button.disabled = false;
+      }
+    };
+    const submitFacebook = async (accepted = false, password) => {
+      if (sending || !accessToken || !challenge) return;
+      sending = true;
+      facebookBox.setAttribute("aria-busy", "true");
+      facebookBox.querySelectorAll("button").forEach(control => { control.disabled = true; });
+      say(T.facebook.loading);
+      try {
+        const result = dataOf(await api("/auth/login/facebook", {
+          method: "POST",
+          body: { accessToken, nonce: challenge.nonce, consent: accepted, ...(password ? { password } : {}) },
+        }));
+        if (!result.token) throw new Error("facebook-token-missing");
+        accessToken = "";
+        link.reset();
+        say(T.loginDone);
+        authPage.querySelectorAll("button").forEach(control => { control.disabled = true; });
+        if (result.isNew === true) await track("sign_up", { method: "facebook" });
+        afterLogin(result.token);
+        completed = true;
+      } catch (error) {
+        consent.hidden = error.code !== "FACEBOOK_CONSENT_REQUIRED";
+        link.hidden = error.code !== "FACEBOOK_LINK_REQUIRED";
+        if (!consent.hidden) {
+          say(T.facebook.consentRequired);
+          consent.elements.consent.focus();
+        } else if (!link.hidden) {
+          say(T.facebook.linkRequired);
+          link.elements.password.focus();
+        } else {
+          accessToken = "";
+          challenge = null;
+          link.reset();
+          say(error.network ? T.network : error.code === "FACEBOOK_EMAIL_REQUIRED" ? T.facebook.emailRequired : T.facebook.failed);
+        }
+      } finally {
+        sending = false;
+        facebookBox.removeAttribute("aria-busy");
+        if (!completed) facebookBox.querySelectorAll("button").forEach(control => { control.disabled = false; });
+      }
+    };
+    button.addEventListener("click", () => {
+      if (preparing || sending || popup) return;
+      if (!challenge || !window.FB?.login) return void prepareFacebook(true);
+      consent.hidden = true;
+      consent.reset();
+      link.hidden = true;
+      link.reset();
+      popup = true;
+      button.disabled = true;
+      say(T.facebook.loading);
+      // Keep FB.login synchronous with the click so browsers allow its popup.
+      try {
+        window.FB.login(response => {
+          popup = false;
+          button.disabled = false;
+          if (!response.authResponse?.accessToken) {
+            say("");
+            return;
+          }
+          accessToken = response.authResponse.accessToken;
+          void submitFacebook();
+        }, { scope: "public_profile,email", return_scopes: true });
+      } catch {
+        popup = false;
+        button.disabled = false;
+        say(T.facebook.unavailable);
+      }
+    });
+    consent.addEventListener("submit", event => {
+      event.preventDefault();
+      if (consent.reportValidity()) void submitFacebook(true);
+    });
+    link.addEventListener("submit", event => {
+      event.preventDefault();
+      if (link.reportValidity()) void submitFacebook(false, link.elements.password.value);
+    });
+    void prepareFacebook();
+  }
 
   // 后台的错误：优先看错误码，其次看消息里的关键词，都认不出就用通用提示
   const errText = (e, kind) => {
@@ -626,8 +1015,13 @@ if (authPage) {
           });
           const token = j.token || dataOf(j).token;
           say(T.regDone, true);
+          await track("sign_up", { method: "email" });
           if (token) afterLogin(token);
-          else setTimeout(() => location.assign(`${authPage.querySelector('[data-auth="login"]').href}?email=${encodeURIComponent(val("email"))}`), 900);
+          else setTimeout(() => {
+            const login = new URL(authPage.querySelector('[data-auth="login"]').href);
+            login.searchParams.set("email", val("email"));
+            location.assign(login.href);
+          }, 900);
         } catch (err) {
           say(errText(err, kind));
           busy(false);
@@ -639,19 +1033,30 @@ if (authPage) {
       const capRow = form.querySelector("[data-captcha-row]");
       const capImg = form.querySelector("[data-captcha-img]");
       let captchaId = "";
-      // 图形验证码：控制台登录页每次都要，官网照做；拿不到就不显示
-      const loadCaptcha = async () => {
-        try {
-          const d = dataOf(await api(`/auth/kaptcha?t=${Date.now()}`));
-          const img = String(d.imgBase64 || d.img || "");
-          if (!img) return;
-          capImg.src = img.startsWith("data:") ? img : img.trim().startsWith("<") ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(img)}` : `data:image/png;base64,${img}`;
-          captchaId = d.captchaId || "";
-          form.elements.captcha.value = "";
-          capRow.hidden = false;
-        } catch {
-          /* 后台没开验证码时忽略 */
-        }
+      let captchaEnabled = true, captchaRequest = Promise.resolve();
+      // Only an explicit server switch disables the challenge.
+      const loadCaptcha = () => {
+        captchaRequest = (async () => {
+          try {
+            const d = dataOf(await api(`/auth/kaptcha?t=${Date.now()}`));
+            captchaEnabled = d.enabled !== false;
+            capRow.hidden = !captchaEnabled;
+            if (!captchaEnabled) {
+              captchaId = "";
+              form.elements.captcha.value = "";
+              return;
+            }
+            const img = String(d.imgBase64 || d.img || "");
+            if (!img) return;
+            capImg.src = img.startsWith("data:") ? img : img.trim().startsWith("<") ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(img)}` : `data:image/png;base64,${img}`;
+            captchaId = d.captchaId || "";
+            form.elements.captcha.value = "";
+            capRow.hidden = false;
+          } catch {
+            /* Leave the challenge required when its status cannot be loaded. */
+          }
+        })();
+        return captchaRequest;
       };
       form.querySelector("[data-captcha-new]").addEventListener("click", loadCaptcha);
       const preset = new URLSearchParams(location.search).get("email");
@@ -685,18 +1090,20 @@ if (authPage) {
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        await captchaRequest;
         say("");
         const ok = check([
           ["email", EMAIL.test(val("email")), T.email],
           ["password", !!form.elements.password.value, T.required],
-          ["captcha", !!val("captcha"), T.captcha],
+          ["captcha", !captchaEnabled || !!val("captcha"), T.captcha],
         ]);
         if (!ok) return;
         busy(true);
         try {
           const j = await api("/auth/login", {
             method: "POST",
-            body: { email: val("email"), password: form.elements.password.value, captcha: val("captcha"), captchaId },
+            body: { email: val("email"), password: form.elements.password.value,
+              ...(captchaEnabled ? { captcha: val("captcha"), captchaId } : {}) },
           });
           const t = j.token || dataOf(j).token;
           if (!t) throw new Error("");
@@ -759,4 +1166,236 @@ if (authPage) {
         resetBox.querySelector("[data-reset-again]").hidden = false;
       });
   }
+}
+
+if (document.querySelector("[data-qr-generator]")) {
+  qrGeneratorReady = generatorModule()
+    .then(({ initQrGenerator }) => initQrGenerator({ qrcode, readToken, clearToken, consoleHome: CONSOLE_HOME, lang: LANG, api }))
+    .catch(() => {
+      const root = document.querySelector("[data-qr-generator]");
+      const T = JSON.parse(root.querySelector("[data-qr-text]").textContent);
+      const message = root.querySelector("[data-qr-message]");
+      message.textContent = T.errors.generic;
+      message.hidden = false;
+    });
+}
+
+// 18 · 结账页（第一阶段是模拟支付：后台 /billing/demo-checkout 收到资料就开通套餐，不扣款）
+// 要先登录：令牌来自官网登录写的 cookie；控制台的“升级”按钮跳过来之前也会写这个 cookie
+const payPage = document.querySelector("[data-pay-page]");
+if (payPage) {
+  const T = JSON.parse(document.getElementById("pay-text").textContent);
+  const form = payPage.querySelector("[data-pay-form]");
+  const login = payPage.querySelector("[data-pay-login]");
+  const msg = form.querySelector("[data-auth-msg]");
+  const btn = form.querySelector(".auth-submit");
+  const btnText = form.querySelector("[data-pay-btn]");
+  const untilRow = payPage.querySelector("[data-pay-until]");
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const RFC = /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/;
+  const DAY = 86400000;
+  const fmt = (d) => d.toLocaleDateString(document.documentElement.lang, { day: "numeric", month: "long", year: "numeric" });
+  // 后台的接口有两种写法：status="success" 或 success=true；都要看
+  const ok = (j) => !(j && j.status && j.status !== "success");
+  const val = (n) => String(form.elements[n]?.value || "").trim();
+  const say = (text) => {
+    msg.hidden = !text;
+    msg.textContent = text || "";
+  };
+  const fieldErr = (name, text) => {
+    const box = form.querySelector(`[data-fld="${name}"]`);
+    const el = box.querySelector("[data-err]");
+    el.hidden = !text;
+    el.textContent = text || "";
+    form.elements[name].setAttribute("aria-invalid", String(!!text));
+  };
+  form.addEventListener("input", (e) => e.target.name && form.querySelector(`[data-fld="${e.target.name}"]`) && fieldErr(e.target.name, ""));
+
+  // 套餐：?plan= 预选；切换时右边的订单摘要和按钮金额跟着换
+  let user = null;
+  const want = new URLSearchParams(location.search).get("plan");
+  const radio = form.querySelector(`input[name="plan"][value="${CSS.escape(want || "")}"]`);
+  if (radio) radio.checked = true;
+  const plan = () => form.elements.plan.value;
+  // 当前套餐还没到期、又买同一个：在原到期日上加一年；否则从今天起一年
+  const sameAs = (id) => user && new RegExp(id === "premium" ? "premium" : "est[aá]ndar|standard", "i").test(String(user.packagetypeName || ""));
+  const showPlan = () => {
+    const id = plan();
+    payPage.querySelectorAll("[data-sum]").forEach((el) => (el.hidden = el.dataset.sum !== id));
+    btnText.textContent = method() === "spei" ? T.speiPay : T.pay.replace("{price}", T.plans[id].price);
+    form.querySelector("[data-spei-amount]").textContent = T.plans[id].price;
+    if (!user) return;
+    const exp = new Date(user.serviceExpiration).getTime();
+    const extend = sameAs(id) && exp > Date.now();
+    untilRow.querySelector("span").textContent = T.until.replace("{date}", fmt(new Date((extend ? exp : Date.now()) + 365 * DAY))) + (extend ? ` · ${T.extend}` : "");
+    untilRow.hidden = false;
+  };
+  // 付款方式：选中的那一种展开它的面板（银行卡填卡，SPEI 显示转账信息）
+  const method = () => form.elements.method.value;
+  const showMethod = () => {
+    form.querySelectorAll("[data-method-panel]").forEach((el) => (el.hidden = el.dataset.methodPanel !== method()));
+    showPlan();
+  };
+  form.addEventListener("change", (e) => (e.target.name === "plan" ? showPlan() : e.target.name === "method" && showMethod()));
+  // SPEI 参考号：7 位数字，同一个浏览器标签里保持不变，转账备注要填
+  let ref = sessionStorage.getItem("qrveo-spei-ref");
+  if (!ref) sessionStorage.setItem("qrveo-spei-ref", (ref = String(1000000 + Math.floor(Math.random() * 9000000))));
+  form.querySelector("[data-spei-ref]").textContent = ref;
+  form.querySelectorAll(".copy-btn").forEach((b) =>
+    b.addEventListener("click", () => {
+      const text = b.dataset.copyText || form.querySelector(b.dataset.copyFrom).textContent;
+      navigator.clipboard?.writeText(b.dataset.copyText ? text : text.replace(/[^\d.]/g, "")).then(() => {
+        b.textContent = T.copied;
+        setTimeout(() => (b.textContent = T.copy), 1600);
+      });
+    }),
+  );
+
+  // 银行卡：边输入边分组、认卡组织；提交时校验
+  const BRANDS = [
+    ["amex", "American Express", /^3[47]/, [15], 4],
+    ["visa", "Visa", /^4/, [13, 16, 19], 3],
+    ["mastercard", "Mastercard", /^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/, [16], 3],
+  ];
+  const digits = (n) => val(n).replace(/\D/g, "");
+  const brandOf = (num) => BRANDS.find((b) => b[2].test(num));
+  const luhn = (num) => {
+    let sum = 0;
+    for (let i = 0; i < num.length; i++) {
+      let d = +num[num.length - 1 - i];
+      if (i % 2) d = d * 2 > 9 ? d * 2 - 9 : d * 2;
+      sum += d;
+    }
+    return sum % 10 === 0;
+  };
+  const cardInput = form.elements.cardnum;
+  const brandTag = form.querySelector("[data-card-brand]");
+  cardInput.addEventListener("input", () => {
+    const num = digits("cardnum").slice(0, 19);
+    const b = brandOf(num);
+    // American Express 按 4-6-5 分组，其他按 4 位一组
+    cardInput.value = b && b[0] === "amex" ? [num.slice(0, 4), num.slice(4, 10), num.slice(10, 15)].filter(Boolean).join(" ") : num.replace(/(\d{4})(?=\d)/g, "$1 ");
+    brandTag.textContent = b ? b[1] : "";
+    brandTag.dataset.brand = b ? b[0] : "";
+    form.elements.cardcvc.maxLength = b ? b[4] : 4;
+  });
+  form.elements.cardexp.addEventListener("input", (e) => {
+    let d = digits("cardexp").slice(0, 4);
+    if (d.length === 1 && d > "1") d = `0${d}`; // 输入 8 → 08
+    e.target.value = d.length > 2 || (d.length === 2 && e.inputType !== "deleteContentBackward") ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
+  });
+  form.elements.cardcvc.addEventListener("input", (e) => (e.target.value = digits("cardcvc")));
+  const cardRules = () => {
+    const num = digits("cardnum");
+    const b = brandOf(num);
+    const [mm, yy] = [digits("cardexp").slice(0, 2), digits("cardexp").slice(2)];
+    const now = new Date();
+    const expOk = /^(0[1-9]|1[0-2])$/.test(mm) && yy.length === 2;
+    const notPast = expOk && new Date(2000 + +yy, +mm, 1) > now;
+    return [
+      ["cardnum", num.length >= 12 && (b ? b[3].includes(num.length) && luhn(num) : false), b || num.length < 12 ? T.cardBad : T.cardBrandBad],
+      ["cardname", !!val("cardname"), T.required],
+      ["cardexp", notPast, expOk ? T.expPast : T.expBad],
+      ["cardcvc", digits("cardcvc").length === (b ? b[4] : 3), T.cvcBad],
+    ];
+  };
+  showMethod();
+
+  // 登录后回到这一页（带着选好的套餐）
+  const back = () => {
+    const u = new URL(location.href);
+    u.searchParams.set("plan", plan());
+    return u.pathname + u.search;
+  };
+  payPage.querySelectorAll("[data-pay-return]").forEach((a) => a.addEventListener("click", () => (a.href = `${a.href.split("?")[0]}?return=${encodeURIComponent(back())}`)));
+  const needLogin = (text) => {
+    clearToken();
+    user = null;
+    form.hidden = true;
+    login.hidden = false;
+    const p = login.querySelector("p");
+    if (text) p.textContent = text;
+  };
+
+  const token = readToken();
+  if (!token) needLogin();
+  else
+    api("/user/get-user", { token })
+      .then((j) => {
+        if (!ok(j)) throw Object.assign(new Error(""), { status: 401 });
+        user = dataOf(j);
+        form.querySelector("[data-pay-account]").textContent = user.email || user.name || "";
+        if (!form.elements.name.value) form.elements.name.value = user.company || user.name || "";
+        if (!form.elements.email.value) form.elements.email.value = user.email || "";
+        if (!form.elements.phone.value) form.elements.phone.value = user.telephone || "";
+        form.hidden = false;
+        showPlan();
+      })
+      .catch((e) => (e.network ? (form.hidden = false, say(T.network)) : needLogin()));
+
+  payPage.querySelector("[data-pay-logout]").addEventListener("click", async () => {
+    await api("/auth/logout", { method: "POST", token: readToken() }).catch(() => {});
+    needLogin();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    say("");
+    form.elements.rfc.value = val("rfc").toUpperCase().replace(/\s+/g, "");
+    const rules = [
+      ["name", !!val("name"), T.required],
+      ["email", EMAIL.test(val("email")), T.email],
+      ["rfc", !val("rfc") || RFC.test(val("rfc")), T.rfcBad],
+      ...(method() === "card" ? cardRules() : []),
+    ];
+    let first = null;
+    for (const [name, good, text] of rules) {
+      fieldErr(name, good ? "" : text);
+      if (!good && !first) first = form.elements[name];
+    }
+    if (first) return first.focus();
+    btn.disabled = true;
+    btnText.textContent = btn.dataset.busy;
+    try {
+      const billing = { name: val("name"), email: val("email") };
+      if (val("rfc")) billing.rfc = val("rfc");
+      if (val("phone")) billing.phone = val("phone");
+      // 卡号和安全码不出浏览器：后台只拿到卡组织和后四位
+      const num = digits("cardnum");
+      const pay = method() === "card" ? { card: { brand: brandOf(num)[0], last4: num.slice(-4), exp: digits("cardexp").replace(/^(\d\d)(\d\d)$/, "$1/$2"), holder: val("cardname") } } : { spei: { reference: ref } };
+      const j = await api("/billing/demo-checkout", { method: "POST", token: readToken(), body: { plan: plan(), method: method(), billing, ...pay } });
+      if (!ok(j)) throw Object.assign(new Error(j.message || ""), { status: j.statusCode });
+      const d = dataOf(j);
+      const done = payPage.querySelector("[data-pay-done]");
+      const exp = d.serviceExpiration ? new Date(d.serviceExpiration) : new Date(Date.now() + 365 * DAY);
+      const order = d.orderNo || d.orderId || d.order_no || (d.order && (d.order.orderNo || d.order.id)) || "";
+      done.querySelector("[data-done-title]").textContent = T.doneTitle.replace("{plan}", T.plans[plan()].name);
+      done.querySelector("[data-done-text]").textContent = T.doneText.replace("{date}", fmt(exp));
+      done.querySelector("[data-done-order]").textContent = order;
+      done.querySelector("[data-done-paid]").textContent = pay.card
+        ? T.paidWith.replace("{brand}", brandOf(num)[1]).replace("{last4}", pay.card.last4)
+        : T.paidSpei.replace("{ref}", ref);
+      ["cardnum", "cardcvc"].forEach((n) => (form.elements[n].value = ""));
+      done.querySelector(".pay-done-order").hidden = !order;
+      done.querySelector('[data-console="panel"]').href = panelUrl();
+      untilRow.querySelector("span").textContent = T.until.replace("{date}", fmt(exp));
+      payPage.querySelector("[data-pay-head]").hidden = true;
+      form.hidden = true;
+      done.hidden = false;
+      done.focus();
+      scrollTo({ top: 0, behavior: "instant" });
+    } catch (err) {
+      // 有的错误是 HTTP 200 + 业务码，所以 HTTP 状态不是错误码时看业务码
+      const s = err.status >= 400 ? err.status : err.num || err.status;
+      // 400 时后台在 errors 里按字段给出原因（例如 email、billing.rfc）；用我们自己的多语言提示标到对应输入框
+      const bad = Object.keys((s === 400 && err.errors) || {}).map((k) => k.replace(/^billing\./, ""));
+      const known = { name: T.required, email: T.email, rfc: T.rfcBad };
+      bad.filter((k) => known[k]).forEach((k) => fieldErr(k, known[k]));
+      if (s === 401) needLogin(T.session);
+      else if (bad.some((k) => known[k])) form.elements[bad.find((k) => known[k])].focus();
+      else say(err.network ? T.network : s === 403 ? T.child : s === 404 || s === 409 ? T.off : T.generic);
+      btn.disabled = false;
+      showPlan();
+    }
+  });
 }

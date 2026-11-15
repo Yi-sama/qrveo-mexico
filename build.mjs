@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { existsSync } from "node:fs";
-import { AUTH, pageAbout, pageAuth, pageContact, pageExamples, pageFeatures, pageHelp, pageHome, pageLegal, pagePricing, pageSolution, pageSolutions } from "./src/render.mjs";
+import { AUTH, PAY, GENERATOR, pageGenerator, pageAbout, pageCheckout, pageAuth, pageContact, pageExamples, pageFeatures, pageHelp, pageHome, pageLegal, pagePricing, pageSolution, pageSolutions } from "./src/render.mjs";
 import { DEFAULT_LANG, LANGS, langDir, localize, missing } from "./src/i18n.mjs";
 import { pageExample } from "./src/example.mjs";
 import { legalPages } from "./src/legal.mjs";
@@ -54,16 +54,24 @@ export async function build() {
 
   // 样式：全站样式 + 动效 + 首页短片舞台（v1 沿用）
   const css = (
-    await Promise.all(["site.css", "motion.css", "stage.css", "account.css"].map((f) => readFile(path.join(ROOT, "src", "styles", f), "utf8")))
+    await Promise.all(["site.css", "motion.css", "stage.css", "account.css", "qr-generator.css"].map((f) => readFile(path.join(ROOT, "src", "styles", f), "utf8")))
   ).join("\n");
   const js = await readFile(path.join(ROOT, "src", "scripts", "site.js"), "utf8");
+  const analyticsJs = await readFile(path.join(ROOT, "src", "scripts", "analytics.mjs"), "utf8");
+  const metricsJs = await readFile(path.join(ROOT, "src", "scripts", "site-metrics.mjs"), "utf8");
+  const navigationJs = await readFile(path.join(ROOT, "src", "scripts", "navigation-media.mjs"), "utf8");
+  const generatorJs = await readFile(path.join(ROOT, "src", "scripts", "qr-generator.mjs"), "utf8");
   // 第三方二维码库（MIT），包成 ES 模块供 site.js 引入
   const qrLib = `${await readFile(path.join(ROOT, "src", "vendor", "qrcode.js"), "utf8")}
 export default qrcode;
 `;
-  const v = createHash("sha1").update(css + js + qrLib).digest("hex").slice(0, 8);
+  const v = createHash("sha1").update(css + js + qrLib + generatorJs + analyticsJs + metricsJs + navigationJs).digest("hex").slice(0, 8);
   await write("assets/site.css", css);
-  await write("assets/site.js", js);
+  await write("assets/site.js", js.replace("__QR_GENERATOR_VERSION__", v).replace("__ANALYTICS_VERSION__", v).replace("__SITE_METRICS_VERSION__", v).replace("__NAVIGATION_VERSION__", v));
+  await write("assets/analytics.mjs", analyticsJs);
+  await write("assets/site-metrics.mjs", metricsJs);
+  await write("assets/navigation-media.mjs", navigationJs);
+  await write("assets/qr-generator.mjs", generatorJs.replace("__SITE_METRICS_VERSION__", v));
   await write("assets/qrcode.mjs", qrLib);
   await write("favicon.svg", FAVICON);
 
@@ -72,6 +80,7 @@ export default qrcode;
   const demo = es.demo.url || (first?.vid ? `${WATCH}/videos/${first.vid}` : `${ORIGIN}${BASE}ejemplo/`);
   const pages = [
     ["", pageHome],
+    [GENERATOR, pageGenerator],
     ["funciones/", pageFeatures],
     ["soluciones/", pageSolutions],
     ["ejemplos/", pageExamples],
@@ -91,7 +100,7 @@ export default qrcode;
     // o.root 到站点根目录（图片、样式等共用资源），o.L 到本语言首页，o.alt(l) 同一页在另一种语言里的路径
     const opts = (p) => {
       const root = "../".repeat((dir + p).split("/").filter(Boolean).length);
-      return { origin: ORIGIN, base: BASE, watch: WATCH, path: p, full: dir + p, root, L: root + dir, lang, langs: LANGS, alt: (l) => langDir(l.code) + p, v, qr: (t) => qrSvg(t), demo };
+      return { origin: ORIGIN, base: BASE, watch: WATCH, path: p, full: dir + p, root, L: root + dir, lang, langs: LANGS, alt: (l) => langDir(l.code) + p, v, authCss: css, qr: (t) => qrSvg(t), demo };
     };
     const put = async (p, html) => {
       await write(`${dir}${p}index.html`, html);
@@ -100,6 +109,7 @@ export default qrcode;
     for (const [p, fn] of pages) await put(p, fn(c, opts(p)));
     for (const s of c.solutions) await put(`soluciones/${s.slug}/`, pageSolution(c, opts(`soluciones/${s.slug}/`), s));
     for (const kind of ["register", "login", "recover"]) await put(AUTH[kind], pageAuth(c, opts(AUTH[kind]), kind));
+    await put(PAY, pageCheckout(c, opts(PAY)));
     for (const page of legalPages) await write(`${dir}${page.path}index.html`, pageLegal(c, opts(page.path), page));
   }
   // 备用静态示例页只有西语（模仿后台观看页）
@@ -107,9 +117,12 @@ export default qrcode;
   // 站点地图（给搜索引擎）
   await write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.filter((u) => !u.endsWith(AUTH.recover)).map((u) => `  <url><loc>${ORIGIN}${BASE}${u}</loc></url>`).join("\n")}
+${urls.filter((u) => !u.endsWith(AUTH.recover) && !u.endsWith(PAY)).map((u) => `  <url><loc>${ORIGIN}${BASE}${u}</loc></url>`).join("\n")}
 </urlset>
 `);
+  // robots.txt 必须放在域名根目录，所以写到 DIST 而不是 OUT。
+  // 不屏蔽任何页面：登录、结账等页面已经用 noindex，屏蔽抓取反而让谷歌读不到 noindex。
+  await writeFile(path.join(DIST, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}${BASE}sitemap.xml\n`);
 
   return { out: path.relative(ROOT, OUT), base: BASE, v, gaps };
 }

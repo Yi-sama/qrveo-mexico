@@ -1,9 +1,121 @@
 {
+  "generator": {
+    "nav": "Create a free QR",
+    "title": "Create your QR code",
+    "lead": "Choose a video or link.",
+    "homeNote": "Links without signup. Videos with a 30-day trial.",
+    "free": "No credit card",
+    "videoTab": "Video",
+    "url": "Link",
+    "videoTitle": "Your video, in a QR",
+    "videoText": "For your product, lesson or packaging. Scanning opens the video on a phone, with no app.",
+    "videoDays": "30 days free",
+    "videoSpace": "5 GB trial storage",
+    "videoCard": "No credit card",
+    "videoStart": "Create an account and upload",
+    "videoLogin": "I already have an account",
+    "upload": "Upload my video",
+    "videoExample": "Example: product tutorial",
+    "seeExample": "Open example",
+    "urlLabel": "Destination link",
+    "urlNote": "This QR's destination cannot be edited later.",
+    "generate": "Generate QR",
+    "remaining": "",
+    "loading": "Checking your allowance…",
+    "unlimited": "",
+    "videoLimit": "Unlimited QR codes, including on the free trial. Your account storage and the per-file limit shown before uploading still apply.",
+    "quotaNote": "",
+    "privacy": "The server generates your QR without storing the original link. Your logo stays in this browser.",
+    "customize": "Customize",
+    "color": "QR color",
+    "logo": "Logo",
+    "logoAdd": "Add logo",
+    "logoHint": "PNG, JPG or WebP.",
+    "logoRemove": "Remove logo",
+    "template": "Label",
+    "templates": [
+      "QR only",
+      "Product",
+      "Education",
+      "Promotion"
+    ],
+    "caption": "Label text",
+    "captions": {
+      "product": "Scan to see how it works",
+      "education": "Scan and learn",
+      "promotion": "Scan and discover"
+    },
+    "empty": "Your QR will appear here",
+    "preview": "Preview",
+    "download": "Download",
+    "downloadNote": "1600 px wide PNG · Vector SVG",
+    "open": "Open link",
+    "ready": "Your QR is ready.",
+    "changed": "The link changed. Generate its new QR.",
+    "noscript": "Enable JavaScript to create your QR.",
+    "errors": {
+      "url": "Enter a valid https:// or http:// link, up to 600 characters.",
+      "color": "Choose a darker color to keep the QR readable.",
+      "logo": "Choose a valid PNG, JPG or WebP image.",
+      "limit": "We couldn't create the QR code. Please try again.",
+      "service": "We could not reach the server. Check your connection and try again.",
+      "session": "Your session ended. Please sign in again.",
+      "generic": "The QR could not be created or downloaded. Check your details and try again.",
+      "tooLarge": "Your video is larger than 50 MB. Trim or compress it and try again.",
+      "tooLong": "Your video is longer than {seconds} seconds. Use a shorter clip.",
+      "badFormat": "That file isn't an MP4, MOV or WebM video.",
+      "trialLimit": "We couldn't start the upload. Please try again.",
+      "trialExpired": "This trial video was already deleted. Upload it again.",
+      "captcha": "The code doesn't match. Type the one in the new image.",
+      "trialFailed": "We couldn't process this video. Try another file.",
+      "trialServer": "We couldn't process your video because of a problem on our side. Try again in a few minutes.",
+      "draft": "Your video could not be saved for the language change. It is still on this page. Please try again.",
+      "accountSize": "The available limit for this video is {max}.",
+      "accountStorage": "Your account does not have enough space. Free up space or upgrade your plan.",
+      "accountExpired": "Your plan has expired. Renew it to upload videos."
+    },
+    "navTag": "No sign-up",
+    "dropTitle": "Drag your video here",
+    "dropOr": "or tap to choose it",
+    "dropLimits": "MP4, MOV or WebM. Up to {seconds} seconds and {max}.",
+    "keepNote": "Your video stays on our server for only 24 hours and is then deleted automatically. Sign up to keep it.",
+    "trialCaptcha": "Type the code in the image",
+    "trialSubmit": "Upload and create my QR",
+    "trialUploading": "Uploading your video: {p}%",
+    "trialProcessing": "Preparing your video. It can take a few minutes; you can leave this page and come back.",
+    "trialReady": "Your QR is ready. Scan it with your phone.",
+    "trialExpires": "Deleted in {h} h {m} min unless you create your account.",
+    "trialKeep": "Create account and keep it",
+    "trialRemove": "Remove video",
+    "trialFallback": "Create your free account to upload this video and get its QR.",
+    "trialLocal": "This is how your customers will see it on their phone.",
+    "colorCustom": "Other color",
+    "fineTitle": "Limits and privacy",
+    "emptyCap": "Your QR will appear on the label.",
+    "yourCap": "Your QR",
+    "mineTitle": "This is your QR code",
+    "mineHint": "Print it and stick it on your product. Anyone who scans it sees your video.",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "again": "Make another video QR",
+    "againNote": "Without an account only one video is kept at a time: the new one replaces this one and this QR will stop working. With an account you can keep several.",
+    "againCancel": "Back to my QR",
+    "scanHere": "This is your QR",
+    "downloadPng": "Download PNG",
+    "styleTitle": "Label style",
+    "trialQuota": "",
+    "trialRemaining": "",
+    "phoneMine": "Your video",
+    "videoLabel": "Choose your video",
+    "memberTitle": "Upload to your account",
+    "memberNote": "The video is saved in your account, where you can customize and download its QR.",
+    "memberLimits": "MP4, MOV or WebM. Up to {max}."
+  },
   "meta": {
     "title": "QRveo · QR codes that open your video instantly",
-    "description": "Upload a video, download its QR code and put it on your product, book, machine or packaging. It plays on any phone, no app needed. Change the video anytime: the QR stays the same. 7 days free.",
+    "description": "Upload a video, download its QR code and put it on your product, book, machine or packaging. It plays on any phone, no app needed. Change the video anytime: the QR stays the same. 30 days free.",
     "ogTitle": "Print the QR once. Change the video anytime.",
-    "ogDescription": "QR codes that open your video on any phone, with no app and no ads. Try it free for 7 days."
+    "ogDescription": "QR codes that open your video on any phone, with no app and no ads. Try it free for 30 days."
   },
   "brand": {
     "poweredBy": "Powered by POLYV video technology"
@@ -40,7 +152,7 @@
       "kicker": "QR code video for businesses",
       "title": "Print the QR once. *Change the video* anytime.",
       "lead": "Upload a video, download its QR code and put it on your product, book, machine or packaging. Anyone who scans it watches it instantly on their phone, no app needed.",
-      "ctaPrimary": "Try it free for 7 days",
+      "ctaPrimary": "Try it free for 30 days",
       "ctaSecondary": "See examples",
       "note": "No card required. Your account is ready in 2 minutes.",
       "waLink": "Questions? Message us on WhatsApp",
@@ -55,7 +167,7 @@
         "line1": "Answer once.",
         "line2": "The video does it every day.",
         "cta1": "Try it",
-        "cta2": "7 days free",
+        "cta2": "30 days free",
         "note1": "No card needed.",
         "note2": "We help you on WhatsApp.",
         "sticker1": "SCAN TO SEE",
@@ -77,7 +189,7 @@
       },
       {
         "k": "CFDI invoice",
-        "v": "Prices in pesos, VAT (IVA) included"
+        "v": "Prices in pesos, 16% VAT (IVA) included"
       }
     ],
     "uses": {
@@ -93,7 +205,7 @@
       "items": [
         {
           "title": "Upload your video",
-          "text": "Drag it from your computer (up to 2 GB per file). In a few minutes it's ready to play on any phone.",
+          "text": "Drag it from your computer. Your available file limit is shown before uploading. In a few minutes it's ready to play on any phone.",
           "alt": "Video list in the QRveo dashboard"
         },
         {
@@ -149,7 +261,7 @@
     "pricing": {
       "label": "Pricing",
       "title": "Start free. Pay only if it works for you.",
-      "text": "7 days free, no card required. After that, annual plans in pesos with VAT (IVA) included. We issue invoices (CFDI).",
+      "text": "30 days free, no card required. After that, annual plans in pesos with 16% VAT (IVA) included. We issue invoices (CFDI).",
       "from": "Plans from",
       "fromPrice": "$1,399 MXN a year",
       "cta": "See plans and pricing"
@@ -169,7 +281,7 @@
   "final": {
     "title": "Make your first QR today.",
     "text": "Create your account, upload a video and scan it yourself. If you get stuck, we'll help you on WhatsApp.",
-    "cta": "Try it free for 7 days",
+    "cta": "Try it free for 30 days",
     "whatsapp": "Message us on WhatsApp"
   },
   "solutionsPage": {
@@ -419,7 +531,7 @@
       {
         "label": "Upload",
         "title": "Upload the video you already have.",
-        "text": "Drag in the video you already have, up to 2 GB per file. QRveo converts it to look great on any phone, in several quality levels, and creates a thumbnail.",
+        "text": "Drag in the video you already have. Your available file limit is shown before uploading. QRveo converts it to look great on any phone, in several quality levels, and creates a thumbnail.",
         "points": [
           "Upload several videos at once",
           "Quality from 360p to 1080p",
@@ -537,14 +649,14 @@
   },
   "pricing": {
     "title": "Clear pricing, in pesos.",
-    "lead": "Start free for 7 days, no card required. If it works for you, choose an annual plan. All prices include VAT (IVA).",
+    "lead": "Start free for 30 days, no card required. If it works for you, choose an annual plan. All prices include 16% VAT (IVA).",
     "seoTitle": "Pricing · QRveo plans in Mexican pesos, VAT included",
     "plans": [
       {
         "name": "Free trial",
         "for": "To try it with your first videos",
         "price": "$0",
-        "unit": "7 days",
+        "unit": "30 days",
         "monthly": "No card required",
         "cta": "Create free account"
       },
@@ -553,17 +665,29 @@
         "for": "For a business with several products, courses or departments",
         "price": "$1,399",
         "unit": "MXN a year",
-        "monthly": "VAT included · About $117 a month",
+        "monthly": "16% VAT included · About $117 a month",
         "cta": "Start with Standard",
-        "badge": "Most popular"
+        "badge": "Most popular",
+        "extrasTitle": "Everything in the free trial, plus:",
+        "extras": [
+          "Your brand on the video page",
+          "A full year, not just 30 days",
+          "12 times the storage of the trial"
+        ]
       },
       {
         "name": "Premium",
         "for": "For brands and schools with large audiences",
         "price": "$3,999",
         "unit": "MXN a year",
-        "monthly": "VAT included · About $333 a month",
-        "cta": "Start with Premium"
+        "monthly": "16% VAT included · About $333 a month",
+        "cta": "Start with Premium",
+        "extrasTitle": "Everything in Standard, plus:",
+        "extras": [
+          "More than 8 times the storage of Standard",
+          "About 7 times more plays per month",
+          "Built for thousands of boxes, books or students"
+        ]
       }
     ],
     "compareTitle": "Compare plans",
@@ -579,7 +703,7 @@
       {
         "k": "Views per month (approx.)",
         "v": [
-          "370 to 660",
+          "",
           "4,500 to 8,000",
           "31,000 to 56,000"
         ]
@@ -641,14 +765,6 @@
         ]
       },
       {
-        "k": "Quality",
-        "v": [
-          "HD",
-          "HD and UHD",
-          "HD and UHD"
-        ]
-      },
-      {
         "k": "WhatsApp support",
         "v": [
           "Yes",
@@ -665,7 +781,7 @@
       },
       {
         "k": "How do I pay?",
-        "v": "By credit or debit card. If you need to pay by bank transfer, message us."
+        "v": "By credit or debit card, or by SPEI bank transfer: fill in your details and we give you the transfer information."
       },
       {
         "k": "Do you issue invoices?",
@@ -673,7 +789,7 @@
       },
       {
         "k": "What if I run short?",
-        "v": "We email you at 80% and 95% of your plan so you can upgrade in time."
+        "v": "We email you at 80% and 95% of your plan so you can upgrade in time. Your videos don't stop when you reach 100%."
       }
     ],
     "enterprise": {
@@ -697,7 +813,16 @@
         }
       ],
       "note": "Estimate based on short HD videos. You can switch plans whenever you need."
-    }
+    },
+    "trial": {
+      "title": "30-day free trial",
+      "text": "No card. Upload your first videos, print a QR and scan it yourself. Anything you print keeps working after the trial ends."
+    },
+    "promo": {
+      "label": "Launch price",
+      "was": "Was"
+    },
+    "invoice": "CFDI invoice available"
   },
   "help": {
     "title": "Help",
@@ -772,11 +897,11 @@
           },
           {
             "q": "What happens if I run out of views for the month?",
-            "a": "We email you when you've used 80% and 95% of your plan, so you can upgrade in time."
+            "a": "We email you when you've used 80% and 95% of your plan, so you can upgrade in time. Your videos don't stop when you reach 100%."
           },
           {
             "q": "How do I pay?",
-            "a": "By credit or debit card. If you need to pay by bank transfer, message us."
+            "a": "By credit or debit card, or by SPEI bank transfer: fill in your details and we give you the transfer information."
           },
           {
             "q": "Do you issue invoices?",
@@ -842,7 +967,7 @@
       },
       {
         "k": "How we work",
-        "v": "Clear prices with VAT (IVA) included, CFDI invoices, no ads on your videos and WhatsApp support during your business hours."
+        "v": "Clear prices with 16% VAT (IVA) included, CFDI invoices, no ads on your videos and WhatsApp support during Mexico business hours."
       }
     ],
     "flowTitle": "How it works, start to finish",
@@ -975,12 +1100,22 @@
     "whatsapp": "WhatsApp"
   },
   "auth": {
+    "google": {
+      "separator": "or with email",
+      "loading": "Connecting…",
+      "button": "Continue with Google",
+      "unavailable": "Google is currently unavailable. You can use your email instead.",
+      "failed": "Couldn't sign in with Google. Try again or use your email.",
+      "link": "Link and sign in",
+      "linkRequired": "Enter your current password to link Google to your existing account.",
+      "consentRequired": "Accept the terms and privacy notice to create your account."
+    },
     "seoRegister": "Create account",
     "seoLogin": "Log in",
     "seoRecover": "Reset password",
     "sideTitle": "Print the QR once. *Change the video* anytime.",
     "sidePoints": [
-      "7 days free, no card required.",
+      "30 days free, no card required.",
       "Opens on any phone, no app needed.",
       "We help you in Spanish on WhatsApp."
     ],
@@ -1055,6 +1190,78 @@
       "codeBad": "The code is incorrect or has expired.",
       "tooMany": "Too many attempts. Wait a few minutes and try again.",
       "email": "Enter a valid email."
-    }
+    },
+    "sideMineVideo": "Your video is already in a QR. *Create your account* and it won't be deleted.",
+    "sideMineUrl": "Your QR is ready. *With an account*, it can open a video too.",
+    "claimDone": "Your trial video is now in your account."
+  },
+  "checkout": {
+    "seo": "Checkout",
+    "eyebrow": "Checkout",
+    "title": "Complete your purchase",
+    "lead": "Your plan is activated right away. Your videos and QR codes stay the same.",
+    "account": "The plan will be activated on the account",
+    "notYou": "Not your account?",
+    "logout": "Log out",
+    "planTitle": "Plan",
+    "period": "Billed yearly · 365 days",
+    "billingTitle": "Receipt details",
+    "name": "Name or company name",
+    "namePh": "La Espiga Bakery",
+    "email": "Email for receipts",
+    "rfc": "RFC (optional)",
+    "rfcHint": "Only if you need a tax invoice (CFDI).",
+    "rfcBad": "The RFC has 12 or 13 characters, no spaces.",
+    "phone": "Phone (optional)",
+    "methodTitle": "Payment method",
+    "card": "Credit or debit card",
+    "cardNote": "Visa, Mastercard or American Express",
+    "spei": "SPEI bank transfer",
+    "speiNote": "We give you a CLABE to pay from your bank",
+    "demo": "Test version: nothing is charged. When you pay, the plan is activated right away.",
+    "pay": "Pay {price}",
+    "busy": "Processing…",
+    "summary": "Your order",
+    "subtotal": "Subtotal",
+    "iva": "VAT (16%)",
+    "total": "Total",
+    "until": "Valid until {date}",
+    "extend": "Added to your current plan",
+    "keep": "Your videos and QR codes don't change",
+    "loginTitle": "Log in to continue",
+    "loginText": "The plan is activated on your QRveo account. If you don't have one yet, create it for free: it takes a minute.",
+    "loginBtn": "Log in",
+    "registerBtn": "Create a free account",
+    "doneTitle": "Done! Your {plan} plan is active",
+    "doneText": "You can upload more videos now. Valid until {date}.",
+    "order": "Order number",
+    "invoice": "Need a tax invoice? Message us on WhatsApp with your order number.",
+    "goPanel": "Go to my dashboard",
+    "child": "Sub-accounts can't buy plans. Ask the account administrator to do it.",
+    "off": "Online payment isn't available yet. Message us on WhatsApp and we'll help you.",
+    "session": "Your session has ended. Log in again to continue.",
+    "cardNumber": "Card number",
+    "cardName": "Name on card",
+    "cardNamePh": "As it appears on the card",
+    "cardExp": "Expiry date",
+    "cardCvc": "Security code",
+    "cardCvcHint": "3 digits on the back (4 on the front for American Express)",
+    "cardBad": "Check the card number.",
+    "cardBrandBad": "We accept Visa, Mastercard and American Express.",
+    "expBad": "Check the date: month and year, e.g. 08/29.",
+    "expPast": "This card has expired.",
+    "cvcBad": "Enter the full security code.",
+    "speiIntro": "Transfer from your bank's app or website with these details. Put the reference in the payment concept so we can identify your payment.",
+    "speiBank": "Bank",
+    "speiClabe": "CLABE",
+    "speiHolder": "Beneficiary",
+    "speiAmount": "Exact amount",
+    "speiRef": "Concept / reference",
+    "speiPay": "I've made the transfer",
+    "speiWhen": "We activate your plan as soon as we see the deposit: with SPEI it usually arrives in minutes.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "paidWith": "Paid with {brand} ending in {last4}",
+    "paidSpei": "Paid by SPEI transfer · reference {ref}"
   }
 }

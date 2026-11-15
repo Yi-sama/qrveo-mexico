@@ -1154,28 +1154,66 @@ h3 {
 }
 
 /* —— 价格页 —— */
+/* 试用横条：免费试用不和付费套餐并排比，做成上方一条，浅一些 */
+.trial {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px 40px;
+  padding: 24px 32px;
+  border: 1.5px dashed rgba(20, 18, 16, 0.22);
+  border-radius: var(--r);
+}
+.trial-t {
+  font: 800 22px/1.2 var(--f-display);
+}
+.trial-txt p {
+  margin-top: 6px;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.trial-keys {
+  display: flex;
+  gap: 28px;
+  margin: 0;
+}
+.trial-keys dt {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.trial-keys dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* 两张付费卡：共用同一组行（subgrid），价格、按钮、参数、亮点在两张卡里对齐 */
 .plans {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  margin-top: 40px;
 }
 .plan {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 36px 32px 32px;
+  display: grid;
+  grid-row: span 9;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-content: start;
+  padding: 40px 40px 36px;
   border-radius: var(--r);
   background: var(--white);
-  box-shadow: 0 0 0 1px var(--line);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow);
 }
 .plan-featured {
-  box-shadow: 0 0 0 2px var(--ink), var(--shadow);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--shadow);
 }
 .plan-badge {
   position: absolute;
   top: -14px;
-  left: 32px;
+  left: 40px;
   padding: 4px 12px;
   border-radius: 999px;
   background: var(--orange);
@@ -1184,46 +1222,111 @@ h3 {
   font-weight: 700;
 }
 .plan-name {
-  font: 800 26px/1.2 var(--f-display);
+  font: 800 28px/1.2 var(--f-display);
 }
 .plan-for {
   margin-top: 8px;
-  min-height: 3em;
   color: var(--ink-3);
   font-size: 15px;
 }
-.plan-price {
+.plan-featured .plan-for,
+.plan-featured .plan-monthly {
+  color: rgba(247, 244, 238, 0.68);
+}
+.plan-promo {
   margin-top: 24px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.plan-featured .plan-promo {
+  color: rgba(247, 244, 238, 0.85);
+}
+.plan-off {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--orange);
+  color: var(--ink);
+  font-weight: 800;
+}
+.plan-price {
+  margin-top: 10px;
+}
+.plan-price s {
+  margin-right: 4px;
+  color: var(--ink-3);
+  font: 600 22px/1 var(--f-display);
+  text-decoration-thickness: 2px;
+}
+.plan-featured .plan-price s {
+  color: rgba(247, 244, 238, 0.5);
 }
 .plan-price b {
-  font: 800 44px/1 var(--f-display);
+  font: 800 48px/1 var(--f-display);
   letter-spacing: -0.02em;
 }
-.plan-price span {
+.plan-price > span {
   color: var(--ink-2);
   font-weight: 600;
+  white-space: nowrap;
+}
+.plan-featured .plan-price > span {
+  color: rgba(247, 244, 238, 0.8);
 }
 .plan-monthly {
   margin: 8px 0 28px;
   font-size: 14px;
   color: var(--ink-3);
 }
-.plan-keys {
-  list-style: none;
+.plan-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
   margin: 28px 0 0;
-  padding: 0;
-  border-top: 1px solid var(--line);
+  padding: 20px 0;
+  border-block: 1px solid var(--line);
 }
-.plan-keys li {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
+.plan-featured .plan-stats {
+  border-color: rgba(247, 244, 238, 0.16);
+}
+.plan-stats dt {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.plan-featured .plan-stats dt {
+  color: rgba(247, 244, 238, 0.6);
+}
+.plan-stats dd {
+  margin: 4px 0 0;
+  font: 800 22px/1.15 var(--f-display);
+}
+.plan-more {
+  margin: 22px 0 12px;
+  font-weight: 700;
   font-size: 15px;
 }
-.plan-keys span {
-  color: var(--ink-3);
+.plan-extras {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-content: start;
+}
+.plan-extras li {
+  display: flex;
+  gap: 10px;
+  font-size: 15px;
+}
+.plan-extras .ck {
+  flex: none;
+  margin-top: 2px;
+  color: var(--orange-ink);
+}
+.plan-featured .plan-extras .ck {
+  color: var(--orange);
 }
 .table-wrap {
   position: relative;
@@ -1260,6 +1363,63 @@ h3 {
 .compare tfoot td {
   border-bottom: 0;
   padding-bottom: 24px;
+}
+/* 手机：不横着滑。每行先写功能名（占满一行），下面三格是三个套餐的值；
+   套餐名表头吸顶，滚动时也知道哪列是哪个套餐。底部按钮和上面的套餐卡重复，去掉 */
+@media (max-width: 640px) {
+  .table-wrap {
+    overflow: visible;
+  }
+  .compare {
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .compare,
+  .compare thead,
+  .compare tbody {
+    display: block;
+  }
+  .compare tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-bottom: 1px solid var(--line);
+  }
+  .compare th,
+  .compare td {
+    padding: 4px 8px 14px 16px;
+    border-bottom: 0;
+    overflow-wrap: anywhere;
+  }
+  .compare thead {
+    position: sticky;
+    top: var(--topbar);
+    z-index: 2;
+    background: var(--white);
+    border-radius: var(--r) var(--r) 0 0;
+  }
+  .compare thead th {
+    padding: 16px 8px 14px 16px;
+    font-size: 15px;
+    overflow-wrap: normal;
+  }
+  .compare thead th:first-child {
+    display: none;
+  }
+  .compare tbody th {
+    grid-column: 1 / -1;
+    width: auto;
+    padding-top: 14px;
+    padding-bottom: 6px;
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+  .compare tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .compare tfoot {
+    display: none;
+  }
 }
 /* —— 联系 —— */
 .contact {
@@ -1419,6 +1579,12 @@ h3 {
   display: flex;
   gap: 20px;
 }
+/* 手机上点得到：链接上下各加一点点击区域，视觉不变 */
+.foot-legal a {
+  display: inline-block;
+  padding: 4px 0;
+  margin: -4px 0;
+}
 .powered {
   margin-left: auto;
 }
@@ -1444,8 +1610,7 @@ h3 {
   width: 28px;
   height: 28px;
 }
-.wa-float.is-on,
-body:not(.page-home) .wa-float {
+.wa-float.is-on {
   opacity: 1;
   pointer-events: auto;
   translate: 0 0;
@@ -1560,6 +1725,22 @@ body:not(.page-home) .wa-float {
   }
   .plans {
     max-width: 520px;
+    row-gap: 40px;
+  }
+  .trial {
+    max-width: 520px;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 22px 24px;
+  }
+  .trial .btn {
+    justify-self: start;
+  }
+  .plan {
+    padding: 36px 24px 28px;
+  }
+  .plan-badge {
+    left: 24px;
   }
   .proof {
     grid-template-columns: repeat(2, minmax(0, 1fr));

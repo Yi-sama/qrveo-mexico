@@ -18,8 +18,8 @@ export const langDir = (code) => (code === DEFAULT_LANG ? "" : `${code}/`);
 
 // 不翻译的字段：图片、视频、链接、编号等（与编辑入口隐藏的字段相同），以及短片纸箱上的型号和网址、
 // 只有西语的备用示例页、联系方式和品牌名
-export const FIXED = /(^|\.)(lang|img|video|poster|href|console|id|action|plan|slug|solution|exampleId|menu|fallback|shot|pick|phone|clip|vid|max)(\[\d+\])?$/;
-const FIXED_PREFIX = /^(demo|example|brand\.name|home\.hero\.endCard\.(boxLabel|site)|contact\.(company|city|address|rfc|whatsapp|whatsappLabel|email))(\.|\[|$)/;
+export const FIXED = /(^|\.)(lang|img|video|poster|href|console|id|action|plan|slug|solution|exampleId|menu|fallback|shot|pick|phone|clip|vid|max|listPrice)(\[\d+\])?$/;
+const FIXED_PREFIX = /^(demo|example|brand\.name|home\.hero\.endCard\.(boxLabel|site)|contact\.(company|city|address|rfc|whatsapp|whatsappLabel|email|bank|clabe))(\.|\[|$)/;
 export const translatable = (p) => !FIXED.test(p) && !FIXED_PREFIX.test(p);
 
 // 只保留需要翻译的文字（给翻译用的底稿，也是检查缺漏的依据）
